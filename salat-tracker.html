@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -212,25 +212,27 @@
   <!-- MAIN ARC CANVAS -->
   <div class="arc-wrap fade-in">
     <div class="view-toggle-bar">
-      <button class="view-toggle-btn active" id="btn-view-2d">📊 2D Flat View</button>
-      <button class="view-toggle-btn" id="btn-view-3d">🪐 3D Dome View</button>
+      <span style="font-size:0.8rem;color:var(--text2);font-family:'Outfit',sans-serif;font-weight:600;">📊 Solar Path Tracker — 2D Astronomical View</span>
     </div>
     <div style="position:relative">
-      <canvas id="tracker-canvas" height="560"></canvas>
-      <div id="drag-tooltip" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:0.75rem;color:var(--text3);background:rgba(6,13,24,0.85);padding:6px 12px;border-radius:20px;border:1px solid var(--border);pointer-events:none;opacity:0;transition:opacity 0.3s">
-        🖱️ Drag to rotate 3D view
-      </div>
+      <canvas id="tracker-canvas" height="620"></canvas>
     </div>
     <!-- Legend -->
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#1a1060"></div> Astronomical Twilight (18°)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#0d3070"></div> Nautical Twilight (12°)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1a1060"></div> Astro Twilight (18°)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#0d3070"></div> Naut Twilight (12°)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#0d5090"></div> Civil Twilight (6°)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,200,80,0.5)"></div> Daytime</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(60,200,80,0.8)"></div> Ishraq</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(80,190,150,0.8)"></div> Chast/Duha</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,200,30,0.8)"></div> Dhuhr Window</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,120,20,0.8)"></div> Asr Window</div>
       <div class="legend-item"><div class="legend-dot" style="background:rgba(180,30,30,0.7)"></div> Makruh</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#FFE84B;border-radius:50%"></div> Sun / Moon</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFE84B;border-radius:50%"></div> Sun (Live)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(220,210,170,0.9);border-radius:50%"></div> Moon (Live)</div>
     </div>
   </div>
+
+
 
   <!-- DEGREE EXPLANATION -->
   <div class="card angle-explainer fade-in" style="padding:1.2rem;margin-bottom:1.2rem">
@@ -473,7 +475,38 @@ function solarPosition(date){
 }
 
 // ─────────────────────────────────────────────────────────────
-// UTILS
+// MOON POSITION (simplified Meeus)
+// ─────────────────────────────────────────────────────────────
+function moonPosition(date){
+  const JD=date.getTime()/86400000+2440587.5;
+  const n=JD-2451545.0;
+  const Lm=((218.316+13.176396*n)%360+360)%360;
+  const Mm=((134.963+13.064993*n)%360+360)%360*DEG;
+  const Fm=((93.272 +13.229350*n)%360+360)%360*DEG;
+  const lambda=(Lm+6.289*Math.sin(Mm))*DEG;
+  const beta  =5.128*Math.sin(Fm)*DEG;
+  const eps=(23.439-0.0000004*n)*DEG;
+  const dec=Math.asin(Math.sin(beta)*Math.cos(eps)+Math.cos(beta)*Math.sin(eps)*Math.sin(lambda));
+  const RA_deg=Math.atan2(Math.cos(eps)*Math.sin(lambda)-Math.sin(eps)*Math.tan(beta),Math.cos(lambda))*180/Math.PI;
+  const RA24=((RA_deg/15)%24+24)%24;
+  const UT=date.getUTCHours()+date.getUTCMinutes()/60+date.getUTCSeconds()/3600;
+  const GMST=(6.697375+0.0657098242*(n+0.5)+UT*1.002738)%24;
+  const LMST=((GMST+LON/15)%24+24)%24;
+  const LHA=((LMST-RA24+24)%24)*15*DEG;
+  const latR=LAT*DEG;
+  const sinEl=Math.sin(latR)*Math.sin(dec)+Math.cos(latR)*Math.cos(dec)*Math.cos(LHA);
+  const el=Math.asin(Math.max(-1,Math.min(1,sinEl)))/DEG;
+  const cosEl=Math.sqrt(Math.max(0,1-sinEl*sinEl));
+  let az=180;
+  if(cosEl>0.0001){
+    const cosAz=(Math.sin(dec)-Math.sin(latR)*sinEl)/(Math.cos(latR)*cosEl);
+    az=Math.acos(Math.max(-1,Math.min(1,cosAz)))/DEG;
+    if(Math.sin(LHA)>0) az=360-az;
+  }
+  return{elevation:el,azimuth:az};
+}
+
+
 // ─────────────────────────────────────────────────────────────
 function t2m(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function m2f(m){const h=Math.floor(m/60)%24,mn=m%60,ap=h>=12?'PM':'AM',h12=h%12||12;return`${String(h12).padStart(2,'0')}:${String(mn).padStart(2,'0')} ${ap}`;}
@@ -636,720 +669,419 @@ function startCountdown(){
   }
   tick(); cdInt=setInterval(tick,1000);
 }
-
 // ─────────────────────────────────────────────────────────────
-// INTERACTIVITY & TOGGLE SETUP
+// SETUP (no 3D)
 // ─────────────────────────────────────────────────────────────
 function setupToggleAndInteractivity() {
-  const btn2d = document.getElementById('btn-view-2d');
-  const btn3d = document.getElementById('btn-view-3d');
-  const canvas = document.getElementById('tracker-canvas');
-  const tooltip = document.getElementById('drag-tooltip');
-
-  btn2d.addEventListener('click', () => {
-    viewMode = '2d';
-    btn2d.classList.add('active');
-    btn3d.classList.remove('active');
-    tooltip.style.opacity = '0';
-    drawTracker();
-  });
-
-  btn3d.addEventListener('click', () => {
-    viewMode = '3d';
-    btn3d.classList.add('active');
-    btn2d.classList.remove('active');
-    tooltip.style.opacity = '1';
-    drawTracker();
-  });
-
-  // Drag listeners
-  const startDrag = (x, y) => {
-    if (viewMode !== '3d') return;
-    isDragging = true;
-    startX = x;
-    startY = y;
-  };
-
-  const moveDrag = (x, y) => {
-    if (!isDragging) return;
-    const dx = x - startX;
-    const dy = y - startY;
-    
-    yaw += dx * 0.007;
-    pitch = Math.max(5 * DEG, Math.min(85 * DEG, pitch - dy * 0.007));
-    
-    startX = x;
-    startY = y;
-    drawTracker();
-  };
-
-  const stopDrag = () => {
-    isDragging = false;
-  };
-
-  canvas.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-  canvas.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-  window.addEventListener('mouseup', stopDrag);
-
-  canvas.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
-  });
-  canvas.addEventListener('touchmove', e => {
-    if (e.touches.length === 1) moveDrag(e.touches[0].clientX, e.touches[0].clientY);
-  });
-  window.addEventListener('touchend', stopDrag);
+  // Only 2D view — no drag or 3D toggle needed
 }
 
 // ─────────────────────────────────────────────────────────────
-// DRAW ROUTER
+// DRAW ROUTER (always 2D)
 // ─────────────────────────────────────────────────────────────
 function drawTracker() {
   const canvas = document.getElementById('tracker-canvas');
   if (!canvas || !PT) return;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const W = canvas.offsetWidth || 1000, H = 560;
+  const W = canvas.offsetWidth || 1000, H = 620;
   canvas.width = W * dpr; canvas.height = H * dpr;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-
-  ctx.fillStyle = 'rgba(6, 13, 24, 1)';
+  ctx.fillStyle = 'rgba(6,13,24,1)';
   ctx.fillRect(0, 0, W, H);
-
-  if (viewMode === '2d') {
-    draw2DFlatPath(ctx, W, H);
-  } else {
-    draw3DDome(ctx, W, H);
-  }
+  draw2DFlatPath(ctx, W, H);
 }
 
 // ─────────────────────────────────────────────────────────────
-// 2D RENDERER (Enhanced 24h Flat Path)
+// 2D PROFESSIONAL SOLAR PATH TRACKER
 // ─────────────────────────────────────────────────────────────
-function get2DAngle(mins) {
-  const srM = t2m(PT.Sunrise);
-  const ssM = t2m(PT.Sunset || PT.Maghrib);
-  if (mins >= srM && mins <= ssM) {
-    const ratio = (mins - srM) / (ssM - srM);
-    return 180 - ratio * 180;
-  } else {
-    let ratio;
-    if (mins >= ssM) {
-      ratio = (mins - ssM) / (1440 - ssM + srM);
-    } else {
-      ratio = (1440 - ssM + mins) / (1440 - ssM + srM);
-    }
-    return 360 - ratio * 180;
-  }
-}
-
 function draw2DFlatPath(ctx, W, H) {
-  // ── LAYOUT: large protractor fills the canvas ──
-  const R = Math.min(W * 0.42, H * 0.82);
+  // Layout: big semicircle, horizon near bottom, arc spans full width
+  const R = Math.min(W * 0.415, (H - 95) * 0.87);
   const cx = W / 2;
-  const cy = H - 56; // horizon sits near bottom, sky arcs up
+  const cy = H - 72;  // horizon line Y position
 
-  const srM = t2m(PT.Sunrise), ssM = t2m(PT.Sunset || PT.Maghrib);
-  const fajrM = t2m(PT.Fajr), ishaM = t2m(PT.Isha);
-  const nowM = nowMins();
+  // Prayer times
+  const srM  = t2m(PT.Sunrise);
+  const ssM  = t2m(PT.Sunset || PT.Maghrib);
+  const fajrM  = t2m(PT.Fajr);
+  const ishaM  = t2m(PT.Isha);
+  const dhuhrM = t2m(PT.Dhuhr);
+  const asrM   = t2m(PT.Asr);
+  const ishraqS = srM + 20,  ishraqE = srM + 45;
+  const chastS  = srM + 45,  chastE  = dhuhrM - 10;
+  const makr1E  = srM + 20;
+  const makr2S  = dhuhrM - 10, makr2E = dhuhrM;
+  const makr3S  = ssM - 20;
+
+  const nowM     = nowMins();
   const isDayNow = nowM >= srM && nowM <= ssM;
-  const sol = solarPosition(new Date());
+  const sol      = solarPosition(new Date());
+  const moon     = moonPosition(new Date());
+  const dayDur   = ssM - srM;
 
-  // ── BACKGROUND ──
-  const bgGrad = ctx.createRadialGradient(cx, cy, R * 0.1, cx, cy, R * 1.5);
-  bgGrad.addColorStop(0, isDayNow ? 'rgba(10,28,60,0.85)' : 'rgba(4,6,18,0.95)');
-  bgGrad.addColorStop(1, 'rgba(6,13,24,0)');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
+  // ── MAPPING FUNCTIONS ──
+  // Display degree: East(Sunrise)=0°, Zenith=90°, West(Sunset)=180°
+  // Canvas angle:  East=PI(left),   Zenith=PI/2(top), West=0(right)
+  // canvasRad = PI - (displayDeg * DEG) = PI * (1 - displayDeg/180)
+  // For time t (daylight): displayDeg = (t-srM)/dayDur*180
+  //                        canvasRad  = PI * (ssM-t)/dayDur
+  function tCanRad(mins) { return Math.PI * (ssM - mins) / dayDur; }
 
-  // ── HELPER: map time-in-mins to arc angle (0° = East horizon, 90° = Zenith, 180° = West horizon) ──
-  function timeToArcAngle(mins) {
-    if (mins >= srM && mins <= ssM) {
-      return 180 - ((mins - srM) / (ssM - srM)) * 180; // 180° at sunrise, 0° at zenith(90°), 0° at sunset
-    } else {
-      // below horizon – mirror onto lower semicircle
-      let ratio;
-      if (mins >= ssM) ratio = (mins - ssM) / (1440 - ssM + srM);
-      else ratio = (1440 - ssM + mins) / (1440 - ssM + srM);
-      return 360 - ratio * 180;
-    }
+  function radPt(rad, r) { return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) }; }
+
+  // Azimuth to canvas angle: Az90(E)=PI, Az180(S)=PI/2, Az270(W)=0
+  function azCanRad(az) { return (270 - az) * DEG; }
+
+  // ── BACKGROUND GRADIENT ──
+  const bgG = ctx.createRadialGradient(cx, cy - R * 0.4, 10, cx, cy - R * 0.4, R * 1.6);
+  bgG.addColorStop(0,   isDayNow ? 'rgba(8,20,55,0.9)'  : 'rgba(2,4,16,0.95)');
+  bgG.addColorStop(0.6, isDayNow ? 'rgba(6,14,35,0.7)'  : 'rgba(4,6,20,0.7)');
+  bgG.addColorStop(1,   'rgba(6,13,24,0)');
+  ctx.fillStyle = bgG; ctx.fillRect(0, 0, W, H);
+
+  // ── SECTOR FILL (pie from observer center) ──
+  function fillSector(rad1, rad2, col) {
+    // rad1 > rad2 (left side > right side in canvas angle)
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, rad2, rad1, false);
+    ctx.closePath(); ctx.fillStyle = col; ctx.fill();
   }
 
-  // ── SECTOR FILL (pie slices of twilight/makruh) ──
-  function fillSector(startMins, endMins, color) {
-    const a1 = timeToArcAngle(startMins) * DEG;
-    const a2 = timeToArcAngle(endMins) * DEG;
-    // Use the larger angle as start for upper arc CCW
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, R, -a2, -a1, false);
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-  }
+  // ── TWILIGHT SECTORS (approximate widths near horizon edges) ──
+  // Width proportional to twilight duration relative to day length
+  const astroW = (70 / dayDur) * Math.PI;
+  const nautW  = (50 / dayDur) * Math.PI;
+  const civilW = (30 / dayDur) * Math.PI;
 
-  // Twilight sectors (morning)
-  fillSector(fajrM, fajrM + 25, 'rgba(30,18,100,0.50)');
-  fillSector(fajrM + 25, fajrM + 50, 'rgba(16,52,120,0.50)');
-  fillSector(fajrM + 50, srM, 'rgba(16,90,160,0.50)');
-  // Daytime
-  fillSector(srM, ssM, 'rgba(20,50,120,0.20)');
-  // Twilight sectors (evening)
-  fillSector(ssM, ssM + 26, 'rgba(16,90,160,0.40)');
-  fillSector(ssM + 26, ssM + 56, 'rgba(16,52,120,0.40)');
-  fillSector(ssM + 56, ishaM, 'rgba(30,18,100,0.40)');
-  // Makruh sectors (warning red)
-  fillSector(srM, srM + 20, 'rgba(220,50,40,0.28)');
-  fillSector(t2m(PT.Dhuhr) - 10, t2m(PT.Dhuhr), 'rgba(220,50,40,0.28)');
-  fillSector(ssM - 20, ssM, 'rgba(220,50,40,0.28)');
+  // Morning side (near East/left = canvas angle PI)
+  fillSector(Math.PI,              Math.PI - astroW, 'rgba(14,7,45,0.65)');   // Astro
+  fillSector(Math.PI - astroW,     Math.PI - nautW,  'rgba(10,28,80,0.60)');  // Naut
+  fillSector(Math.PI - nautW,      Math.PI - civilW, 'rgba(10,60,120,0.55)'); // Civil
+  // Evening side (near West/right = canvas angle 0)
+  fillSector(astroW, 0,            'rgba(14,7,45,0.55)');   // Astro
+  fillSector(nautW,  astroW,       'rgba(10,28,80,0.50)');  // Naut
+  fillSector(civilW, nautW,        'rgba(10,60,120,0.48)'); // Civil
 
-  // ── ELEVATION REFERENCE RINGS ──
-  function drawElevArc(elev, col, dash) {
+  // ── MAKRUH SECTORS ──
+  if (makr1E > srM) fillSector(Math.PI, tCanRad(makr1E), 'rgba(210,30,30,0.28)');
+  fillSector(tCanRad(makr2S), tCanRad(makr2E), 'rgba(210,30,30,0.28)');
+  fillSector(tCanRad(makr3S), 0, 'rgba(210,30,30,0.28)');
+
+  // ── ELEVATION CONCENTRIC REFERENCE ARCS ──
+  [[15, 'rgba(201,168,76,0.11)'], [30, 'rgba(201,168,76,0.17)'],
+   [45, 'rgba(201,168,76,0.20)'], [60, 'rgba(120,180,220,0.18)'],
+   [75, 'rgba(120,180,220,0.14)']].forEach(([elev, col]) => {
     const rr = R * (elev / 90);
-    ctx.beginPath();
-    ctx.arc(cx, cy, rr, Math.PI, 0, false);
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 0.9;
-    if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    // Elev label at right end of arc
-    const lx = cx + rr + 5;
-    const ly = cy - 2;
-    ctx.font = '7.5px JetBrains Mono';
-    ctx.fillStyle = col;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${elev}°`, lx, ly);
+    ctx.beginPath(); ctx.arc(cx, cy, rr, Math.PI, 0, false);
+    ctx.strokeStyle = col; ctx.lineWidth = 0.85;
+    ctx.setLineDash([3, 6]); ctx.stroke(); ctx.setLineDash([]);
+    // Label at left end of each ring
+    ctx.font = '7.5px JetBrains Mono'; ctx.fillStyle = col;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(`${elev}°`, cx - rr - 3, cy - 2);
+  });
+
+  // ── ZENITH AXIS ──
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - R - 20);
+  ctx.strokeStyle = 'rgba(201,168,76,0.20)'; ctx.lineWidth = 1;
+  ctx.setLineDash([3, 5]); ctx.stroke(); ctx.setLineDash([]);
+  ctx.font = 'bold 8px JetBrains Mono'; ctx.fillStyle = 'rgba(201,168,76,0.55)';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('ZENITH 90°', cx, cy - R - 22);
+
+  // ── SALAT TIME RANGE BANDS (colored thick arcs just outside main arc) ──
+  function drawBand(t1, t2, col, bw, rOffset) {
+    const a1 = tCanRad(Math.max(t1, srM));
+    const a2 = tCanRad(Math.min(t2, ssM));
+    if (a1 <= a2 + 0.001) return; // zero-width or invalid
+    const rr = R + (rOffset || 20);
+    ctx.beginPath(); ctx.arc(cx, cy, rr, a2, a1, false);
+    ctx.strokeStyle = col; ctx.lineWidth = bw || 9;
+    ctx.lineCap = 'round'; ctx.stroke(); ctx.lineCap = 'butt';
   }
-  drawElevArc(15, 'rgba(201,168,76,0.12)', [3, 6]);
-  drawElevArc(30, 'rgba(201,168,76,0.18)', [4, 6]);
-  drawElevArc(45, 'rgba(201,168,76,0.22)', [5, 5]);
-  drawElevArc(60, 'rgba(100,180,220,0.20)', [5, 5]);
-  drawElevArc(75, 'rgba(100,180,220,0.16)', [4, 6]);
 
-  // ── ZENITH VERTICAL AXIS ──
-  ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.lineTo(cx, cy - R - 18);
-  ctx.strokeStyle = 'rgba(201,168,76,0.22)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([3, 5]);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.font = 'bold 8px JetBrains Mono';
-  ctx.fillStyle = 'rgba(201,168,76,0.55)';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'bottom';
-  ctx.fillText('ZENITH 90°', cx, cy - R - 20);
+  const BAND_R = 18; // offset from main R
+  drawBand(srM,     makr1E,  'rgba(210,30,30,0.9)',    9, BAND_R);  // Makruh sunrise
+  drawBand(ishraqS, ishraqE, 'rgba(55,200,75,0.9)',    9, BAND_R);  // Ishraq
+  drawBand(chastS,  chastE,  'rgba(75,185,145,0.80)',  7, BAND_R);  // Chast/Duha
+  drawBand(makr2S,  makr2E,  'rgba(210,30,30,0.9)',    9, BAND_R);  // Makruh zawal
+  drawBand(dhuhrM,  asrM,    'rgba(255,200,25,0.82)',  9, BAND_R);  // Dhuhr window
+  drawBand(asrM,    makr3S,  'rgba(255,115,18,0.82)',  9, BAND_R);  // Asr window
+  drawBand(makr3S,  ssM,     'rgba(210,30,30,0.9)',    9, BAND_R);  // Makruh sunset
 
-  // ── MAIN ARC (Solid upper, dashed lower) ──
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, Math.PI, 0, false);
-  const arcGrad = ctx.createLinearGradient(cx - R, cy, cx + R, cy);
-  arcGrad.addColorStop(0, 'rgba(100,120,240,0.5)');
-  arcGrad.addColorStop(0.5, 'rgba(255,200,60,0.9)');
-  arcGrad.addColorStop(1, 'rgba(255,90,50,0.6)');
-  ctx.strokeStyle = arcGrad;
-  ctx.lineWidth = 3.5;
-  ctx.stroke();
+  // Band labels (at midpoint of each band)
+  function bandLabel(t1, t2, txt, col) {
+    const mid = (Math.max(t1, srM) + Math.min(t2, ssM)) / 2;
+    if (mid < srM || mid > ssM) return;
+    const pt = radPt(tCanRad(mid), R + BAND_R + 14);
+    ctx.font = 'bold 8px Inter'; ctx.fillStyle = col;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(txt, pt.x, pt.y);
+  }
+  bandLabel(ishraqS, ishraqE, 'Ishraq', 'rgba(55,200,75,0.85)');
+  bandLabel(chastS,  chastE,  'Chast',  'rgba(75,185,145,0.80)');
+  bandLabel(dhuhrM + 30, asrM, 'Dhuhr', 'rgba(255,200,25,0.85)');
+  bandLabel(asrM + 30, makr3S, 'Asr',   'rgba(255,115,18,0.85)');
 
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, 0, Math.PI, false);
-  ctx.strokeStyle = 'rgba(100,100,180,0.14)';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([5, 7]);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // ── MAIN SOLAR ARC ──
+  ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI, 0, false);
+  const arcG = ctx.createLinearGradient(cx - R, cy, cx + R, cy);
+  arcG.addColorStop(0,    'rgba(80,100,230,0.8)');
+  arcG.addColorStop(0.18, 'rgba(255,220,70,0.9)');
+  arcG.addColorStop(0.5,  'rgba(255,230,60,1.0)');
+  arcG.addColorStop(0.82, 'rgba(255,180,40,0.9)');
+  arcG.addColorStop(1,    'rgba(255,70,35,0.8)');
+  ctx.strokeStyle = arcG; ctx.lineWidth = 2.8; ctx.stroke();
 
-  // ── PRECISION DEGREE TICKS (outer protractor ring) ──
-  ctx.textBaseline = 'middle';
-  for (let deg = 0; deg <= 180; deg += 5) {
-    const theta = deg * DEG;
-    const isMajor30 = deg % 30 === 0;
-    const isMajor15 = deg % 15 === 0;
-    const tickOuter = isMajor30 ? 16 : (isMajor15 ? 11 : 6);
-    const tickInner = 3;
-    const x1 = cx + R * Math.cos(theta);
-    const y1 = cy - R * Math.sin(theta);
-    const x2 = cx + (R + tickOuter) * Math.cos(theta);
-    const y2 = cy - (R + tickOuter) * Math.sin(theta);
-    const xi = cx + (R - tickInner) * Math.cos(theta);
-    const yi = cy - (R - tickInner) * Math.sin(theta);
+  // Lower dashed arc (night path)
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI, false);
+  ctx.strokeStyle = 'rgba(70,70,160,0.12)'; ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 8]); ctx.stroke(); ctx.setLineDash([]);
 
-    ctx.beginPath(); ctx.moveTo(xi, yi); ctx.lineTo(x2, y2);
-    ctx.strokeStyle = isMajor30 ? 'rgba(201,168,76,0.9)' : (isMajor15 ? 'rgba(201,168,76,0.55)' : 'rgba(201,168,76,0.28)');
-    ctx.lineWidth = isMajor30 ? 2 : (isMajor15 ? 1.3 : 0.8);
+  // ── DEGREE TICKS (East=0° left, West=180° right, increasing left→right) ──
+  for (let dispDeg = 0; dispDeg <= 180; dispDeg += 5) {
+    // display 0°=East=canvas PI, display 180°=West=canvas 0
+    const cRad = Math.PI - dispDeg * DEG;
+    const isMaj30 = dispDeg % 30 === 0;
+    const isMaj15 = dispDeg % 15 === 0;
+    const tLen = isMaj30 ? 17 : (isMaj15 ? 11 : 6);
+    const {x: xi, y: yi} = radPt(cRad, R - 3);
+    const {x: xo, y: yo} = radPt(cRad, R + tLen);
+    ctx.beginPath(); ctx.moveTo(xi, yi); ctx.lineTo(xo, yo);
+    ctx.strokeStyle = isMaj30 ? 'rgba(201,168,76,0.92)' : (isMaj15 ? 'rgba(201,168,76,0.60)' : 'rgba(201,168,76,0.28)');
+    ctx.lineWidth = isMaj30 ? 2.2 : (isMaj15 ? 1.3 : 0.8);
     ctx.stroke();
 
-    if (isMajor15) {
-      const labelR = R + 28;
-      const lx = cx + labelR * Math.cos(theta);
-      const ly = cy - labelR * Math.sin(theta);
-      ctx.font = isMajor30 ? 'bold 9.5px JetBrains Mono' : '8px JetBrains Mono';
-      ctx.fillStyle = deg === 90 ? '#FFE84B' : (isMajor30 ? 'rgba(201,168,76,0.85)' : 'rgba(201,168,76,0.55)');
-      ctx.textAlign = 'center';
-      ctx.fillText(deg + '°', lx, ly);
+    if (isMaj15) {
+      const {x: lx, y: ly} = radPt(cRad, R + 30);
+      ctx.font = isMaj30 ? 'bold 10px JetBrains Mono' : '8px JetBrains Mono';
+      ctx.fillStyle = dispDeg === 90 ? '#FFE84B' : (isMaj30 ? 'rgba(201,168,76,0.88)' : 'rgba(201,168,76,0.55)');
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(dispDeg + '°', lx, ly);
     }
+  }
+
+  // ── SALAT MARKER DOTS on arc ──
+  const markerDefs = [
+    { key:'Fajr',    t:fajrM,   col:'#8899FF', icon:'🌅', nm:'Fajr',    onArc:false },
+    { key:'Sunrise', t:srM,     col:'#FFE050', icon:'🌄', nm:'Sunrise', onArc:true  },
+    { key:'Ishraq',  t:ishraqS, col:'#40CC55', icon:'🕊', nm:'Ishraq',  onArc:true  },
+    { key:'Chast',   t:Math.round((chastS+chastE)/2), col:'#55D0A0', icon:'🤲', nm:'Chast', onArc:true },
+    { key:'Dhuhr',   t:dhuhrM,  col:'#FFE020', icon:'☀️', nm:'Dhuhr',   onArc:true  },
+    { key:'Asr',     t:asrM,    col:'#FFA020', icon:'🌤', nm:'Asr',     onArc:true  },
+    { key:'Sunset',  t:ssM,     col:'#FF5525', icon:'🌇', nm:'Sunset',  onArc:true  },
+    { key:'Isha',    t:ishaM,   col:'#AA77FF', icon:'🌙', nm:'Isha',    onArc:false },
+  ];
+
+  markerDefs.forEach(s => {
+    if (!s.onArc) return; // Off-arc markers shown differently below
+    const cRad = tCanRad(s.t);
+    const pt   = radPt(cRad, R);
+
+    // Radial guide line
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pt.x, pt.y);
+    ctx.strokeStyle = s.col + '18'; ctx.lineWidth = 1.2; ctx.stroke();
+
+    // Dot
+    ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = s.col; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.4; ctx.stroke();
+
+    // Time label
+    const tStr = PT[s.key === 'Sunset' ? 'Maghrib' : s.key]
+      ? fmt12(PT[s.key === 'Sunset' ? 'Maghrib' : s.key]) : '';
+    const LPAD = 15;
+    const cosA = Math.cos(cRad), sinA = Math.sin(cRad);
+    let tx, ta;
+    if (cosA > 0.12)       { tx = pt.x + LPAD; ta = 'left'; }
+    else if (cosA < -0.12) { tx = pt.x - LPAD; ta = 'right'; }
+    else                   { tx = pt.x;         ta = 'center'; }
+    const ty = sinA > 0.1 ? pt.y - 17 : pt.y + 3;
+    ctx.font = 'bold 9px Inter'; ctx.fillStyle = s.col;
+    ctx.textAlign = ta; ctx.textBaseline = 'middle';
+    ctx.fillText(`${s.icon} ${s.nm}  ${tStr}`, tx, ty);
+  });
+
+  // Fajr & Isha as edge labels (below horizon)
+  ctx.font = 'bold 9px Inter'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#8899FF'; ctx.textAlign = 'right';
+  ctx.fillText(`🌅 Fajr  ${fmt12(PT.Fajr)}`, cx - R + 12, cy - 22);
+  ctx.fillStyle = '#AA77FF'; ctx.textAlign = 'left';
+  ctx.fillText(`🌙 Isha  ${fmt12(PT.Isha)}`, cx + R - 12, cy - 22);
+
+  // ── TWILIGHT ZONE LABELS (inside sectors near edges) ──
+  function twilightLabel(angRad, rFrac, txt, col) {
+    const pt = radPt(angRad, R * rFrac);
+    ctx.font = '7.5px JetBrains Mono'; ctx.fillStyle = col;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(txt, pt.x, pt.y);
+  }
+  // Morning (left side: angle > PI - something)
+  twilightLabel(Math.PI - astroW * 0.5,              0.84, 'Astro', 'rgba(110,90,200,0.7)');
+  twilightLabel(Math.PI - (astroW + nautW) * 0.5,    0.84, 'Naut',  'rgba(80,120,200,0.7)');
+  twilightLabel(Math.PI - (nautW + civilW) * 0.5,    0.84, 'Civil', 'rgba(70,150,220,0.7)');
+  // Evening (right side)
+  twilightLabel(astroW * 0.5,                        0.84, 'Astro', 'rgba(110,90,200,0.65)');
+  twilightLabel((astroW + nautW) * 0.5,              0.84, 'Naut',  'rgba(80,120,200,0.65)');
+  twilightLabel((nautW + civilW) * 0.5,              0.84, 'Civil', 'rgba(70,150,220,0.65)');
+
+  // ── SUN (Live position via azimuth) ──
+  const sunCRad = azCanRad(sol.azimuth);
+  if (sunCRad >= -0.05 && sunCRad <= Math.PI + 0.05) {
+    const {x: sx, y: sy} = radPt(sunCRad, R);
+    // Guide line
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sx, sy);
+    ctx.strokeStyle = isDayNow ? 'rgba(255,220,80,0.5)' : 'rgba(100,100,200,0.35)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+
+    if (isDayNow) {
+      // Glow
+      const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, 34);
+      grd.addColorStop(0, 'rgba(255,240,75,0.95)');
+      grd.addColorStop(0.38, 'rgba(255,175,40,0.45)');
+      grd.addColorStop(1, 'transparent');
+      ctx.beginPath(); ctx.arc(sx, sy, 34, 0, Math.PI * 2);
+      ctx.fillStyle = grd; ctx.fill();
+      // Core
+      ctx.beginPath(); ctx.arc(sx, sy, 12, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFE84B'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.2; ctx.stroke();
+      // Labels
+      ctx.font = 'bold 10px JetBrains Mono'; ctx.fillStyle = '#FFE84B';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(`☀ ${sol.elevation.toFixed(1)}° elev`, sx, sy - 18);
+      ctx.font = '8px JetBrains Mono'; ctx.fillStyle = 'rgba(255,220,80,0.72)';
+      ctx.fillText(`Az: ${Math.round(sol.azimuth)}°`, sx, sy - 6);
+    }
+
+    // Current arc-degree badge (outside ring)
+    const dispDegNow = Math.round(((Math.PI - sunCRad) / Math.PI) * 180);
+    const {x: bx, y: by} = radPt(sunCRad, R + BAND_R + 42);
+    ctx.beginPath(); ctx.roundRect(bx - 24, by - 10, 48, 20, 7);
+    ctx.fillStyle = isDayNow ? 'rgba(201,168,76,0.18)' : 'rgba(70,70,180,0.18)'; ctx.fill();
+    ctx.strokeStyle = isDayNow ? 'rgba(201,168,76,0.7)' : 'rgba(100,100,200,0.6)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.font = 'bold 9px JetBrains Mono';
+    ctx.fillStyle = isDayNow ? '#FFE84B' : 'rgba(170,165,230,0.9)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(dispDegNow + '°', bx, by);
+  }
+
+  // ── MOON (Live position via azimuth) ──
+  const moonCRad = azCanRad(moon.azimuth);
+  if (moon.elevation > -8 && moonCRad >= 0 && moonCRad <= Math.PI) {
+    const {x: mx, y: my} = radPt(moonCRad, R);
+    // Guide line
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(mx, my);
+    ctx.strokeStyle = 'rgba(180,170,135,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+    // Crescent
+    ctx.beginPath(); ctx.arc(mx, my, 11, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(230,218,180,0.95)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(mx + 6, my - 4, 11, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(6,13,24,1)'; ctx.fill();
+    // Border
+    ctx.beginPath(); ctx.arc(mx, my, 11, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(200,185,140,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+    // Labels
+    ctx.font = 'bold 9.5px JetBrains Mono'; ctx.fillStyle = 'rgba(200,185,145,0.92)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(`☽ ${moon.elevation.toFixed(1)}° elev`, mx, my - 16);
+    ctx.font = '8px JetBrains Mono'; ctx.fillStyle = 'rgba(170,155,115,0.65)';
+    ctx.fillText(`Az: ${Math.round(moon.azimuth)}°`, mx, my - 4);
+
+    // Moon arc-degree badge
+    const moonDispDeg = Math.round(((Math.PI - moonCRad) / Math.PI) * 180);
+    const {x: mbx, y: mby} = radPt(moonCRad, R + BAND_R + 42);
+    ctx.beginPath(); ctx.roundRect(mbx - 24, mby - 10, 48, 20, 7);
+    ctx.fillStyle = 'rgba(160,145,110,0.15)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(190,175,130,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.font = 'bold 8.5px JetBrains Mono'; ctx.fillStyle = 'rgba(200,185,145,0.9)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(moonDispDeg + '°', mbx, mby);
   }
 
   // ── HORIZON LINE ──
-  ctx.beginPath();
-  ctx.moveTo(cx - R - 50, cy);
-  ctx.lineTo(cx + R + 50, cy);
-  ctx.strokeStyle = 'rgba(201,168,76,0.55)';
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-
-  // East / West labels on horizon
-  ctx.font = 'bold 9px Outfit';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'bottom';
-  ctx.fillStyle = 'rgba(201,168,76,0.8)';
-  ctx.fillText('◀ EAST  0° (Sunrise)', cx - R - 4, cy - 3);
+  ctx.beginPath(); ctx.moveTo(cx - R - 55, cy); ctx.lineTo(cx + R + 55, cy);
+  ctx.strokeStyle = 'rgba(201,168,76,0.55)'; ctx.lineWidth = 1.8; ctx.stroke();
+  // Horizon labels
+  ctx.font = 'bold 9px Outfit'; ctx.fillStyle = 'rgba(201,168,76,0.82)';
+  ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+  ctx.fillText('◀ EAST  0°  (Sunrise)', cx - R - 6, cy - 4);
   ctx.textAlign = 'left';
-  ctx.fillText('180° WEST ▶ (Sunset)', cx + R + 4, cy - 3);
-
-  // ── SALAT TIME MARKERS ──
-  const salatDefs = [
-    { key: 'Fajr',    mins: fajrM,          color: '#8888FF', icon: '🌅', label: 'Fajr' },
-    { key: 'Sunrise', mins: srM,            color: '#FFDC50', icon: '🌄', label: 'Sunrise' },
-    { key: 'Dhuhr',   mins: t2m(PT.Dhuhr), color: '#FFE030', icon: '☀️', label: 'Dhuhr' },
-    { key: 'Asr',     mins: t2m(PT.Asr),   color: '#FFA030', icon: '🌤️', label: 'Asr' },
-    { key: 'Sunset',  mins: ssM,           color: '#FF5A30', icon: '🌇', label: 'Sunset' },
-    { key: 'Isha',    mins: ishaM,         color: '#A070FF', icon: '🌙', label: 'Isha' },
-  ];
-
-  salatDefs.forEach(s => {
-    const arcDeg = timeToArcAngle(s.mins);
-    const theta = arcDeg * DEG;
-    const mx = cx + R * Math.cos(theta);
-    const my = cy - R * Math.sin(theta);
-
-    // Radial connector from center
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(mx, my);
-    ctx.strokeStyle = s.color + '22'; ctx.lineWidth = 1; ctx.stroke();
-
-    // Dot on arc
-    ctx.beginPath(); ctx.arc(mx, my, 7, 0, Math.PI * 2);
-    ctx.fillStyle = s.color; ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-
-    // Time string
-    const tStr = fmt12(PT[s.key === 'Sunset' ? 'Maghrib' : s.key]);
-    const LPAD = 14;
-    const cos = Math.cos(theta), sin = Math.sin(theta);
-    ctx.font = 'bold 9px Inter';
-    ctx.fillStyle = s.color;
-
-    let tx, ta;
-    if (cos > 0.15) { tx = mx + LPAD; ta = 'left'; }
-    else if (cos < -0.15) { tx = mx - LPAD; ta = 'right'; }
-    else { tx = mx; ta = 'center'; }
-    const ty = sin > 0.1 ? my - 16 : (sin < -0.1 ? my + 20 : my + 3);
-
-    ctx.textAlign = ta;
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${s.icon} ${s.label}  ${tStr}`, tx, ty);
-  });
-
-  // ── ACTIVE SUN / MOON ──
-  const nowArcDeg = timeToArcAngle(nowM);
-  const nowTheta = nowArcDeg * DEG;
-  const sx = cx + R * Math.cos(nowTheta);
-  const sy = cy - R * Math.sin(nowTheta);
-
-  // Vector from center
-  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sx, sy);
-  ctx.strokeStyle = isDayNow ? 'rgba(255,220,80,0.5)' : 'rgba(120,120,220,0.4)';
-  ctx.lineWidth = 1.5; ctx.stroke();
-
-  if (isDayNow) {
-    // Outer glow
-    const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, 32);
-    grd.addColorStop(0, 'rgba(255,240,80,0.95)');
-    grd.addColorStop(0.35, 'rgba(255,180,40,0.5)');
-    grd.addColorStop(1, 'transparent');
-    ctx.beginPath(); ctx.arc(sx, sy, 32, 0, Math.PI * 2);
-    ctx.fillStyle = grd; ctx.fill();
-    // Core
-    ctx.beginPath(); ctx.arc(sx, sy, 11, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFE84B'; ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2.2; ctx.stroke();
-    // Label above sun
-    ctx.font = 'bold 10px JetBrains Mono'; ctx.fillStyle = '#FFE84B';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText(`☀ ${sol.elevation.toFixed(1)}° elev`, sx, sy - 17);
-    ctx.font = '8.5px JetBrains Mono'; ctx.fillStyle = 'rgba(255,220,80,0.7)';
-    ctx.fillText(`Az: ${Math.round(sol.azimuth)}°`, sx, sy - 6);
-  } else {
-    // Moon crescent
-    ctx.beginPath(); ctx.arc(sx, sy, 11, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(230,220,185,0.95)'; ctx.fill();
-    ctx.beginPath(); ctx.arc(sx + 5, sy - 3, 11, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(6,13,24,1)'; ctx.fill();
-    ctx.font = 'bold 9.5px JetBrains Mono'; ctx.fillStyle = 'rgba(200,185,140,0.85)';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText(`☽ ${sol.elevation.toFixed(1)}° elev`, sx, sy - 16);
-  }
-
-  // ── ARC DEGREE BADGE at current angle ──
-  // Show the current arc-position badge just outside the ring
-  const badgeX = cx + (R + 44) * Math.cos(nowTheta);
-  const badgeY = cy - (R + 44) * Math.sin(nowTheta);
-  ctx.beginPath();
-  ctx.roundRect(badgeX - 22, badgeY - 9, 44, 18, 6);
-  ctx.fillStyle = isDayNow ? 'rgba(201,168,76,0.18)' : 'rgba(80,80,180,0.18)';
-  ctx.fill();
-  ctx.strokeStyle = isDayNow ? 'rgba(201,168,76,0.7)' : 'rgba(100,100,200,0.6)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.font = 'bold 8.5px JetBrains Mono';
-  ctx.fillStyle = isDayNow ? '#FFE84B' : 'rgba(180,170,230,0.9)';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(Math.round(nowArcDeg) + '°', badgeX, badgeY);
+  ctx.fillText('180°  WEST ▶  (Sunset)', cx + R + 6, cy - 4);
 
   // ── OBSERVER DOT ──
   ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(201,168,76,0.95)'; ctx.fill();
   ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-  ctx.font = 'bold 8px Inter'; ctx.fillStyle = 'rgba(201,168,76,0.65)';
+  ctx.font = 'bold 8px Inter'; ctx.fillStyle = 'rgba(201,168,76,0.6)';
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   ctx.fillText('OBSERVER', cx, cy + 10);
 
-  // ── HORIZON DATA BAR (below horizon arc, inside canvas bottom) ──
-  const barY = cy + 12;
-  const barH = H - barY - 8;
-  const barL = cx - R, barW = R * 2;
-  if (barH > 14) {
-    const horizZones = [
-      { s: fajrM,       e: fajrM + 25,  col: 'rgba(30,18,100,0.65)',  lbl: 'Astro' },
-      { s: fajrM + 25,  e: fajrM + 50,  col: 'rgba(16,52,120,0.65)',  lbl: 'Naut' },
-      { s: fajrM + 50,  e: srM,         col: 'rgba(16,90,160,0.65)',  lbl: 'Civil' },
-      { s: srM,         e: ssM,         col: 'rgba(255,180,60,0.08)', lbl: '' },
-      { s: ssM,         e: ssM + 26,    col: 'rgba(16,90,160,0.55)',  lbl: 'Civil' },
-      { s: ssM + 26,    e: ssM + 56,    col: 'rgba(16,52,120,0.55)',  lbl: 'Naut' },
-      { s: ssM + 56,    e: ishaM,       col: 'rgba(30,18,100,0.55)',  lbl: 'Astro' },
+  // ── BELOW-HORIZON TIMELINE BAR ──
+  const barY  = cy + 14;
+  const barH  = H - barY - 10;
+  const barL  = cx - R;
+  const barW  = R * 2;
+  const totalSpan = ishaM - fajrM;
+
+  if (barH > 12) {
+    // Zone fills
+    const zones = [
+      { s: fajrM,      e: fajrM+25, col:'rgba(22,11,70,0.75)',  lbl:'Astro' },
+      { s: fajrM+25,   e: fajrM+50, col:'rgba(12,36,95,0.75)',  lbl:'Naut' },
+      { s: fajrM+50,   e: srM,      col:'rgba(10,65,130,0.70)', lbl:'Civil' },
+      { s: srM,        e: ssM,      col:'rgba(255,180,50,0.07)',lbl:'⬆ Day' },
+      { s: ssM,        e: ssM+26,   col:'rgba(10,65,130,0.65)', lbl:'Civil' },
+      { s: ssM+26,     e: ssM+56,   col:'rgba(12,36,95,0.65)',  lbl:'Naut' },
+      { s: ssM+56,     e: ishaM,    col:'rgba(22,11,70,0.65)',  lbl:'Astro' },
     ];
-    const totalSpan = ishaM - fajrM;
-    horizZones.forEach(z => {
+    zones.forEach(z => {
       const x1 = barL + ((z.s - fajrM) / totalSpan) * barW;
       const x2 = barL + ((z.e - fajrM) / totalSpan) * barW;
-      ctx.fillStyle = z.col;
-      ctx.fillRect(x1, barY, x2 - x1, barH);
+      ctx.fillStyle = z.col; ctx.fillRect(x1, barY, x2 - x1, barH);
       if (z.lbl && x2 - x1 > 28) {
-        ctx.font = '7px Inter'; ctx.fillStyle = 'rgba(200,200,255,0.5)';
+        ctx.font = '7px Inter'; ctx.fillStyle = 'rgba(190,195,230,0.55)';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(z.lbl, (x1 + x2) / 2, barY + barH / 2);
+        ctx.fillText(z.lbl, (x1+x2)/2, barY + barH/2);
       }
     });
-    // NOW line
+
+    // Salat time tick marks on bar
+    [
+      { t:fajrM, col:'#8899FF', lbl:'Fajr' },
+      { t:srM,   col:'#FFE050', lbl:'Srse' },
+      { t:dhuhrM,col:'#FFE020', lbl:'Dhr' },
+      { t:asrM,  col:'#FFA020', lbl:'Asr' },
+      { t:ssM,   col:'#FF5525', lbl:'Mgh' },
+      { t:ishaM, col:'#AA77FF', lbl:'Isha' },
+    ].forEach(tk => {
+      const tx = barL + ((tk.t - fajrM) / totalSpan) * barW;
+      ctx.beginPath(); ctx.moveTo(tx, barY - 4); ctx.lineTo(tx, barY + barH);
+      ctx.strokeStyle = tk.col + 'CC'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.font = '6.5px JetBrains Mono'; ctx.fillStyle = tk.col;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(tk.lbl, tx, barY - 5);
+    });
+
+    // NOW marker
     const nowBarX = barL + ((nowM - fajrM) / totalSpan) * barW;
-    ctx.beginPath(); ctx.moveTo(nowBarX, barY - 3); ctx.lineTo(nowBarX, barY + barH + 2);
-    ctx.strokeStyle = '#FFE84B'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(nowBarX, barY - 4); ctx.lineTo(nowBarX, barY + barH + 3);
+    ctx.strokeStyle = '#FFE84B'; ctx.lineWidth = 2.2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(nowBarX, barY - 4, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFE84B'; ctx.fill();
     ctx.font = 'bold 7.5px JetBrains Mono'; ctx.fillStyle = '#FFE84B';
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillText('NOW', nowBarX, barY + barH + 3);
+    ctx.fillText('NOW', nowBarX, barY + barH + 4);
+
     // Bar border
-    ctx.strokeStyle = 'rgba(201,168,76,0.2)'; ctx.lineWidth = 0.8;
+    ctx.strokeStyle = 'rgba(201,168,76,0.22)'; ctx.lineWidth = 0.8;
     ctx.strokeRect(barL, barY, barW, barH);
-    // Left label
-    ctx.font = '7.5px Inter'; ctx.fillStyle = 'rgba(150,160,200,0.45)';
+    ctx.font = '7px Inter'; ctx.fillStyle = 'rgba(140,150,195,0.42)';
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-    ctx.fillText('↓ Below Horizon', barL - 4, barY + barH / 2);
+    ctx.fillText('↓ Below Horizon Timeline', barL - 5, barY + barH / 2);
   }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 3D RENDERER (Celestial Hemisphere Dome)
-// ─────────────────────────────────────────────────────────────
-function draw3DDome(ctx, W, H) {
-  const cx = W / 2, cy = H / 2 + 15;
-  const R = Math.min(W / 2 - 90, H / 2 - 35);
-
-  // 3D Projector
-  const project3D = (x, y, z) => {
-    // Z rotation (yaw)
-    const x1 = x * Math.cos(yaw) - y * Math.sin(yaw);
-    const y1 = x * Math.sin(yaw) + y * Math.cos(yaw);
-    const z1 = z;
-
-    // X rotation (pitch)
-    const x2 = x1;
-    const y2 = y1 * Math.cos(pitch) - z1 * Math.sin(pitch);
-    const z2 = y1 * Math.sin(pitch) + z1 * Math.cos(pitch);
-
-    return {
-      x: cx + x2,
-      y: cy - z2,
-      depth: y2
-    };
-  };
-
-  const drawList = [];
-
-  // 1. Compass directions (Ground Circle)
-  const dirs = [
-    { label: 'N', az: 0, color: 'rgba(231, 76, 60, 0.9)' },
-    { label: 'E', az: 90, color: 'rgba(201, 168, 76, 0.8)' },
-    { label: 'S', az: 180, color: 'rgba(201, 168, 76, 0.8)' },
-    { label: 'W', az: 270, color: 'rgba(201, 168, 76, 0.8)' }
-  ];
-
-  dirs.forEach(d => {
-    const x = R * Math.sin(d.az * DEG);
-    const y = R * Math.cos(d.az * DEG);
-    const proj = project3D(x, y, 0);
-
-    drawList.push({
-      depth: proj.depth,
-      draw: () => {
-        ctx.beginPath(); ctx.arc(proj.x, proj.y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = d.color; ctx.fill();
-        ctx.font = 'bold 10px Outfit'; ctx.fillStyle = d.color;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(d.label, proj.x, proj.y - 10);
-      }
-    });
-  });
-
-  // Ground circle outline
-  for (let i = 0; i < 360; i += 5) {
-    const a1 = i * DEG, a2 = (i + 5) * DEG;
-    const p1 = project3D(R * Math.sin(a1), R * Math.cos(a1), 0);
-    const p2 = project3D(R * Math.sin(a2), R * Math.cos(a2), 0);
-
-    drawList.push({
-      depth: (p1.depth + p2.depth) / 2,
-      draw: () => {
-        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = 'rgba(201, 168, 76, 0.25)'; ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    });
-  }
-
-  // 2. Dome Grid lines
-  // Meridian North-South
-  for (let i = -90; i < 90; i += 5) {
-    const el1 = i * DEG, el2 = (i + 5) * DEG;
-    const p1 = project3D(0, R * Math.cos(el1), R * Math.sin(el1));
-    const p2 = project3D(0, R * Math.cos(el2), R * Math.sin(el2));
-
-    drawList.push({
-      depth: (p1.depth + p2.depth) / 2,
-      draw: () => {
-        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = 'rgba(201, 168, 76, 0.08)'; ctx.lineWidth = 0.8;
-        ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]);
-      }
-    });
-  }
-
-  // Meridian East-West
-  for (let i = -90; i < 90; i += 5) {
-    const el1 = i * DEG, el2 = (i + 5) * DEG;
-    const p1 = project3D(R * Math.cos(el1), 0, R * Math.sin(el1));
-    const p2 = project3D(R * Math.cos(el2), 0, R * Math.sin(el2));
-
-    drawList.push({
-      depth: (p1.depth + p2.depth) / 2,
-      draw: () => {
-        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-        ctx.strokeStyle = 'rgba(201, 168, 76, 0.08)'; ctx.lineWidth = 0.8;
-        ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]);
-      }
-    });
-  }
-
-  // Constant elevation rings (30° and 60°)
-  [30, 60].forEach(h => {
-    const rRing = R * Math.cos(h * DEG);
-    const zRing = R * Math.sin(h * DEG);
-    for (let i = 0; i < 360; i += 10) {
-      const a1 = i * DEG, a2 = (i + 10) * DEG;
-      const p1 = project3D(rRing * Math.sin(a1), rRing * Math.cos(a1), zRing);
-      const p2 = project3D(rRing * Math.sin(a2), rRing * Math.cos(a2), zRing);
-
-      drawList.push({
-        depth: (p1.depth + p2.depth) / 2,
-        draw: () => {
-          ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = 'rgba(201, 168, 76, 0.06)'; ctx.lineWidth = 0.8;
-          ctx.stroke();
-        }
-      });
-    }
-  });
-
-  // 3. Sun daily path arc
-  const srM = t2m(PT.Sunrise), ssM = t2m(PT.Sunset || PT.Maghrib);
-  const fajrM = t2m(PT.Fajr), ishaM = t2m(PT.Isha);
-  const mak1S = srM, mak1E = srM + 20;
-  const mak2S = t2m(PT.Dhuhr) - 10, mak2E = t2m(PT.Dhuhr);
-  const mak3S = ssM - 20, mak3E = ssM;
-
-  const pathPoints = [];
-  const startT = fajrM - 30;
-  const endT = ishaM + 30;
-
-  for (let t = startT; t <= endT; t += 10) {
-    const dVal = new Date();
-    dVal.setHours(Math.floor(t / 60), t % 60, 0, 0);
-    const sol = solarPosition(dVal);
-    
-    const rEl = sol.elevation * DEG;
-    const rAz = sol.azimuth * DEG;
-    
-    // 3D spherical coords mapped
-    const x = R * Math.cos(rEl) * Math.sin(rAz);
-    const y = R * Math.cos(rEl) * Math.cos(rAz);
-    const z = R * Math.sin(rEl);
-
-    pathPoints.push({ t, x, y, z });
-  }
-
-  // Draw Sun Path segments
-  for (let i = 0; i < pathPoints.length - 1; i++) {
-    const pt1 = pathPoints[i], pt2 = pathPoints[i+1];
-    const proj1 = project3D(pt1.x, pt1.y, pt1.z);
-    const proj2 = project3D(pt2.x, pt2.y, pt2.z);
-
-    // Color code based on Salat zones
-    let col = 'rgba(100, 100, 200, 0.15)'; // Night
-    if (pt1.t >= srM && pt1.t <= ssM) {
-      col = 'rgba(201, 168, 76, 0.7)'; // Daytime
-      // Makruh segments overlay
-      if ((pt1.t >= mak1S && pt1.t <= mak1E) || (pt1.t >= mak2S && pt1.t <= mak2E) || (pt1.t >= mak3S && pt1.t <= mak3E)) {
-        col = 'rgba(231, 76, 60, 0.8)';
-      }
-    } else if ((pt1.t >= fajrM && pt1.t <= srM) || (pt1.t >= ssM && pt1.t <= ishaM)) {
-      col = 'rgba(150, 120, 255, 0.6)'; // Twilight
-    }
-
-    drawList.push({
-      depth: (proj1.depth + proj2.depth) / 2,
-      draw: () => {
-        ctx.beginPath(); ctx.moveTo(proj1.x, proj1.y); ctx.lineTo(proj2.x, proj2.y);
-        ctx.strokeStyle = col; ctx.lineWidth = pt1.t >= srM && pt1.t <= ssM ? 2.5 : 1.8;
-        ctx.stroke();
-      }
-    });
-  }
-
-  // 4. Salat time markers in 3D
-  const salats = [
-    { name: 'Fajr', mins: fajrM, color: 'rgba(120, 130, 255, 0.95)', icon: '🌅' },
-    { name: 'Sunrise', mins: srM, color: 'rgba(255, 220, 80, 1)', icon: '🌄' },
-    { name: 'Dhuhr', mins: t2m(PT.Dhuhr), color: 'rgba(255, 240, 60, 1)', icon: '☀️' },
-    { name: 'Asr', mins: t2m(PT.Asr), color: 'rgba(255, 160, 50, 0.95)', icon: '🌤️' },
-    { name: 'Sunset', mins: ssM, color: 'rgba(255, 80, 40, 0.95)', icon: '🌇' },
-    { name: 'Isha', mins: ishaM, color: 'rgba(150, 100, 255, 0.95)', icon: '🌙' },
-  ];
-
-  salats.forEach(s => {
-    const dVal = new Date();
-    dVal.setHours(Math.floor(s.mins / 60), s.mins % 60, 0, 0);
-    const sol = solarPosition(dVal);
-    
-    const rEl = sol.elevation * DEG;
-    const rAz = sol.azimuth * DEG;
-    
-    const x = R * Math.cos(rEl) * Math.sin(rAz);
-    const y = R * Math.cos(rEl) * Math.cos(rAz);
-    const z = R * Math.sin(rEl);
-
-    const proj = project3D(x, y, z);
-    const timeStr = fmt12(PT[s.name === 'Sunset' ? 'Maghrib' : s.name]);
-
-    drawList.push({
-      depth: proj.depth + 1, // slightly in front of path
-      draw: () => {
-        // Dot
-        ctx.beginPath(); ctx.arc(proj.x, proj.y, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = s.color; ctx.fill();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
-
-        // Label
-        ctx.font = 'bold 8.5px Inter'; ctx.fillStyle = s.color;
-        ctx.textAlign = 'center';
-        ctx.fillText(`${s.icon} ${s.name} ${timeStr}`, proj.x, proj.y - 10);
-      }
-    });
-  });
-
-  // 5. Current Sun position and observer line
-  const nowM = nowMins();
-  const currentSol = solarPosition(new Date());
-  
-  const rEl = currentSol.elevation * DEG;
-  const rAz = currentSol.azimuth * DEG;
-
-  const sx = R * Math.cos(rEl) * Math.sin(rAz);
-  const sy = R * Math.cos(rEl) * Math.cos(rAz);
-  const sz = R * Math.sin(rEl);
-
-  const projSun = project3D(sx, sy, sz);
-  const isDayNow = nowM >= srM && nowM <= ssM;
-
-  // Vector connector line
-  drawList.push({
-    depth: projSun.depth / 2, // middle depth
-    draw: () => {
-      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(projSun.x, projSun.y);
-      ctx.strokeStyle = isDayNow ? 'rgba(255, 220, 80, 0.45)' : 'rgba(100, 100, 200, 0.35)';
-      ctx.lineWidth = 1; ctx.stroke();
-    }
-  });
-
-  // Sun / Moon sphere drawer
-  drawList.push({
-    depth: projSun.depth + 2,
-    draw: () => {
-      if (isDayNow) {
-        // Sun
-        const sg = ctx.createRadialGradient(projSun.x, projSun.y, 0, projSun.x, projSun.y, 22);
-        sg.addColorStop(0, 'rgba(255, 240, 80, 0.9)');
-        sg.addColorStop(0.4, 'rgba(255, 180, 40, 0.45)');
-        sg.addColorStop(1, 'transparent');
-        ctx.beginPath(); ctx.arc(projSun.x, projSun.y, 22, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
-
-        ctx.beginPath(); ctx.arc(projSun.x, projSun.y, 8, 0, Math.PI * 2);
-        ctx.fillStyle = '#FFE84B'; ctx.fill();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-
-        ctx.font = 'bold 9px JetBrains Mono'; ctx.fillStyle = '#fff';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Sun: ${currentSol.elevation.toFixed(1)}°`, projSun.x, projSun.y + 18);
-      } else {
-        // Moon
-        ctx.beginPath(); ctx.arc(projSun.x, projSun.y, 7, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(230, 220, 185, 0.95)'; ctx.fill();
-        ctx.beginPath(); ctx.arc(projSun.x + 3, projSun.y - 2, 7, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(6, 13, 24, 1)'; ctx.fill();
-
-        ctx.font = 'bold 9px JetBrains Mono'; ctx.fillStyle = 'rgba(180,170,140,0.7)';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Moon: ${currentSol.elevation.toFixed(1)}°`, projSun.x, projSun.y + 18);
-      }
-    }
-  });
-
-  // Observer center marker
-  drawList.push({
-    depth: 0.1,
-    draw: () => {
-      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(201, 168, 76, 0.95)'; ctx.fill();
-      ctx.font = '8px Inter'; ctx.fillStyle = 'rgba(201, 168, 76, 0.5)';
-      ctx.textAlign = 'center';
-      ctx.fillText('OBSERVER', cx, cy + 12);
-    }
-  });
-
-  // 6. Draw all elements sorted by Depth ascending (back to front)
-  drawList.sort((a, b) => a.depth - b.depth);
-  drawList.forEach(item => item.draw());
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1360,4 +1092,3 @@ loadPrayers();
 </script>
 </body>
 </html>
-
