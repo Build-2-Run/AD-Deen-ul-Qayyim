@@ -56,7 +56,8 @@
       pointer-events:none; z-index:999999;
       transform:translate(-50%,-50%);
       box-shadow:0 0 12px var(--gold),0 0 24px rgba(201,168,76,0.5);
-      transition:width 0.15s,height 0.15s;
+      transition:width 0.15s, height 0.15s, opacity 0.3s;
+      opacity:0;
     }
     #cursor-ring {
       position:fixed; width:28px; height:28px;
@@ -64,10 +65,22 @@
       border-radius:50%;
       pointer-events:none; z-index:999998;
       transform:translate(-50%,-50%);
-      transition:left 0.12s ease,top 0.12s ease,width 0.2s,height 0.2s;
+      transition:width 0.2s, height 0.2s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-dot.visible, #cursor-ring.visible {
+      opacity:1;
     }
     #sparkle-canvas {
       position:fixed; inset:0; pointer-events:none; z-index:999995;
+    }
+    @media (max-width: 1024px) {
+      #cursor-dot, #cursor-ring, #sparkle-canvas {
+        display:none !important;
+      }
+      body {
+        cursor:auto !important;
+      }
     }
 
     /* ── STARS ── */
@@ -578,7 +591,14 @@ const spawnParticles = (x, y) => {
   }
 };
 
+let cursorInitialized = false;
+
 document.addEventListener('mousemove', e => {
+  if (!cursorInitialized) {
+    dot.classList.add('visible');
+    ring.classList.add('visible');
+    cursorInitialized = true;
+  }
   mx = e.clientX;
   my = e.clientY;
   dot.style.left = mx + 'px';
@@ -596,7 +616,7 @@ document.addEventListener('mousemove', e => {
   // Draw/animate canvas particles
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  particles.forEach((p, i) => {
+  particles = particles.filter(p => {
     p.x += p.dx;
     p.y += p.dy;
     p.dx *= 0.92;
@@ -607,10 +627,7 @@ document.addEventListener('mousemove', e => {
     ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    // Remove slow particles
-    if (Math.abs(p.dx) < 0.05 && Math.abs(p.dy) < 0.05) {
-      particles.splice(i, 1);
-    }
+    return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
   });
 
   requestAnimationFrame(animateSparkles);

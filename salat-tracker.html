@@ -28,10 +28,19 @@
     ::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:4px}
 
     /* CURSOR */
-    #cursor-dot{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--gold)}
-    #cursor-ring{position:fixed;width:26px;height:26px;border:1.5px solid rgba(201,168,76,0.6);border-radius:50%;pointer-events:none;z-index:999998;transform:translate(-50%,-50%);transition:left .12s ease,top .12s ease}
+    #cursor-dot{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--gold);transition:width 0.15s, height 0.15s, opacity 0.3s;opacity:0}
+    #cursor-ring{position:fixed;width:26px;height:26px;border:1.5px solid rgba(201,168,76,0.6);border-radius:50%;pointer-events:none;z-index:999998;transform:translate(-50%,-50%);transition:width 0.2s, height 0.2s, opacity 0.3s;opacity:0}
+    #cursor-dot.visible, #cursor-ring.visible { opacity:1; }
     #sparkle-canvas {
       position:fixed; inset:0; pointer-events:none; z-index:999995;
+    }
+    @media (max-width: 1024px) {
+      #cursor-dot, #cursor-ring, #sparkle-canvas {
+        display:none !important;
+      }
+      body {
+        cursor:auto !important;
+      }
     }
 
     /* NAV */
@@ -335,7 +344,14 @@ const spawnParticles = (x, y) => {
   }
 };
 
+let cursorInitialized = false;
+
 document.addEventListener('mousemove', e => {
+  if (!cursorInitialized) {
+    dot.classList.add('visible');
+    ring.classList.add('visible');
+    cursorInitialized = true;
+  }
   mx = e.clientX;
   my = e.clientY;
   dot.style.left = mx + 'px';
@@ -353,7 +369,7 @@ document.addEventListener('mousemove', e => {
   // Draw/animate canvas particles
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  particles.forEach((p, i) => {
+  particles = particles.filter(p => {
     p.x += p.dx;
     p.y += p.dy;
     p.dx *= 0.92;
@@ -364,10 +380,7 @@ document.addEventListener('mousemove', e => {
     ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    // Remove slow particles
-    if (Math.abs(p.dx) < 0.05 && Math.abs(p.dy) < 0.05) {
-      particles.splice(i, 1);
-    }
+    return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
   });
 
   requestAnimationFrame(animateSparkles);
