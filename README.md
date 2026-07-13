@@ -2,7 +2,7 @@
 
 > *An open-source knowledge engine dedicated to Islamic history, theology, and philosophy. Connecting traditional scholarship with modern digital accessibility.*
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green?style=flat-square)](https://build2run.github.io/AD-Deen-ul-Qayyim/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green?style=flat-square)](https://build-2-run.github.io/AD-Deen-ul-Qayyim/)
 [![No Backend](https://img.shields.io/badge/Backend-None%20Required-gold?style=flat-square)]()
 [![Mobile Ready](https://img.shields.io/badge/Mobile-Responsive-blue?style=flat-square)]()
 [![Open Source](https://img.shields.io/badge/Open%20Source-Islamic%20Knowledge-teal?style=flat-square)]()
@@ -47,7 +47,7 @@ git push -u origin main
 3. Click **Save**
 4. Wait 2–3 minutes, then visit:
 
-🌐 **https://build2run.github.io/AD-Deen-ul-Qayyim/**
+🌐 **https://build-2-run.github.io/AD-Deen-ul-Qayyim/**
 
 🎉 **Your site is now live for free, forever!**
 
