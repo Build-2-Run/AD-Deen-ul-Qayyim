@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Full Salat Tracker — AD-Deen ul-Qayyim</title>
+  <meta name="description" content="Detailed Islamic prayer time tracker with sun arc, solar elevation, twilight zones and makruh times for Srinagar, Kashmir."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#060d18; --bg2:#0b1425; --bg3:#101d35;
+      --card:rgba(255,255,255,0.04); --card-h:rgba(255,255,255,0.08);
+      --gold:#c9a84c; --gold-l:#e8c96a; --gold-d:#9a7a30;
+      --gold-glow:rgba(201,168,76,0.25);
+      --text:#f0e6d3; --text2:#a8b8cc; --text3:#6b7fa0;
+      --border:rgba(201,168,76,0.15); --border-b:rgba(201,168,76,0.4);
+      --r:14px; --ease:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      /* Twilight colours */
+      --c-astro:#1a1060; --c-naut:#0d3070; --c-civil:#0d5090;
+      --c-day:#c9a84c; --c-makruh:#8b1a1a;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;cursor:none}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:4px}
+
+    /* CURSOR */
+    #cursor-dot{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--gold)}
+    #cursor-ring{position:fixed;width:26px;height:26px;border:1.5px solid rgba(201,168,76,0.6);border-radius:50%;pointer-events:none;z-index:999998;transform:translate(-50%,-50%);transition:left .12s ease,top .12s ease}
+    .sparkle{position:fixed;pointer-events:none;z-index:999997;font-size:11px;color:var(--gold);animation:sp .7s ease forwards;transform:translate(-50%,-50%)}
+    @keyframes sp{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(0)}}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;background:rgba(6,13,24,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem}
+    .nav-back{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--gold);font-weight:600;font-size:0.9rem;transition:var(--ease)}
+    .nav-back:hover{color:var(--gold-l);transform:translateX(-3px)}
+    .nav-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--text2)}
+    .nav-title span{color:var(--gold)}
+    .nav-datetime{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--gold);text-align:right}
+
+    /* LAYOUT */
+    .page{max-width:1100px;margin:0 auto;padding:1.5rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(12px);transition:var(--ease);position:relative;overflow:hidden}
+    .card:hover{background:var(--card-h);border-color:var(--border-b)}
+
+    /* PAGE HEADER */
+    .page-header{text-align:center;margin-bottom:1.5rem}
+    .page-header h1{font-family:'Outfit',sans-serif;font-size:clamp(1.3rem,3vw,2rem);font-weight:800}
+    .page-header h1 span{background:linear-gradient(135deg,var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .page-header p{color:var(--text3);font-size:0.82rem;margin-top:0.3rem}
+    .location-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-glow);border:1px solid var(--border-b);border-radius:20px;padding:4px 14px;font-size:0.75rem;color:var(--gold);margin-top:0.5rem}
+
+    /* LIVE READOUT */
+    .live-readout{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-bottom:1.2rem}
+    @media(max-width:600px){.live-readout{grid-template-columns:1fr 1fr}}
+    .readout-card{padding:1rem;text-align:center;background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));border:1px solid var(--border-b);border-radius:var(--r)}
+    .readout-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:0.4rem}
+    .readout-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:600;color:var(--gold-l)}
+    .readout-unit{font-size:0.7rem;color:var(--text3)}
+
+    /* MAIN ARC CANVAS */
+    .arc-wrap{margin-bottom:1.2rem;padding:1rem;background:linear-gradient(180deg,rgba(11,20,37,0.95),rgba(6,13,24,0.98));border:1px solid var(--border-b);border-radius:var(--r)}
+    #tracker-canvas{display:block;width:100%;border-radius:8px}
+
+    /* LEGEND */
+    .legend{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:0.8rem}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:0.65rem;color:var(--text3)}
+    .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+    /* PRAYER DETAIL */
+    .prayer-detail{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.7rem;margin-bottom:1.2rem}
+    .prayer-card{padding:1rem 0.8rem;text-align:center;border-radius:var(--r);border:1px solid var(--border);background:var(--card)}
+    .prayer-card.active{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.05));box-shadow:0 0 20px var(--gold-glow)}
+    .prayer-card.makruh-warn{border-color:rgba(231,76,60,0.5)}
+    .p-icon{font-size:1.5rem}
+    .p-name{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin:0.3rem 0 0.2rem}
+    .p-time{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--text)}
+    .p-elev{font-size:0.65rem;color:var(--text3);margin-top:0.3rem}
+    .p-arc{font-size:0.65rem;color:var(--gold);margin-top:0.1rem}
+    .prayer-card.active .p-name{color:var(--gold)}
+    .prayer-card.active .p-time{color:var(--gold-l)}
+
+    /* COUNTDOWN */
+    .countdown-bar{background:var(--card);border:1px solid var(--border-b);border-radius:var(--r);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.2rem}
+    .cd-label{font-size:0.8rem;color:var(--text2)}
+    .cd-time{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--gold)}
+    .progress-wrap{flex:1;min-width:150px}
+    .progress-bar-bg{background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden}
+    .progress-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width 1s linear}
+
+    /* INFO GRID */
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
+    @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
+
+    .info-card{padding:1.2rem;border-radius:var(--r)}
+    .info-card h3{font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;margin-bottom:0.8rem}
+
+    /* TWILIGHT TABLE */
+    .tl-table{width:100%;border-collapse:collapse}
+    .tl-table th,.tl-table td{padding:0.5rem 0.6rem;font-size:0.75rem;border-bottom:1px solid var(--border);text-align:left}
+    .tl-table th{color:var(--text3);font-weight:500;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em}
+    .tl-table td{color:var(--text2)}
+    .tl-table .tl-name{color:var(--text);font-weight:600}
+    .tl-deg{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:middle}
+
+    /* MAKRUH TABLE */
+    .mak-list{display:flex;flex-direction:column;gap:0.5rem}
+    .mak-item{display:flex;align-items:center;gap:0.7rem;background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:0.6rem 0.8rem;font-size:0.78rem}
+    .mak-icon{font-size:1rem;flex-shrink:0}
+    .mak-name{color:var(--text);font-weight:600;font-size:0.75rem}
+    .mak-time{color:rgba(231,76,60,0.85);font-family:'JetBrains Mono',monospace;font-size:0.78rem;margin-left:auto}
+    .mak-rule{color:var(--text3);font-size:0.68rem;display:block;margin-top:1px}
+
+    /* ANGLE EXPLANATION */
+    .angle-explainer{margin-bottom:1.2rem}
+    .angle-explainer h3{font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;margin-bottom:0.8rem;color:var(--gold)}
+    .angle-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem}
+    @media(max-width:500px){.angle-grid{grid-template-columns:repeat(3,1fr)}}
+    .angle-card{background:rgba(201,168,76,0.06);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.4rem;text-align:center}
+    .angle-deg{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--gold-l)}
+    .angle-desc{font-size:0.62rem;color:var(--text3);margin-top:0.3rem;line-height:1.3}
+    .angle-pos{font-size:0.68rem;color:var(--text2);margin-top:0.2rem}
+
+    /* FOOTER SPACER */
+    .spacer{height:3rem}
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn 0.6s ease both}
+  </style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-back">← Back to Home</a>
+  <div class="nav-title">Full <span>Salat Tracker</span></div>
+  <div class="nav-datetime" id="nav-time">Loading…</div>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header fade-in">
+    <h1>🌅 Full <span>Salat Tracker</span> & Sun Arc</h1>
+    <p>Real-time solar position, prayer times, twilight zones and makruh periods</p>
+    <div class="location-badge">📍 Srinagar, Kashmir, India · 34.08°N · 74.80°E · Hanafi · UISK</div>
+  </div>
+
+  <!-- LIVE READOUT -->
+  <div class="live-readout fade-in">
+    <div class="readout-card">
+      <div class="readout-label">☀️ Solar Elevation</div>
+      <div class="readout-val" id="r-elevation">—<span class="readout-unit">°</span></div>
+    </div>
+    <div class="readout-card">
+      <div class="readout-label">🧭 Arc Position</div>
+      <div class="readout-val" id="r-arcpos">—<span class="readout-unit">°</span></div>
+    </div>
+    <div class="readout-card">
+      <div class="readout-label">🌐 Azimuth</div>
+      <div class="readout-val" id="r-azimuth">—<span class="readout-unit">°</span></div>
+    </div>
+    <div class="readout-card">
+      <div class="readout-label">📅 Day Progress</div>
+      <div class="readout-val" id="r-dayprog">—<span class="readout-unit">%</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN ARC CANVAS -->
+  <div class="arc-wrap fade-in">
+    <canvas id="tracker-canvas" height="420"></canvas>
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1a1060"></div> Astronomical Twilight (18°)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#0d3070"></div> Nautical Twilight (12°)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#0d5090"></div> Civil Twilight (6°)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,200,80,0.5)"></div> Daytime</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(180,30,30,0.7)"></div> Makruh</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FFE84B;border-radius:50%"></div> Sun / Moon</div>
+    </div>
+  </div>
+
+  <!-- DEGREE EXPLANATION -->
+  <div class="card angle-explainer fade-in" style="padding:1.2rem;margin-bottom:1.2rem">
+    <h3>↖ Arc Degree Guide — Sun's Path (East → West)</h3>
+    <div class="angle-grid">
+      <div class="angle-card">
+        <div class="angle-deg">0°</div>
+        <div class="angle-pos">East · Horizon</div>
+        <div class="angle-desc">Sunrise / Tulu'<br>Elevation: 0°</div>
+      </div>
+      <div class="angle-card">
+        <div class="angle-deg">45°</div>
+        <div class="angle-pos">SE · Morning</div>
+        <div class="angle-desc">Mid-morning sun<br>Elev: ~<span id="el-45">—</span>°</div>
+      </div>
+      <div class="angle-card" style="border-color:var(--gold);background:rgba(201,168,76,0.1)">
+        <div class="angle-deg" style="color:var(--gold)">90°</div>
+        <div class="angle-pos" style="color:var(--gold)">South · Zenith</div>
+        <div class="angle-desc">Dhuhr / Noon<br>Max Elev: ~<span id="el-90">—</span>°</div>
+      </div>
+      <div class="angle-card">
+        <div class="angle-deg">135°</div>
+        <div class="angle-pos">SW · Afternoon</div>
+        <div class="angle-desc">Asr time zone<br>Elev: ~<span id="el-135">—</span>°</div>
+      </div>
+      <div class="angle-card">
+        <div class="angle-deg">180°</div>
+        <div class="angle-pos">West · Horizon</div>
+        <div class="angle-desc">Sunset / Ghurub<br>Elevation: 0°</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="countdown-bar fade-in">
+    <div>
+      <div class="cd-label">Next Prayer: <strong id="cd-name" style="color:var(--gold)">—</strong></div>
+      <div style="font-size:0.72rem;color:var(--text3);margin-top:2px" id="cd-prayer-time">—</div>
+    </div>
+    <div class="cd-time" id="cd-timer">--:--:--</div>
+    <div class="progress-wrap">
+      <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px">Time until next prayer</div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="cd-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- PRAYER DETAIL CARDS -->
+  <div class="prayer-detail fade-in" id="prayer-detail-row">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- INFO GRID -->
+  <div class="info-grid fade-in">
+
+    <!-- TWILIGHT TABLE -->
+    <div class="card info-card">
+      <h3 style="color:#5080c0">🔭 Twilight Zones</h3>
+      <table class="tl-table">
+        <thead>
+          <tr><th>Type</th><th>Angle</th><th>Morning</th><th>Evening</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="tl-name"><div class="tl-deg" style="background:#1a1060"></div>Astronomical</td>
+            <td>18°</td><td id="tl-astro-m">—</td><td id="tl-astro-e">—</td>
+          </tr>
+          <tr>
+            <td class="tl-name"><div class="tl-deg" style="background:#0d3070"></div>Nautical</td>
+            <td>12°</td><td id="tl-naut-m">—</td><td id="tl-naut-e">—</td>
+          </tr>
+          <tr>
+            <td class="tl-name"><div class="tl-deg" style="background:#0d5090"></div>Civil</td>
+            <td>6°</td><td id="tl-civil-m">—</td><td id="tl-civil-e">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MAKRUH TIMES -->
+    <div class="card info-card">
+      <h3 style="color:rgba(231,76,60,0.85)">⚠️ Makruh (Karahat) Times</h3>
+      <div class="mak-list" id="makruh-list"><!-- rendered by JS --></div>
+    </div>
+
+  </div>
+
+  <!-- ADDITIONAL ISLAMIC INFO -->
+  <div class="card fade-in" style="padding:1.2rem;margin-bottom:1.2rem">
+    <h3 style="font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:700;color:var(--gold);margin-bottom:0.8rem">📖 Sun Angle Notes (Hanafi Fiqh)</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;font-size:0.78rem;color:var(--text2)">
+      <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.7rem">
+        <strong style="color:var(--text);display:block;margin-bottom:0.3rem">🌅 Ishraq Time</strong>
+        Begins ~20 minutes after sunrise (Tulu'). Praying nafl at this time is highly recommended — 2 rak'ahs equals the reward of Hajj and Umrah.
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.7rem">
+        <strong style="color:var(--text);display:block;margin-bottom:0.3rem">☀️ Zawal / Istiwa</strong>
+        When the sun reaches its zenith (arc 90°). Prayer is makruh during this brief period — typically 5–10 minutes before Dhuhr Adhan.
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.7rem">
+        <strong style="color:var(--text);display:block;margin-bottom:0.3rem">📐 Asr Indicator (Hanafi)</strong>
+        Asr begins when shadow of an object = its own height + shadow at Zawal. This corresponds to sun at ~35° elevation (approx arc 130°) in summer.
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:0.7rem">
+        <strong style="color:var(--text);display:block;margin-bottom:0.3rem">🌇 Makruh Before Maghrib</strong>
+        When the sun turns yellow/reddish (typically 20–30 min before Maghrib). Nafl prayers become makruh; obligatory prayers remain valid.
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+</div><!-- /page -->
+
+<script>
+'use strict';
+// ─────────────────────────────────────────────────────────────
+// CURSOR
+// ─────────────────────────────────────────────────────────────
+const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
+const SPS=['✦','✧','★','⋆','·','✵'];
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  dot.style.left=mx+'px';dot.style.top=my+'px';
+  if(Math.random()<0.3){
+    const s=document.createElement('div');s.className='sparkle';
+    s.style.left=mx+'px';s.style.top=my+'px';
+    s.style.fontSize=(7+Math.random()*7)+'px';
+    s.style.color=`hsl(${40+Math.random()*20},90%,${60+Math.random()*15}%)`;
+    s.textContent=SPS[Math.floor(Math.random()*SPS.length)];
+    document.body.appendChild(s);setTimeout(()=>s.remove(),700);
+  }
+});
+(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+
+// ─────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────
+const LAT=34.0837, LON=74.7973; // Srinagar
+const DEG=Math.PI/180;
+
+// ─────────────────────────────────────────────────────────────
+// SOLAR POSITION (Simplified Spencer / Meeus)
+// ─────────────────────────────────────────────────────────────
+function solarPosition(date){
+  const JD=date.getTime()/86400000+2440587.5;
+  const n=JD-2451545.0;
+  const L0=(280.460+0.9856474*n)%360;
+  const M=((357.528+0.9856003*n)%360)*DEG;
+  const lambda=(L0+1.915*Math.sin(M)+0.020*Math.sin(2*M))*DEG;
+  const eps=(23.439-0.0000004*n)*DEG;
+  const dec=Math.asin(Math.sin(eps)*Math.sin(lambda));
+  const RA=Math.atan2(Math.cos(eps)*Math.sin(lambda),Math.cos(lambda))*180/Math.PI/15;
+  const UT=date.getUTCHours()+date.getUTCMinutes()/60+date.getUTCSeconds()/3600;
+  const GMST=(6.697375+0.0657098242*(n+0.5)+UT*1.002738)%24;
+  const LMST=((GMST+LON/15)%24+24)%24;
+  const LHA=((LMST-(RA<0?RA+24:RA)+24)%24)*15*DEG;
+  const latR=LAT*DEG;
+  const sinEl=Math.sin(latR)*Math.sin(dec)+Math.cos(latR)*Math.cos(dec)*Math.cos(LHA);
+  const el=Math.asin(Math.max(-1,Math.min(1,sinEl)))/DEG;
+  const cosEl=Math.cos(Math.asin(Math.max(-1,Math.min(1,sinEl))));
+  const cosAz=(Math.sin(dec)-Math.sin(latR)*sinEl)/(Math.cos(latR)*cosEl);
+  let az=Math.acos(Math.max(-1,Math.min(1,cosAz)))/DEG;
+  if(Math.sin(LHA)>0) az=360-az;
+  return{elevation:el,azimuth:az};
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────
+function t2m(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function m2f(m){const h=Math.floor(m/60)%24,mn=m%60,ap=h>=12?'PM':'AM',h12=h%12||12;return`${String(h12).padStart(2,'0')}:${String(mn).padStart(2,'0')} ${ap}`;}
+function fmt12(t){const[h,m]=t.split(':').map(Number);const ap=h>=12?'PM':'AM',h12=h%12||12;return`${String(h12).padStart(2,'0')}:${String(m).padStart(2,'0')} ${ap}`;}
+function nowMins(){const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60;}
+
+// ─────────────────────────────────────────────────────────────
+// NAV TIME
+// ─────────────────────────────────────────────────────────────
+const navTimeEl=document.getElementById('nav-time');
+function updateNavTime(){
+  const d=new Date();
+  navTimeEl.textContent=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:'Asia/Kolkata'})+' IST';
+}
+updateNavTime();setInterval(updateNavTime,1000);
+
+// ─────────────────────────────────────────────────────────────
+// PRAYER DATA
+// ─────────────────────────────────────────────────────────────
+let PT=null;
+const FALLBACK={Fajr:'03:42',Sunrise:'05:20',Dhuhr:'12:14',Asr:'16:05',Sunset:'19:09',Maghrib:'19:09',Isha:'20:47'};
+const PRAYERS=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+const PICONS={Fajr:'🌅',Dhuhr:'☀️',Asr:'🌤️',Maghrib:'🌇',Isha:'🌙'};
+const PDESC={
+  Fajr:'Dawn prayer — before Tulu\'',
+  Dhuhr:'Midday prayer — after Zawal',
+  Asr:'Afternoon prayer',
+  Maghrib:'Sunset prayer',
+  Isha:'Night prayer'
+};
+
+async function loadPrayers(){
+  try{
+    const d=new Date();
+    const r=await fetch(`https://api.aladhan.com/v1/timingsByCity/${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}?city=Srinagar&country=India&method=1&school=1`);
+    const j=await r.json();
+    if(j.code===200) PT=j.data.timings;
+  }catch(e){}
+  if(!PT) PT=FALLBACK;
+  initTracker();
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT TRACKER
+// ─────────────────────────────────────────────────────────────
+function initTracker(){
+  const srM=t2m(PT.Sunrise), ssM=t2m(PT.Sunset||PT.Maghrib);
+  const fajrM=t2m(PT.Fajr), ishaM=t2m(PT.Isha);
+
+  // Twilight approx offsets (minutes from sunrise/sunset)
+  const astroME=fajrM, nautME=fajrM+25, civilME=fajrM+50;  // morning ends
+  const civilEE=ssM+26, nautEE=ssM+56, astroEE=ishaM;        // evening ends
+
+  // Update twilight table
+  document.getElementById('tl-astro-m').textContent=`${fmt12(PT.Fajr)} – ${m2f(nautME)}`;
+  document.getElementById('tl-naut-m').textContent= `${m2f(nautME)} – ${m2f(civilME)}`;
+  document.getElementById('tl-civil-m').textContent=`${m2f(civilME)} – ${fmt12(PT.Sunrise)}`;
+  document.getElementById('tl-civil-e').textContent=`${fmt12(PT.Sunset||PT.Maghrib)} – ${m2f(civilEE)}`;
+  document.getElementById('tl-naut-e').textContent= `${m2f(civilEE)} – ${m2f(nautEE)}`;
+  document.getElementById('tl-astro-e').textContent=`${m2f(nautEE)} – ${fmt12(PT.Isha)}`;
+
+  // Max elevation (Srinagar July ≈ 77°)
+  const maxEl=calcMaxEl()||77;
+  const el45=Math.round(maxEl*Math.sin(45*DEG));
+  document.getElementById('el-45').textContent=el45;
+  document.getElementById('el-90').textContent=Math.round(maxEl);
+  document.getElementById('el-135').textContent=el45;
+
+  // Makruh
+  const mak1S=srM, mak1E=srM+20;
+  const mak2S=t2m(PT.Dhuhr)-10, mak2E=t2m(PT.Dhuhr);
+  const mak3S=ssM-20, mak3E=ssM;
+  document.getElementById('makruh-list').innerHTML=`
+    <div class="mak-item"><span class="mak-icon">🌅</span>
+      <div><span class="mak-name">After Sunrise (Karahat)</span><span class="mak-rule">Nafl prayer makruh until Ishraq time</span></div>
+      <span class="mak-time">${m2f(mak1S)} – ${m2f(mak1E)}</span>
+    </div>
+    <div class="mak-item"><span class="mak-icon">☀️</span>
+      <div><span class="mak-name">Zawal / Istiwa (Zenith)</span><span class="mak-rule">Sun at 90° — all nafl makruh</span></div>
+      <span class="mak-time">${m2f(mak2S)} – ${m2f(mak2E)}</span>
+    </div>
+    <div class="mak-item"><span class="mak-icon">🌇</span>
+      <div><span class="mak-name">Before Sunset (Karahat)</span><span class="mak-rule">Sun yellowing — nafl makruh</span></div>
+      <span class="mak-time">${m2f(mak3S)} – ${m2f(mak3E)}</span>
+    </div>`;
+
+  renderPrayerCards();
+  startCountdown();
+  drawArc();
+  // Refresh arc + readout every 30 seconds
+  setInterval(()=>{drawArc();renderPrayerCards();},30000);
+}
+
+function calcMaxEl(){
+  // Calculate max elevation at Dhuhr today
+  const d=new Date();
+  d.setHours(12,14,0,0); // approx Dhuhr
+  return Math.round(solarPosition(d).elevation);
+}
+
+// ─────────────────────────────────────────────────────────────
+// PRAYER CARDS
+// ─────────────────────────────────────────────────────────────
+function getCurrentNext(){
+  const nm=nowMins();
+  for(const p of PRAYERS){if(t2m(PT[p])>nm)return p;}
+  return 'Fajr';
+}
+
+function renderPrayerCards(){
+  const next=getCurrentNext();
+  const srM=t2m(PT.Sunrise),ssM=t2m(PT.Sunset||PT.Maghrib);
+  const row=document.getElementById('prayer-detail-row');
+  const allP=['Fajr','Sunrise','Dhuhr','Asr','Sunset','Isha'];
+  const icons={Fajr:'🌅',Sunrise:'🌄',Dhuhr:'☀️',Asr:'🌤️',Sunset:'🌇',Isha:'🌙'};
+  const keys={Fajr:'Fajr',Sunrise:'Sunrise',Dhuhr:'Dhuhr',Asr:'Asr',Sunset:'Sunset',Isha:'Isha'};
+  row.innerHTML=allP.map(p=>{
+    const tStr=PT[keys[p]];
+    const tM=t2m(tStr);
+    // Arc position (0-180 from sunrise to sunset; extend for pre/post)
+    let arcPos=null;
+    if(srM!==ssM) arcPos=Math.round(((tM-srM)/(ssM-srM))*180);
+    const arcStr=arcPos!==null?`Arc: ${arcPos}°`:'Below horizon';
+    // Solar elevation at that time
+    const d2=new Date();
+    d2.setHours(Math.floor(tM/60),tM%60,0,0);
+    const solEl=solarPosition(d2).elevation;
+    const elStr=`Elev: ${solEl.toFixed(1)}°`;
+    const isActive=p===next;
+    return`<div class="prayer-card ${isActive?'active':''}">
+      <div class="p-icon">${icons[p]}</div>
+      <div class="p-name">${p}</div>
+      <div class="p-time">${fmt12(tStr)}</div>
+      <div class="p-elev">${elStr}</div>
+      <div class="p-arc">${arcStr}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+// COUNTDOWN
+// ─────────────────────────────────────────────────────────────
+let cdInt=null;
+function startCountdown(){
+  if(cdInt) clearInterval(cdInt);
+  function tick(){
+    const next=getCurrentNext();
+    const nm=nowMins();
+    const d=new Date();
+    let diff=(t2m(PT[next])-nm)*60-d.getSeconds();
+    if(diff<0) diff+=86400;
+    const total=(t2m(PT[next])-t2m(PT[PRAYERS[(PRAYERS.indexOf(next)-1+PRAYERS.length)%PRAYERS.length]]))*60;
+    const pct=total>0?Math.max(0,Math.min(100,100-(diff/total*100))):50;
+    const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
+    document.getElementById('cd-name').textContent=next;
+    document.getElementById('cd-prayer-time').textContent=fmt12(PT[next]);
+    document.getElementById('cd-timer').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    document.getElementById('cd-bar').style.width=pct+'%';
+    // Live readout
+    const sol=solarPosition(new Date());
+    const srM=t2m(PT.Sunrise),ssM=t2m(PT.Sunset||PT.Maghrib);
+    const arcPos=((nowMins()-srM)/(ssM-srM)*180);
+    const dayProg=Math.max(0,Math.min(100,((nowMins()-srM)/(ssM-srM)*100)));
+    document.getElementById('r-elevation').innerHTML=`${sol.elevation.toFixed(1)}<span class="readout-unit">°</span>`;
+    document.getElementById('r-arcpos').innerHTML=`${Math.round(Math.max(0,Math.min(180,arcPos)))<0?'—':Math.round(Math.max(0,Math.min(180,arcPos)))}<span class="readout-unit">°</span>`;
+    document.getElementById('r-azimuth').innerHTML=`${Math.round(sol.azimuth)}<span class="readout-unit">°</span>`;
+    document.getElementById('r-dayprog').innerHTML=`${dayProg.toFixed(1)}<span class="readout-unit">%</span>`;
+  }
+  tick(); cdInt=setInterval(tick,1000);
+}
+
+// ─────────────────────────────────────────────────────────────
+// DRAW MAIN ARC
+// ─────────────────────────────────────────────────────────────
+function drawArc(){
+  const canvas=document.getElementById('tracker-canvas');
+  if(!canvas||!PT) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const W=canvas.offsetWidth||1000, H=420;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  // Geometry
+  const MARGIN=60, PAD_B=60;
+  const cx=W/2, cy=H-PAD_B;
+  const R=Math.min(W/2-MARGIN, H-PAD_B-20);
+
+  const fajrM=t2m(PT.Fajr),srM=t2m(PT.Sunrise);
+  const dhuhrM=t2m(PT.Dhuhr),asrM=t2m(PT.Asr);
+  const ssM=t2m(PT.Sunset||PT.Maghrib),ishaM=t2m(PT.Isha);
+  const nowM=nowMins();
+
+  // Twilight minutes
+  const nautME=fajrM+25,civilME=fajrM+50;
+  const civilEE=ssM+26,nautEE=ssM+56;
+  const mak1S=srM,mak1E=srM+20;
+  const mak2S=dhuhrM-10,mak2E=dhuhrM;
+  const mak3S=ssM-20,mak3E=ssM;
+
+  // Arc range (show from Fajr to Isha)
+  const RANGE_START=fajrM-10, RANGE_END=ishaM+10;
+  const RANGE=RANGE_END-RANGE_START;
+
+  // Time → arc position (0° to 180°, 0°=east=sunrise, 90°=noon, 180°=west=sunset)
+  // But we also show pre-sunrise and post-sunset on extended arc
+  const tToArcAngle=m=>(m-RANGE_START)/RANGE*180; // 0→180
+  // Arc angle to canvas angle (θ): arcAngle 0=left(east), 90=top, 180=right(west)
+  // canvas θ: 180°=left, 90°=top, 0°=right
+  const arcToCanvas=a=>( 180 - a ) * DEG; // radians
+  // Point on arc from arc angle (degrees)
+  const arcPt=a=>{const theta=arcToCanvas(a);return{x:cx+R*Math.cos(theta),y:cy-R*Math.sin(theta)};};
+  // Time to point
+  const tPt=m=>arcPt(tToArcAngle(m));
+
+  // ── BACKGROUND ──
+  ctx.fillStyle='rgba(6,13,24,1)';
+  ctx.fillRect(0,0,W,H);
+
+  // ── SKY GRADIENT (radial, from center outward) ──
+  const now_arcAngle=tToArcAngle(nowM);
+  const skyGrad=ctx.createLinearGradient(0,0,0,H);
+  const isDaytime=nowM>=srM&&nowM<=ssM;
+  skyGrad.addColorStop(0,isDaytime?'rgba(10,25,60,0.7)':'rgba(3,5,20,0.8)');
+  skyGrad.addColorStop(1,'rgba(6,13,24,0)');
+  ctx.fillStyle=skyGrad; ctx.fillRect(0,0,W,H);
+
+  // ── ELEVATION GUIDE RINGS ──
+  // 30° and 60° elevation as arcs inside the main arc
+  function drawElevRing(elevDeg, color, label){
+    // At elevation e, height above horizon = R * (e/90)
+    const rRing=R*(elevDeg/90);
+    ctx.beginPath();
+    ctx.arc(cx,cy,rRing,Math.PI,0,false);
+    ctx.strokeStyle=color; ctx.lineWidth=0.8;
+    ctx.setLineDash([4,8]); ctx.stroke(); ctx.setLineDash([]);
+    // Label
+    ctx.font='bold 9px Inter'; ctx.fillStyle=color; ctx.textAlign='left';
+    ctx.fillText(label, cx+rRing*Math.cos(Math.PI*0.7)+5, cy-rRing*Math.sin(Math.PI*0.7));
+  }
+  drawElevRing(30,'rgba(100,140,200,0.25)','30°');
+  drawElevRing(60,'rgba(100,180,220,0.2)','60°');
+
+  // ── TWILIGHT SECTOR BANDS (fan shapes from center) ──
+  function drawSector(tStart,tEnd,fillColor){
+    const steps=30;
+    const a1=tToArcAngle(tStart), a2=tToArcAngle(tEnd);
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    for(let i=0;i<=steps;i++){
+      const a=a1+(a2-a1)*i/steps;
+      const theta=arcToCanvas(a);
+      ctx.lineTo(cx+R*Math.cos(theta),cy-R*Math.sin(theta));
+    }
+    ctx.closePath();
+    ctx.fillStyle=fillColor; ctx.fill();
+  }
+
+  // Night zones (extended)
+  ctx.fillStyle='rgba(3,5,20,0.5)';
+  ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,R,Math.PI,arcToCanvas(tToArcAngle(fajrM)),true);
+  ctx.closePath();ctx.fill();
+
+  ctx.fillStyle='rgba(3,5,20,0.5)';
+  ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,R,arcToCanvas(tToArcAngle(ishaM)),0,false);
+  ctx.closePath();ctx.fill();
+
+  // Astronomical twilight (morning/evening)
+  drawSector(fajrM,nautME,'rgba(26,16,96,0.5)');
+  drawSector(nautEE,ishaM,'rgba(26,16,96,0.5)');
+  // Nautical twilight
+  drawSector(nautME,civilME,'rgba(13,48,112,0.5)');
+  drawSector(civilEE,nautEE,'rgba(13,48,112,0.5)');
+  // Civil twilight
+  drawSector(civilME,srM,'rgba(13,80,144,0.5)');
+  drawSector(ssM,civilEE,'rgba(13,80,144,0.4)');
+  // Daytime
+  drawSector(srM,ssM,'rgba(255,200,80,0.06)');
+  // Makruh zones
+  drawSector(mak1S,mak1E,'rgba(180,30,30,0.35)');
+  drawSector(mak2S,mak2E,'rgba(180,30,30,0.35)');
+  drawSector(mak3S,mak3E,'rgba(180,30,30,0.35)');
+
+  // ── MAIN ARC (guide path) ──
+  ctx.beginPath();
+  ctx.arc(cx,cy,R,Math.PI,0,false);
+  ctx.strokeStyle='rgba(201,168,76,0.3)'; ctx.lineWidth=1.5;
+  ctx.setLineDash([4,10]); ctx.stroke(); ctx.setLineDash([]);
+
+  // ── HORIZON LINE ──
+  ctx.beginPath(); ctx.moveTo(cx-R-20,cy); ctx.lineTo(cx+R+20,cy);
+  ctx.strokeStyle='rgba(201,168,76,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.font='bold 9px Inter'; ctx.fillStyle='rgba(201,168,76,0.4)'; ctx.textAlign='left';
+  ctx.fillText('HORIZON (0°)', cx-R-16, cy-4);
+  ctx.textAlign='right'; ctx.fillText('HORIZON (180°)', cx+R+16, cy-4);
+
+  // ── DEGREE MARKERS (0°, 45°, 90°, 135°, 180°) ──
+  const DEG_MARKS=[0,45,90,135,180];
+  DEG_MARKS.forEach(deg=>{
+    const theta=arcToCanvas(deg);
+    const px=cx+R*Math.cos(theta), py=cy-R*Math.sin(theta);
+    // Tick (inner & outer)
+    const inner=0.88, outer=1.1;
+    const ix=cx+(R*inner)*Math.cos(theta), iy=cy-(R*inner)*Math.sin(theta);
+    const ox=cx+(R*outer)*Math.cos(theta), oy=cy-(R*outer)*Math.sin(theta);
+    ctx.beginPath(); ctx.moveTo(ix,iy); ctx.lineTo(ox,oy);
+    ctx.strokeStyle='rgba(201,168,76,0.7)'; ctx.lineWidth=deg===90?2:1.5; ctx.stroke();
+    // Radial line from center
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,py);
+    ctx.strokeStyle=deg===90?'rgba(201,168,76,0.25)':'rgba(201,168,76,0.1)'; ctx.lineWidth=0.8; ctx.stroke();
+    // Label
+    const lx=cx+(R*1.17)*Math.cos(theta), ly=cy-(R*1.17)*Math.sin(theta);
+    ctx.font=`bold ${deg===90?12:10}px Outfit`; ctx.fillStyle=deg===90?'#e8c96a':'rgba(201,168,76,0.7)';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(deg+'°',lx,ly);
+    // Sub-labels
+    const sublabels={0:'East (Sunrise)',90:'Zenith (Noon)',180:'West (Sunset)'};
+    if(sublabels[deg]){
+      const slx=cx+(R*1.28)*Math.cos(theta), sly=cy-(R*1.28)*Math.sin(theta);
+      ctx.font='9px Inter'; ctx.fillStyle='rgba(201,168,76,0.45)';
+      ctx.fillText(sublabels[deg],slx,sly);
+    }
+  });
+  ctx.textBaseline='alphabetic';
+
+  // ── PRAYER TIME MARKERS ──
+  const pMarkers=[
+    {label:'Fajr',   t:fajrM,  color:'rgba(120,130,255,0.9)', icon:'🌅'},
+    {label:"Tulu'",  t:srM,    color:'rgba(255,220,80,1)',     icon:'🌄'},
+    {label:'Dhuhr',  t:dhuhrM, color:'rgba(255,240,60,1)',     icon:'☀️'},
+    {label:'Asr',    t:asrM,   color:'rgba(255,160,50,0.9)',   icon:'🌤️'},
+    {label:'Ghurub', t:ssM,    color:'rgba(255,80,40,0.9)',    icon:'🌇'},
+    {label:'Isha',   t:ishaM,  color:'rgba(150,100,255,0.9)', icon:'🌙'},
+  ];
+  ctx.textBaseline='alphabetic';
+  pMarkers.forEach(mk=>{
+    const a=tToArcAngle(mk.t);
+    if(a<-5||a>185) return;
+    const theta=arcToCanvas(a);
+    const px=cx+R*Math.cos(theta), py=cy-R*Math.sin(theta);
+    // Radial line from center to arc
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,py);
+    ctx.strokeStyle=mk.color.replace('0.9','0.2').replace('1)','0.2)'); ctx.lineWidth=0.8; ctx.stroke();
+    // Dot on arc
+    ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2);
+    ctx.fillStyle=mk.color; ctx.fill();
+    // Label (inside arc)
+    const lr=R*0.78, lx=cx+lr*Math.cos(theta), ly=cy-lr*Math.sin(theta);
+    ctx.font='bold 9px Inter'; ctx.fillStyle=mk.color; ctx.textAlign='center';
+    ctx.fillText(mk.label,lx,ly>cy-10?ly-12:ly);
+  });
+
+  // Makruh labels
+  [[mak1S+10,'Karahat'],[mak2S+5,'Zawal'],[mak3S+10,'Karahat']].forEach(([t,lbl])=>{
+    const a=tToArcAngle(t);
+    if(a<0||a>180) return;
+    const theta=arcToCanvas(a);
+    const lr=R*0.55, lx=cx+lr*Math.cos(theta), ly=cy-lr*Math.sin(theta);
+    ctx.font='bold 8px Inter'; ctx.fillStyle='rgba(220,70,70,0.85)'; ctx.textAlign='center';
+    ctx.fillText('⚠ '+lbl,lx,ly);
+  });
+
+  // ── CURRENT SUN / MOON POSITION ──
+  const isDayNow=nowM>=srM&&nowM<=ssM;
+  const sunArcAngle=tToArcAngle(nowM);
+  const sunTheta=arcToCanvas(sunArcAngle);
+  const sx=cx+R*Math.cos(sunTheta), sy=cy-R*Math.sin(sunTheta);
+  const sol=solarPosition(new Date());
+
+  if(isDayNow && sx>=cx-R && sx<=cx+R && sy>=0 && sy<=cy){
+    // Sun glow
+    const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,30);
+    sg.addColorStop(0,'rgba(255,240,80,0.9)'); sg.addColorStop(0.4,'rgba(255,180,40,0.4)'); sg.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(sx,sy,30,0,Math.PI*2); ctx.fillStyle=sg; ctx.fill();
+    // Core
+    ctx.beginPath(); ctx.arc(sx,sy,9,0,Math.PI*2);
+    ctx.fillStyle='#FFE84B'; ctx.fill();
+    ctx.strokeStyle='rgba(255,230,80,0.9)'; ctx.lineWidth=2.5; ctx.stroke();
+    // Rays
+    for(let i=0;i<8;i++){const ra=i*Math.PI/4;ctx.beginPath();ctx.arc(sx+Math.cos(ra)*14,sy+Math.sin(ra)*14,2,0,Math.PI*2);ctx.fillStyle='rgba(255,220,70,0.4)';ctx.fill();}
+    // Elevation label on sun
+    ctx.font='bold 10px JetBrains Mono'; ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(sol.elevation.toFixed(1)+'°',sx,sy+22);
+    ctx.textBaseline='alphabetic';
+    // Line from center to sun position (like a clock hand)
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(sx,sy);
+    ctx.strokeStyle='rgba(255,220,80,0.3)'; ctx.lineWidth=1; ctx.stroke();
+  } else {
+    // Moon
+    const mx2=cx+(R*1.05)*Math.cos(arcToCanvas(tToArcAngle(nowM<srM?nowM:nowM))),
+          my2=cy-(R*0.4)*Math.sin(arcToCanvas(90))-20;
+    const mg=ctx.createRadialGradient(W-60,25,0,W-60,25,14);
+    mg.addColorStop(0,'rgba(230,220,185,0.95)'); mg.addColorStop(1,'rgba(100,90,60,0.15)');
+    ctx.beginPath(); ctx.arc(W-60,25,13,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
+    ctx.beginPath(); ctx.arc(W-60+7,22,9,0,Math.PI*2); ctx.fillStyle='rgba(6,13,24,0.97)'; ctx.fill();
+    ctx.font='9px Inter'; ctx.fillStyle='rgba(180,170,140,0.5)'; ctx.textAlign='center';
+    ctx.fillText(sol.elevation.toFixed(1)+'°',W-60,42);
+  }
+
+  // ── CENTER DOT ──
+  ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2);
+  ctx.fillStyle='rgba(201,168,76,0.6)'; ctx.fill();
+  ctx.font='8px Inter'; ctx.fillStyle='rgba(201,168,76,0.4)'; ctx.textAlign='center';
+  ctx.fillText('OBSERVER',cx,cy+12);
+
+  // ── BELOW-HORIZON TWILIGHT BAND ──
+  const bandH=PAD_B-10;
+  const tzones=[
+    {start:fajrM,end:nautME,  col:'rgba(26,16,96,0.7)',  lbl:'Astro'},
+    {start:nautME,end:civilME,col:'rgba(13,48,112,0.7)', lbl:'Nautical'},
+    {start:civilME,end:srM,   col:'rgba(13,80,144,0.7)', lbl:'Civil'},
+    {start:srM,end:ssM,       col:'rgba(255,180,60,0.1)',lbl:''},
+    {start:ssM,end:civilEE,   col:'rgba(13,80,144,0.7)', lbl:'Civil'},
+    {start:civilEE,end:nautEE,col:'rgba(13,48,112,0.7)', lbl:'Nautical'},
+    {start:nautEE,end:ishaM,  col:'rgba(26,16,96,0.7)',  lbl:'Astro'},
+  ];
+  tzones.forEach(z=>{
+    const x1=((z.start-RANGE_START)/RANGE)*(W-40)+20;
+    const x2=((z.end-RANGE_START)/RANGE)*(W-40)+20;
+    ctx.fillStyle=z.col; ctx.fillRect(x1,cy+2,x2-x1,bandH-4);
+    if(z.lbl&&(x2-x1)>30){
+      ctx.font='8px Inter'; ctx.fillStyle='rgba(200,200,255,0.5)'; ctx.textAlign='center';
+      ctx.fillText(z.lbl,(x1+x2)/2,cy+bandH/2+3);
+    }
+  });
+  // Now marker in band
+  const nowX=((nowM-RANGE_START)/RANGE)*(W-40)+20;
+  ctx.beginPath(); ctx.moveTo(nowX,cy+1); ctx.lineTo(nowX,cy+bandH);
+  ctx.strokeStyle='rgba(201,168,76,0.8)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='rgba(201,168,76,0.8)'; ctx.font='8px Inter'; ctx.textAlign='center';
+  ctx.fillText('NOW',nowX,cy+bandH+10);
+
+  // Band labels (left side)
+  ctx.font='8px Inter'; ctx.fillStyle='rgba(150,160,200,0.4)'; ctx.textAlign='right';
+  ctx.fillText('↓ Below Horizon', 18, cy+bandH/2+3);
+
+  ctx.textBaseline='alphabetic';
+}
+
+// ─────────────────────────────────────────────────────────────
+// RESIZE
+// ─────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{if(PT) drawArc();});
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+loadPrayers();
+</script>
+</body>
+</html>
