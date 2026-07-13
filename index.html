@@ -3,850 +3,900 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Islamic Knowledge Hub — Ratnipora, Kashmir</title>
-  <meta name="description" content="A comprehensive personal Islamic reference hub with Zakat calculator, inheritance (Mirath), Qurbani guide, prayer times, Islamic history, 99 Names of Allah, lunar calendar, and live market data." />
-  <meta name="keywords" content="Islam, Zakat calculator, Islamic inheritance, Mirath, Quran, Prayer times, Eid ul Adha, Qurbani, 99 Names, Asmaul Husna, Hijri calendar" />
-  <meta name="author" content="Islamic Hub — Ratnipora, Pulwama, Kashmir" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Islamic Knowledge Hub" />
-  <meta property="og:description" content="Your personal Islamic reference — Zakat, Inheritance, History, Prayer Times & more" />
-  <meta property="og:type" content="website" />
-
-  <!-- Favicon (crescent) -->
+  <title>AD-Deen ul-Qayyim — الدِّينُ الْقَيِّمُ</title>
+  <meta name="description" content="An open-source Islamic knowledge engine — Prayer times, Zakat, Inheritance, History, 99 Names, Ramadan, Qibla and more." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>" />
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --bg:       #060d18;
+      --bg2:      #0b1425;
+      --bg3:      #101d35;
+      --card:     rgba(255,255,255,0.04);
+      --card-h:   rgba(255,255,255,0.08);
+      --gold:     #c9a84c;
+      --gold-l:   #e8c96a;
+      --gold-d:   #9a7a30;
+      --gold-glow:rgba(201,168,76,0.25);
+      --green:    #27ae60;
+      --text:     #f0e6d3;
+      --text2:    #a8b8cc;
+      --text3:    #6b7fa0;
+      --border:   rgba(201,168,76,0.15);
+      --border-b: rgba(201,168,76,0.4);
+      --r:        16px;
+      --r-sm:     10px;
+      --ease:     all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      overflow-x:hidden;
+      line-height:1.6;
+    }
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--gold-d); border-radius:3px; }
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    /* ── STARS ── */
+    #bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
 
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="css/main.css" />
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      height:62px;
+      background:rgba(6,13,24,0.95);
+      backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 1.5rem;
+    }
+    .nav-brand {
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none;
+      font-family:'Outfit',sans-serif; font-weight:700; font-size:1.1rem;
+      color:var(--gold);
+    }
+    .nav-brand-arabic { font-family:'Amiri',serif; font-size:1.4rem; color:var(--gold-l); }
+    .nav-links { display:flex; gap:2px; list-style:none; overflow-x:auto; scrollbar-width:none; }
+    .nav-links::-webkit-scrollbar { display:none; }
+    .nav-links a {
+      color:var(--text2); text-decoration:none; font-size:0.78rem; font-weight:500;
+      padding:5px 10px; border-radius:20px; white-space:nowrap; transition:var(--ease);
+    }
+    .nav-links a:hover { color:var(--gold); background:var(--gold-glow); }
+    .nav-toggle { display:none; background:none; border:none; color:var(--gold); font-size:1.4rem; cursor:pointer; }
+    @media(max-width:768px){
+      .nav-links { display:none; flex-direction:column; position:absolute; top:62px; left:0; right:0; background:var(--bg); border-bottom:1px solid var(--border); padding:1rem; }
+      .nav-links.open { display:flex; }
+      .nav-toggle { display:block; }
+    }
+
+    /* ── MAIN ── */
+    main { padding-top:62px; position:relative; z-index:1; }
+    .container { max-width:1200px; margin:0 auto; padding:0 1.5rem; }
+
+    /* ── GLASS CARD ── */
+    .card {
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      backdrop-filter:blur(12px);
+      transition:var(--ease);
+      position:relative; overflow:hidden;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
+      opacity:0; transition:var(--ease);
+    }
+    .card:hover::before { opacity:1; }
+    .card:hover { background:var(--card-h); border-color:var(--border-b); }
+
+    /* ── HERO ── */
+    #hero {
+      padding:2.5rem 0 3rem;
+      text-align:center;
+    }
+    .bismillah {
+      font-family:'Amiri',serif;
+      font-size:clamp(1.6rem,4vw,2.8rem);
+      color:var(--gold-l);
+      text-shadow:0 0 40px var(--gold-glow);
+      margin-bottom:0.4rem;
+      animation:fadeInDown 0.8s ease;
+    }
+    .site-title {
+      font-family:'Outfit',sans-serif;
+      font-size:clamp(1.4rem,3.5vw,2.5rem);
+      font-weight:800; line-height:1.15;
+      margin-bottom:0.3rem;
+      animation:fadeInUp 0.8s ease 0.1s both;
+    }
+    .site-title span { background:linear-gradient(135deg,var(--gold),var(--gold-l)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .site-tagline {
+      font-family:'Amiri',serif; font-size:1rem;
+      color:var(--text2); margin-bottom:2rem;
+      animation:fadeInUp 0.8s ease 0.2s both;
+    }
+
+    /* ── SUN ARC TRACKER ── */
+    .prayer-tracker-wrap {
+      background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));
+      border:1px solid var(--border-b);
+      border-radius:var(--r);
+      padding:1.5rem 1.5rem 1rem;
+      margin-bottom:1.5rem;
+      animation:fadeInUp 0.8s ease 0.3s both;
+    }
+    .tracker-label {
+      font-size:0.72rem; text-transform:uppercase; letter-spacing:0.12em;
+      color:var(--text3); margin-bottom:0.8rem; text-align:center;
+    }
+    #sun-arc-canvas { display:block; width:100%; max-width:700px; margin:0 auto; }
+
+    /* Prayer times row */
+    .prayer-row {
+      display:flex; justify-content:center; gap:0.4rem;
+      flex-wrap:wrap; margin-top:1rem;
+    }
+    .prayer-pill {
+      background:rgba(255,255,255,0.04);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:6px 12px; text-align:center;
+      min-width:72px; transition:var(--ease);
+      cursor:default;
+    }
+    .prayer-pill.active {
+      background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08));
+      border-color:var(--gold);
+      box-shadow:0 0 16px var(--gold-glow);
+    }
+    .prayer-pill .pname { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); display:block; }
+    .prayer-pill .ptime { font-family:'Outfit',sans-serif; font-size:0.9rem; font-weight:700; color:var(--text); }
+    .prayer-pill.active .pname { color:var(--gold); }
+    .prayer-pill.active .ptime { color:var(--gold-l); }
+
+    /* Countdown */
+    .prayer-countdown {
+      text-align:center; margin-top:0.8rem;
+      font-size:0.82rem; color:var(--text2);
+    }
+    .prayer-countdown strong { color:var(--gold); font-family:'Outfit',sans-serif; font-size:1rem; }
+
+    /* ── DAROOD IBRAHIM ── */
+    .darood-card {
+      padding:1.8rem 2rem;
+      text-align:center;
+      margin-bottom:1.5rem;
+      background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.02));
+      animation:fadeInUp 0.8s ease 0.4s both;
+    }
+    .darood-label {
+      font-size:0.7rem; text-transform:uppercase; letter-spacing:0.15em;
+      color:var(--gold); margin-bottom:1rem; font-weight:600;
+    }
+    .darood-arabic {
+      font-family:'Amiri',serif;
+      font-size:clamp(1.1rem,2.5vw,1.5rem);
+      color:var(--gold-l);
+      line-height:2.2;
+      margin-bottom:1rem;
+      direction:rtl;
+    }
+    .darood-trans {
+      font-size:0.8rem; color:var(--text2); font-style:italic; line-height:1.8;
+      max-width:700px; margin:0 auto;
+    }
+
+    /* ── CALENDARS ── */
+    .calendars-row {
+      display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;
+      margin-bottom:1.5rem;
+      animation:fadeInUp 0.8s ease 0.5s both;
+    }
+    @media(max-width:600px){ .calendars-row { grid-template-columns:1fr; } }
+    .cal-card { padding:1.2rem; }
+    .cal-title {
+      font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:700;
+      color:var(--gold); margin-bottom:0.8rem; text-align:center;
+    }
+    .cal-month-nav {
+      display:flex; align-items:center; justify-content:center; gap:0.8rem;
+      margin-bottom:0.6rem;
+    }
+    .cal-month-name { font-family:'Amiri',serif; font-size:1rem; color:var(--text); }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+    .cal-day-hdr {
+      text-align:center; font-size:0.6rem; text-transform:uppercase;
+      color:var(--text3); padding:2px;
+    }
+    .cal-day {
+      text-align:center; font-size:0.75rem; padding:4px 2px;
+      border-radius:6px; cursor:default; transition:var(--ease);
+    }
+    .cal-day.today { background:var(--gold); color:var(--bg); font-weight:700; border-radius:50%; }
+    .cal-day.event { color:var(--gold); font-weight:600; }
+    .cal-day.other-month { color:var(--text3); }
+    .cal-day.empty { pointer-events:none; }
+
+    /* ── CITY CLOCKS ── */
+    .clocks-row {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem;
+      margin-bottom:1.5rem;
+      animation:fadeInUp 0.8s ease 0.6s both;
+    }
+    @media(max-width:500px){ .clocks-row { grid-template-columns:1fr; } }
+    .clock-card { padding:1.2rem; text-align:center; }
+    .clock-city { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text3); margin-bottom:0.3rem; }
+    .clock-flag { font-size:1.5rem; margin-bottom:0.2rem; }
+    .clock-time { font-family:'Outfit',sans-serif; font-size:1.8rem; font-weight:800; color:var(--gold-l); line-height:1; }
+    .clock-date { font-size:0.7rem; color:var(--text2); margin-top:0.3rem; }
+    .clock-tz { font-size:0.62rem; color:var(--text3); }
+
+    /* ── SECTIONS GRID ── */
+    .sections-title {
+      font-family:'Outfit',sans-serif; font-size:1rem; font-weight:700;
+      color:var(--text2); text-align:center; margin-bottom:1rem;
+      text-transform:uppercase; letter-spacing:0.1em;
+    }
+    .sections-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+      gap:0.8rem;
+      margin-bottom:2rem;
+      animation:fadeInUp 0.8s ease 0.7s both;
+    }
+    .section-card {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:1.2rem 0.8rem;
+      text-align:center;
+      text-decoration:none;
+      border-radius:var(--r);
+      background:var(--card);
+      border:1px solid var(--border);
+      color:var(--text2);
+      transition:var(--ease);
+      gap:0.5rem;
+      position:relative; overflow:hidden;
+    }
+    .section-card::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,var(--gold-glow),transparent);
+      opacity:0; transition:var(--ease);
+    }
+    .section-card:hover { border-color:var(--gold); color:var(--gold-l); transform:translateY(-4px); box-shadow:0 8px 30px var(--gold-glow); }
+    .section-card:hover::after { opacity:1; }
+    .section-card .sc-icon { font-size:1.8rem; position:relative; z-index:1; }
+    .section-card .sc-name { font-size:0.75rem; font-weight:600; position:relative; z-index:1; }
+    .section-card .sc-badge {
+      position:absolute; top:6px; right:6px;
+      background:var(--gold); color:var(--bg);
+      font-size:0.55rem; font-weight:700;
+      padding:1px 5px; border-radius:10px; z-index:2;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background:var(--bg2); border-top:1px solid var(--border);
+      padding:2rem 1.5rem; text-align:center; position:relative; z-index:1;
+    }
+    .footer-arabic { font-family:'Amiri',serif; font-size:1.6rem; color:var(--gold); margin-bottom:0.4rem; }
+    .footer-text { color:var(--text3); font-size:0.8rem; line-height:1.8; }
+    .footer-tags { display:flex; justify-content:center; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
+    .tag {
+      display:inline-block; background:var(--gold-glow); border:1px solid var(--border);
+      color:var(--gold); font-size:0.72rem; padding:3px 10px; border-radius:20px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 var(--gold-glow)} 50%{box-shadow:0 0 20px 6px rgba(201,168,76,0)} }
+
+    /* ── DIVIDER ── */
+    .divider { width:50px; height:2px; background:linear-gradient(90deg,var(--gold),transparent); margin:.8rem auto; border-radius:2px; }
+
+    /* ── DATE BAR ── */
+    .date-bar {
+      display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;
+      margin-bottom:1.5rem; animation:fadeInUp 0.8s ease 0.25s both;
+    }
+    .date-chip {
+      background:rgba(201,168,76,0.08);
+      border:1px solid var(--border);
+      border-radius:30px;
+      padding:6px 16px;
+      font-size:0.82rem; color:var(--text2);
+      display:flex; align-items:center; gap:6px;
+    }
+    .date-chip strong { color:var(--gold-l); }
+
+    /* Tulu / Gharoob labels */
+    .sun-labels {
+      display:flex; justify-content:space-between; align-items:center;
+      max-width:700px; margin:0.3rem auto 0;
+      padding:0 1rem;
+    }
+    .sun-label { font-size:0.7rem; color:var(--text3); text-align:center; }
+    .sun-label strong { display:block; color:var(--text2); font-size:0.8rem; }
+  </style>
 </head>
 <body>
 
-<!-- Background Star Canvas -->
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-<!-- ======= NAVIGATION ======= -->
-<nav class="nav" role="navigation" aria-label="Main navigation">
-  <a href="#hero" class="nav-brand">
-    <span class="brand-arabic">الإسلام</span>
-    <span>Islamic Hub</span>
+<!-- NAV -->
+<nav aria-label="Main navigation">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-brand-arabic">الدِّين</span>
+    AD-Deen ul-Qayyim
   </a>
-
-  <ul class="nav-links" id="nav-links" role="list">
-    <li><a href="#hero">🏠 Home</a></li>
-    <li><a href="#history">📜 History</a></li>
-    <li><a href="#zakat">💰 Zakat</a></li>
-    <li><a href="#inheritance">⚖️ Mirath</a></li>
-    <li><a href="#qurbani">🐑 Qurbani</a></li>
-    <li><a href="#calendar">🌙 Calendar</a></li>
-    <li><a href="#orrery">🌍 Solar System</a></li>
-    <li><a href="#market">📈 Market</a></li>
-    <li><a href="#pillars">🕋 Pillars</a></li>
-    <li><a href="#asmaul-husna">📿 99 Names</a></li>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="sections.html#history">📜 History</a></li>
+    <li><a href="sections.html#zakat">💰 Zakat</a></li>
+    <li><a href="sections.html#inheritance">⚖️ Mirath</a></li>
+    <li><a href="sections.html#qurbani">🐑 Qurbani</a></li>
+    <li><a href="sections.html#calendar">🌙 Calendar</a></li>
+    <li><a href="sections.html#market">📈 Market</a></li>
+    <li><a href="sections.html#pillars">🕋 Pillars</a></li>
+    <li><a href="sections.html#asmaul-husna">📿 99 Names</a></li>
   </ul>
-
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">☰</button>
 </nav>
 
 <main>
+<div class="container">
 
-  <!-- ============================================================ -->
-  <!-- SECTION 1: HERO                                               -->
-  <!-- ============================================================ -->
+  <!-- HERO -->
   <section id="hero">
-    <div class="hero-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
 
-    <h1 class="hero-title">
-      Your <span class="highlight">Islamic</span><br />Knowledge Hub
-    </h1>
+    <!-- Bismillah -->
+    <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
 
-    <p class="hero-subtitle">
-      Ratnipora, Pulwama · Kashmir · India &nbsp;|&nbsp; اللهم صل على محمد
-    </p>
+    <!-- Title -->
+    <h1 class="site-title">AD-Deen ul-Qayyim<br><span>الدِّينُ الْقَيِّمُ</span></h1>
+    <p class="site-tagline">An open-source Islamic knowledge engine · اللهم صل على محمد</p>
 
-    <!-- Info Grid: Date + Time -->
-    <div class="hero-info-grid">
-      <div class="hero-info-card">
-        <div class="info-label">📅 Gregorian Date</div>
-        <div class="info-value" id="greg-date-display">Loading...</div>
+    <!-- Date Bar -->
+    <div class="date-bar">
+      <div class="date-chip">📅 <strong id="greg-date-display">—</strong></div>
+      <div class="date-chip">🌙 <strong id="hijri-date-display">—</strong></div>
+      <div class="date-chip">⏰ <strong id="local-time-display">—</strong></div>
+    </div>
+
+    <!-- ── SUN ARC PRAYER TRACKER ── -->
+    <div class="prayer-tracker-wrap card">
+      <div class="tracker-label">🕌 Salat Tracker — Srinagar, Kashmir</div>
+
+      <canvas id="sun-arc-canvas" height="160" aria-label="Sun arc showing prayer times"></canvas>
+
+      <div class="sun-labels">
+        <div class="sun-label">🌄 Tulu' (Sunrise)<strong id="sunrise-time">—</strong></div>
+        <div class="sun-label" style="text-align:center">
+          <span id="next-prayer-label" style="color:var(--gold);font-weight:600;font-size:0.75rem">Next Prayer</span>
+        </div>
+        <div class="sun-label" style="text-align:right">🌇 Ghurub (Sunset)<strong id="sunset-time">—</strong></div>
       </div>
-      <div class="hero-info-card">
-        <div class="info-label">🌙 Hijri Date</div>
-        <div class="info-value" id="hijri-date">Loading...</div>
+
+      <div class="prayer-row" id="prayer-pills">
+        <!-- rendered by JS -->
+        <div class="prayer-pill"><span class="pname">Fajr</span><span class="ptime">—</span></div>
+        <div class="prayer-pill"><span class="pname">Dhuhr</span><span class="ptime">—</span></div>
+        <div class="prayer-pill"><span class="pname">Asr</span><span class="ptime">—</span></div>
+        <div class="prayer-pill"><span class="pname">Maghrib</span><span class="ptime">—</span></div>
+        <div class="prayer-pill"><span class="pname">Isha</span><span class="ptime">—</span></div>
       </div>
-      <div class="hero-info-card">
-        <div class="info-label">🕋 Hijri (Arabic)</div>
-        <div class="info-value" id="hijri-date-arabic" style="font-family:'Amiri',serif;font-size:1.2rem">Loading...</div>
+
+      <div class="prayer-countdown" id="prayer-countdown">Loading prayer times…</div>
+    </div>
+
+    <!-- ── DAROOD IBRAHIM ── -->
+    <div class="card darood-card">
+      <div class="darood-label">✦ Darood Ibrahim — درود ابراهیم ✦</div>
+      <div class="darood-arabic">
+        اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ
       </div>
-      <div class="hero-info-card">
-        <div class="info-label">📍 Prayer Location</div>
-        <div class="info-value" id="prayer-city">Srinagar, Kashmir</div>
+      <div class="darood-arabic" style="margin-top:0.5rem">
+        اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ
       </div>
-    </div>
-
-    <!-- Prayer Times -->
-    <div style="text-align:center;margin-bottom:1rem">
-      <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)">🕌 Today's Prayer Times</span>
-    </div>
-    <div class="prayer-strip" id="prayer-times-strip">
-      <div class="prayer-time"><span class="p-name">Fajr</span><span class="p-time">--:--</span></div>
-      <div class="prayer-time"><span class="p-name">Sunrise</span><span class="p-time">--:--</span></div>
-      <div class="prayer-time"><span class="p-name">Dhuhr</span><span class="p-time">--:--</span></div>
-      <div class="prayer-time"><span class="p-name">Asr</span><span class="p-time">--:--</span></div>
-      <div class="prayer-time"><span class="p-name">Maghrib</span><span class="p-time">--:--</span></div>
-      <div class="prayer-time"><span class="p-name">Isha</span><span class="p-time">--:--</span></div>
-    </div>
-
-    <div class="next-prayer-countdown" id="next-prayer-countdown">
-      Loading next prayer...
-    </div>
-
-    <!-- World Clock Strip -->
-    <div class="world-clock-strip">
-      <div class="world-clock-title">🌍 World Islamic Cities — Local Time</div>
-      <div class="world-clocks" id="world-clocks"></div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 2: HISTORY                                            -->
-  <!-- ============================================================ -->
-  <section id="history" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">تاريخ الإسلام</div>
-      <h2 class="section-title">Islamic <span>History</span> Timeline</h2>
       <div class="divider"></div>
-      <p class="section-desc">Explore 1,400+ years of Islamic civilization — from the birth of the Prophet ﷺ to the modern Muslim world. Click each era to expand details.</p>
+      <p class="darood-trans">
+        O Allah, send Your grace upon Muhammad and upon the family of Muhammad, as You sent Your grace upon Ibrahim and upon the family of Ibrahim. Indeed You are Praiseworthy and Glorious.<br>
+        O Allah, send Your blessings upon Muhammad and upon the family of Muhammad, as You sent Your blessings upon Ibrahim and upon the family of Ibrahim. Indeed You are Praiseworthy and Glorious.
+      </p>
     </div>
 
-    <div class="timeline" id="history-timeline">
-      <!-- Dynamically rendered by JS -->
-      <div class="text-muted text-center" style="padding:2rem">Loading history timeline...</div>
+    <!-- ── CALENDARS ── -->
+    <div class="calendars-row">
+      <!-- Gregorian -->
+      <div class="card cal-card">
+        <div class="cal-title">📅 Gregorian Calendar</div>
+        <div class="cal-month-nav">
+          <span class="cal-month-name" id="greg-month-name">—</span>
+        </div>
+        <div class="cal-grid" id="greg-calendar">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Hijri -->
+      <div class="card cal-card">
+        <div class="cal-title">🌙 Hijri Calendar</div>
+        <div class="cal-month-nav">
+          <span class="cal-month-name" id="hijri-month-name">—</span>
+        </div>
+        <div class="cal-grid" id="hijri-calendar">
+          <!-- rendered by JS -->
+        </div>
+      </div>
     </div>
+
+    <!-- ── 3 CITY CLOCKS ── -->
+    <div class="clocks-row">
+      <div class="card clock-card">
+        <div class="clock-flag">🕋</div>
+        <div class="clock-city">Mecca, Saudi Arabia</div>
+        <div class="clock-time" id="clock-mecca">00:00</div>
+        <div class="clock-date" id="clock-mecca-date">—</div>
+        <div class="clock-tz">AST (UTC+3)</div>
+      </div>
+      <div class="card clock-card">
+        <div class="clock-flag">🇬🇧</div>
+        <div class="clock-city">London, UK</div>
+        <div class="clock-time" id="clock-london">00:00</div>
+        <div class="clock-date" id="clock-london-date">—</div>
+        <div class="clock-tz">BST / GMT</div>
+      </div>
+      <div class="card clock-card">
+        <div class="clock-flag">🇵🇰</div>
+        <div class="clock-city">Lahore, Pakistan</div>
+        <div class="clock-time" id="clock-lahore">00:00</div>
+        <div class="clock-date" id="clock-lahore-date">—</div>
+        <div class="clock-tz">PKT (UTC+5)</div>
+      </div>
+    </div>
+
+    <!-- ── SECTIONS NAVIGATION ── -->
+    <div class="sections-title">Explore All Sections</div>
+    <div class="sections-grid">
+
+      <a href="sections.html#history" class="section-card">
+        <span class="sc-icon">📜</span>
+        <span class="sc-name">Islamic History</span>
+      </a>
+
+      <a href="sections.html#zakat" class="section-card">
+        <span class="sc-icon">💰</span>
+        <span class="sc-name">Zakat Calculator</span>
+      </a>
+
+      <a href="sections.html#inheritance" class="section-card">
+        <span class="sc-icon">⚖️</span>
+        <span class="sc-name">Mirath / Faraid</span>
+      </a>
+
+      <a href="sections.html#qurbani" class="section-card">
+        <span class="sc-icon">🐑</span>
+        <span class="sc-name">Qurbani Guide</span>
+      </a>
+
+      <a href="sections.html#calendar" class="section-card">
+        <span class="sc-icon">🌙</span>
+        <span class="sc-name">Hijri Calendar</span>
+      </a>
+
+      <a href="sections.html#orrery" class="section-card">
+        <span class="sc-icon">🌍</span>
+        <span class="sc-name">Solar System</span>
+      </a>
+
+      <a href="sections.html#market" class="section-card">
+        <span class="sc-icon">📈</span>
+        <span class="sc-name">Gold & Market</span>
+      </a>
+
+      <a href="sections.html#pillars" class="section-card">
+        <span class="sc-icon">🕋</span>
+        <span class="sc-name">Pillars of Islam</span>
+      </a>
+
+      <a href="sections.html#asmaul-husna" class="section-card">
+        <span class="sc-icon">📿</span>
+        <span class="sc-name">99 Names of Allah</span>
+      </a>
+
+      <a href="#" class="section-card" id="ramadan-card">
+        <span class="sc-badge">SOON</span>
+        <span class="sc-icon">🌙</span>
+        <span class="sc-name">Ramadan</span>
+      </a>
+
+      <a href="#" class="section-card" id="qibla-card">
+        <span class="sc-badge">SOON</span>
+        <span class="sc-icon">🧭</span>
+        <span class="sc-name">Qibla Finder</span>
+      </a>
+
+      <a href="#" class="section-card" id="duas-card">
+        <span class="sc-badge">SOON</span>
+        <span class="sc-icon">🤲</span>
+        <span class="sc-name">Duas Collection</span>
+      </a>
+
+    </div>
+
   </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 3: ZAKAT CALCULATOR                                   -->
-  <!-- ============================================================ -->
-  <section id="zakat" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">الزكاة</div>
-      <h2 class="section-title">Zakat <span>Calculator</span></h2>
-      <div class="divider"></div>
-      <p class="section-desc">Calculate your annual Zakat obligation based on live gold/silver prices. Supports all four Madhabs.</p>
-    </div>
-
-    <!-- Madhab & Currency Selector -->
-    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem" class="section-animate">
-      <div class="form-group" style="flex:1;min-width:200px">
-        <label class="form-label" for="madhab-select">⚖️ Madhab</label>
-        <select class="form-select" id="madhab-select">
-          <option value="hanafi" selected>Hanafi (Silver Nisab — Default)</option>
-          <option value="shafii">Shafi'i (Gold Nisab)</option>
-          <option value="maliki">Maliki (Gold Nisab)</option>
-          <option value="hanbali">Hanbali (Gold Nisab)</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Nisab Indicator -->
-    <div id="nisab-display" class="nisab-indicator section-animate">
-      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.3rem">Nisab Threshold</div>
-      <div class="nisab-value">Loading...</div>
-    </div>
-
-    <!-- Calculator Grid -->
-    <div class="calculator-grid section-animate">
-      <!-- Left: Inputs -->
-      <div>
-        <form id="zakat-form">
-          <div class="card mb-2">
-            <h3 style="color:var(--gold);margin-bottom:1.5rem;font-family:'Outfit',sans-serif">💰 Asset Values (in INR)</h3>
-
-            <div class="form-group">
-              <label class="form-label" for="zakat-cash">💵 Cash & Bank Balance (₹)</label>
-              <input type="number" class="form-input" id="zakat-cash" placeholder="0" min="0" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="zakat-savings">🏦 Savings & FDs (₹)</label>
-              <input type="number" class="form-input" id="zakat-savings" placeholder="0" min="0" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="zakat-gold-g">🥇 Gold Weight (grams) — Price auto-calculated</label>
-              <input type="number" class="form-input" id="zakat-gold-g" placeholder="0" min="0" step="0.1" />
-              <small style="color:var(--text-muted);font-size:0.78rem" id="gold-price-hint">Gold price: Loading... per gram</small>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="zakat-silver-g">🥈 Silver Weight (grams) — Price auto-calculated</label>
-              <input type="number" class="form-input" id="zakat-silver-g" placeholder="0" min="0" step="0.1" />
-              <small style="color:var(--text-muted);font-size:0.78rem" id="silver-price-hint">Silver price: Loading... per gram</small>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="zakat-business">🏪 Business Assets & Stock (₹)</label>
-              <input type="number" class="form-input" id="zakat-business" placeholder="0" min="0" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="zakat-livestock">🐄 Livestock Value (₹)</label>
-              <input type="number" class="form-input" id="zakat-livestock" placeholder="0" min="0" />
-            </div>
-          </div>
-
-          <div id="zakat-due-msg"></div>
-
-          <div class="zakat-result" id="zakat-result-card">
-            <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem">Annual Zakat Due (2.5%)</div>
-            <div class="zakat-amount" id="zakat-amount">₹0</div>
-            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem">
-              Distribute to: Fuqara, Masakeen, Fi Sabilillah, Ibn as-Sabil
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- Right: Chart -->
-      <div>
-        <div class="card">
-          <h3 style="color:var(--gold);margin-bottom:1.5rem;font-family:'Outfit',sans-serif">📊 Asset Breakdown</h3>
-          <div class="chart-container">
-            <canvas id="zakat-chart"></canvas>
-          </div>
-        </div>
-
-        <div class="card mt-2" style="margin-top:1.5rem">
-          <h3 style="color:var(--gold);margin-bottom:1rem;font-family:'Outfit',sans-serif">📖 Zakat Recipients</h3>
-          <p style="font-family:'Amiri',serif;font-size:1.1rem;color:var(--gold-light);margin-bottom:0.8rem;line-height:1.8">
-            إِنَّمَا الصَّدَقَاتُ لِلْفُقَرَاءِ وَالْمَسَاكِينِ وَالْعَامِلِينَ عَلَيْهَا...
-          </p>
-          <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem">— Surah At-Tawbah 9:60</p>
-          <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
-            <span class="tag">Fuqara (Poor)</span>
-            <span class="tag">Masakeen (Needy)</span>
-            <span class="tag">Zakat Workers</span>
-            <span class="tag">New Muslims</span>
-            <span class="tag">In Debt</span>
-            <span class="tag">Fi Sabilillah</span>
-            <span class="tag">Travelers</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 4: INHERITANCE (MIRATH)                               -->
-  <!-- ============================================================ -->
-  <section id="inheritance" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">الميراث والفرائض</div>
-      <h2 class="section-title">Islamic <span>Inheritance</span> Calculator</h2>
-      <div class="divider"></div>
-      <p class="section-desc">Calculate the division of estate according to Quranic Faraid (inheritance laws). Based on Surah An-Nisa 4:11-12.</p>
-    </div>
-
-    <div class="grid-2 section-animate" style="align-items:start">
-      <!-- Left: Inputs -->
-      <div>
-        <div class="card mb-2">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
-            <h3 style="color:var(--gold);font-family:'Outfit',sans-serif">📋 Estate Details</h3>
-            <div class="form-group" style="margin:0;min-width:180px">
-              <select class="form-select" id="inheritance-madhab" style="padding:8px 12px;font-size:0.85rem">
-                <option value="hanafi" selected>Hanafi Madhab</option>
-                <option value="shafii">Shafi'i Madhab</option>
-                <option value="maliki">Maliki Madhab</option>
-                <option value="hanbali">Hanbali Madhab</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="estate-total">💰 Total Estate Value (₹)</label>
-            <input type="number" class="form-input" id="estate-total" placeholder="Enter total estate in INR" min="0" />
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem">👨‍👩‍👧‍👦 Surviving Heirs</h3>
-          <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:1rem">Enter number of each surviving heir (0 if none):</p>
-
-          <div class="heirs-grid">
-            <div class="heir-input-card">
-              <div class="heir-name">👨 Husband</div>
-              <input type="number" class="heir-count" id="h-husband" value="0" min="0" max="1" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👩 Wife/Wives</div>
-              <input type="number" class="heir-count" id="h-wife" value="0" min="0" max="4" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👦 Son(s)</div>
-              <input type="number" class="heir-count" id="h-son" value="0" min="0" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👧 Daughter(s)</div>
-              <input type="number" class="heir-count" id="h-daughter" value="0" min="0" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👴 Father</div>
-              <input type="number" class="heir-count" id="h-father" value="0" min="0" max="1" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👵 Mother</div>
-              <input type="number" class="heir-count" id="h-mother" value="0" min="0" max="1" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👴 Pat. Grandfather</div>
-              <input type="number" class="heir-count" id="h-pgf" value="0" min="0" max="1" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👵 Mat. Grandmother</div>
-              <input type="number" class="heir-count" id="h-mgm" value="0" min="0" max="1" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">🧑 Full Brother(s)</div>
-              <input type="number" class="heir-count" id="h-fbrother" value="0" min="0" />
-            </div>
-            <div class="heir-input-card">
-              <div class="heir-name">👩 Full Sister(s)</div>
-              <input type="number" class="heir-count" id="h-fsister" value="0" min="0" />
-            </div>
-          </div>
-
-          <button class="btn btn-gold" id="calc-inheritance" style="margin-top:1.5rem;width:100%">
-            ⚖️ Calculate Inheritance
-          </button>
-        </div>
-      </div>
-
-      <!-- Right: Results -->
-      <div>
-        <div class="card mb-2" style="margin-bottom:1.5rem">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">📊 Share Distribution</h3>
-          <div class="chart-container" style="height:280px">
-            <canvas id="inheritance-chart"></canvas>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">📋 Inheritance Breakdown</h3>
-          <div id="inheritance-result">
-            <div class="alert alert-info">Enter estate value and heirs, then click Calculate.</div>
-          </div>
-        </div>
-
-        <div class="card mt-2" style="margin-top:1.5rem">
-          <p style="font-family:'Amiri',serif;font-size:1.1rem;color:var(--gold-light);line-height:1.8;margin-bottom:0.5rem">
-            يُوصِيكُمُ اللَّهُ فِي أَوْلَادِكُمْ ۖ لِلذَّكَرِ مِثْلُ حَظِّ الْأُنثَيَيْنِ
-          </p>
-          <p style="color:var(--text-muted);font-size:0.85rem">— Surah An-Nisa 4:11 | For the male is the equivalent of two females' share</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 5: QURBANI / EID UL ADHA                             -->
-  <!-- ============================================================ -->
-  <section id="qurbani" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">الأضحية</div>
-      <h2 class="section-title">Eid ul-Adha <span>Qurbani</span> Guide</h2>
-      <div class="divider"></div>
-      <p class="section-desc">The sacred sacrifice of Eid ul-Adha — commemorating Prophet Ibrahim's ﷺ devotion to Allah. Learn who must perform Qurbani, eligible animals, and distribution rules.</p>
-    </div>
-
-    <!-- Days Banner -->
-    <div class="card section-animate" style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.03));border-color:var(--border-bright);text-align:center;padding:2.5rem;margin-bottom:2rem">
-      <div style="font-family:'Amiri',serif;font-size:2.5rem;color:var(--gold);margin-bottom:0.5rem">إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ</div>
-      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem">Surah Al-Kawthar — "Indeed, We have granted you Al-Kawthar"</div>
-      <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
-        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
-          <div class="info-label">Start</div>
-          <div class="info-value">10 Dhul Hijjah</div>
-        </div>
-        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
-          <div class="info-label">End</div>
-          <div class="info-value">13 Dhul Hijjah</div>
-        </div>
-        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
-          <div class="info-label">Days of Sacrifice</div>
-          <div class="info-value">4 Days (Ayyam al-Nahr)</div>
-        </div>
-        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
-          <div class="info-label">Best Time</div>
-          <div class="info-value">After Eid Prayer</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Animal Types -->
-    <h3 class="section-animate" style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem">🐄 Eligible Animals for Qurbani</h3>
-    <div class="qurbani-type-cards section-animate">
-      <div class="card animal-card">
-        <span class="animal-icon">🐏</span>
-        <div class="animal-name">Goat / Sheep</div>
-        <div class="animal-shares">🎯 1 Share = 1 Person</div>
-        <div class="animal-age">Minimum age: 1 year (goat) or 6 months (sheep if plump)</div>
-        <div style="margin-top:0.8rem"><span class="tag">Most Common</span></div>
-      </div>
-      <div class="card animal-card">
-        <span class="animal-icon">🐄</span>
-        <div class="animal-name">Cow / Buffalo / Ox</div>
-        <div class="animal-shares">🎯 7 Shares = 7 People</div>
-        <div class="animal-age">Minimum age: 2 years</div>
-        <div style="margin-top:0.8rem"><span class="tag">7 Shares</span></div>
-      </div>
-      <div class="card animal-card">
-        <span class="animal-icon">🐪</span>
-        <div class="animal-name">Camel</div>
-        <div class="animal-shares">🎯 7 Shares = 7 People</div>
-        <div class="animal-age">Minimum age: 5 years</div>
-        <div style="margin-top:0.8rem"><span class="tag">7 Shares</span> <span class="tag">Most Merit</span></div>
-      </div>
-    </div>
-
-    <!-- Distribution -->
-    <h3 class="section-animate" style="color:var(--gold);font-family:'Outfit',sans-serif;margin:2rem 0 1rem">🥩 Meat Distribution Rules</h3>
-    <div class="distribution-visual section-animate">
-      <div class="distribution-part">
-        <div class="dist-fraction">⅓</div>
-        <div class="dist-label">🏠 Keep for yourself<br>and family</div>
-      </div>
-      <div class="distribution-part">
-        <div class="dist-fraction">⅓</div>
-        <div class="dist-label">👫 Gift to relatives,<br>friends & neighbors</div>
-      </div>
-      <div class="distribution-part">
-        <div class="dist-fraction">⅓</div>
-        <div class="dist-label">🤲 Give to the poor<br>and needy</div>
-      </div>
-    </div>
-
-    <!-- Qurbani Calculator -->
-    <div class="grid-2 section-animate" style="margin-top:2rem;align-items:start">
-      <div class="card">
-        <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem">🧮 Qurbani Eligibility Calculator</h3>
-        <div class="form-group">
-          <label class="form-label" for="qurbani-assets">Total Zakatable Assets (₹)</label>
-          <input type="number" class="form-input" id="qurbani-assets" placeholder="Enter your assets in INR" min="0" />
-          <small style="color:var(--text-muted);font-size:0.78rem">Include cash, gold, silver, savings (not house/car used for personal use)</small>
-        </div>
-        <button class="btn btn-gold" id="calc-qurbani" style="width:100%">🐑 Check Qurbani Obligation</button>
-        <div id="qurbani-result" style="margin-top:1rem"></div>
-      </div>
-
-      <div class="card">
-        <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">📜 Conditions for Qurbani</h3>
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:0.7rem">
-          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Muslim (male or female)</li>
-          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Sane (Aaqil) and adult (Baligh)</li>
-          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Resident (Muqeem — not a traveler)</li>
-          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Owner of Nisab (same as Zakat threshold)</li>
-          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> On the days of Eid ul-Adha (10-13 Dhul Hijjah)</li>
-          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--red)">✗</span> Cutting nails/hair before sacrificing (Sunnah to avoid)</li>
-        </ul>
-        <div class="alert alert-info" style="margin-top:1rem;font-size:0.85rem">
-          💡 <strong>Note (Hanafi):</strong> Qurbani is Wajib (obligatory) for eligible Muslims in their home city. Shafi'i considers it Sunnah Mu'akkadah.
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 6: CALENDAR & MOON                                    -->
-  <!-- ============================================================ -->
-  <section id="calendar" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">التقويم الهجري</div>
-      <h2 class="section-title">Islamic <span>Calendar</span> & Moon Tracker</h2>
-      <div class="divider"></div>
-      <p class="section-desc">Track the Hijri lunar calendar, moon phases, and upcoming Islamic events. Convert between Gregorian and Hijri dates.</p>
-    </div>
-
-    <div class="calendar-grid section-animate">
-      <!-- Moon Display -->
-      <div>
-        <div class="card moon-display">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem;text-align:center">🌙 Current Moon Phase</h3>
-          <canvas id="moon-canvas"></canvas>
-          <div class="moon-phase-name" id="moon-phase-name">Loading...</div>
-          <p style="color:var(--text-muted);font-size:0.85rem;text-align:center;margin-top:0.5rem">The Islamic calendar is purely lunar — each month begins with the sighting of the new crescent moon (Hilal).</p>
-        </div>
-
-        <!-- Date Converter -->
-        <div class="date-converter mt-2" style="margin-top:1.5rem">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">📅 Date Converter</h3>
-          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.8rem">Gregorian → Hijri</div>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-            <input type="date" class="form-input" id="greg-date" style="flex:1" />
-            <button class="btn btn-gold" id="convert-date">Convert</button>
-          </div>
-          <div style="margin-top:1rem;padding:0.8rem;background:rgba(201,168,76,0.08);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Amiri',serif;font-size:1.1rem;color:var(--gold-light)" id="convert-result">
-            Enter a date above to convert
-          </div>
-        </div>
-      </div>
-
-      <!-- Upcoming Events -->
-      <div>
-        <div class="card">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem">📆 Islamic Calendar Events</h3>
-          <ul class="event-list" id="events-list">
-            <div class="text-muted" style="font-size:0.85rem">Loading events...</div>
-          </ul>
-        </div>
-
-        <div class="card mt-2" style="margin-top:1.5rem">
-          <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">📖 Hijri Months</h3>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem" id="hijri-months-grid">
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">01.</span> <span style="color:var(--text-secondary)">Muharram</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">02.</span> <span style="color:var(--text-secondary)">Safar</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">03.</span> <span style="color:var(--text-secondary)">Rabi al-Awwal</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">04.</span> <span style="color:var(--text-secondary)">Rabi al-Thani</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">05.</span> <span style="color:var(--text-secondary)">Jumada al-Awwal</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">06.</span> <span style="color:var(--text-secondary)">Jumada al-Thani</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">07.</span> <span style="color:var(--text-secondary)">Rajab</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">08.</span> <span style="color:var(--text-secondary)">Sha'ban</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">09.</span> <span style="color:var(--text-secondary)">Ramadan ✨</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">10.</span> <span style="color:var(--text-secondary)">Shawwal</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">11.</span> <span style="color:var(--text-secondary)">Dhul Qa'dah</span></div>
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem"><span style="color:var(--gold);font-weight:700">12.</span> <span style="color:var(--text-secondary)">Dhul Hijjah 🕋</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 7: SOLAR SYSTEM ORRERY                                -->
-  <!-- ============================================================ -->
-  <section id="orrery" class="section" style="text-align:center">
-    <div class="section-header section-animate" style="text-align:center">
-      <div class="section-subtitle">النظام الشمسي</div>
-      <h2 class="section-title">Solar System <span>Orrery</span></h2>
-      <div class="divider" style="margin:1rem auto"></div>
-      <p class="section-desc" style="margin:0 auto">Animated Earth–Moon–Sun system demonstrating the lunar orbit that defines the Islamic Hijri calendar. Watch the moon phase change in real-time.</p>
-    </div>
-
-    <div class="section-animate" style="margin-top:2rem">
-      <canvas id="orrery-canvas"></canvas>
-      <div style="margin-top:1.5rem;display:flex;justify-content:center;gap:2rem;flex-wrap:wrap">
-        <div style="text-align:center">
-          <div style="font-size:2rem">☀️</div>
-          <div style="color:var(--gold);font-size:0.8rem;font-weight:600">Sun</div>
-          <div style="color:var(--text-muted);font-size:0.75rem">Fixed center</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:2rem">🌍</div>
-          <div style="color:var(--gold);font-size:0.8rem;font-weight:600">Earth</div>
-          <div style="color:var(--text-muted);font-size:0.75rem">365.25 days/orbit</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:2rem">🌙</div>
-          <div style="color:var(--gold);font-size:0.8rem;font-weight:600">Moon</div>
-          <div style="color:var(--text-muted);font-size:0.75rem">29.5 days/orbit → Islamic month</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card section-animate" style="max-width:700px;margin:2rem auto 0;text-align:left">
-      <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">🌙 Moon & Islamic Calendar</h3>
-      <p style="color:var(--text-secondary);line-height:1.8;margin-bottom:1rem">Allah says in the Quran: <span style="font-family:'Amiri',serif;color:var(--gold-light)">يَسْأَلُونَكَ عَنِ الْأَهِلَّةِ ۖ قُلْ هِيَ مَوَاقِيتُ لِلنَّاسِ وَالْحَجِّ</span></p>
-      <p style="color:var(--text-muted);font-size:0.85rem">"They ask you about the crescents. Say: They are measurements of time for the people and for Hajj." — Al-Baqarah 2:189</p>
-      <ul style="list-style:none;display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem">
-        <li style="color:var(--text-secondary);font-size:0.9rem">🌑 <strong style="color:var(--gold)">New Moon:</strong> Start of new Hijri month (after Hilal sighting)</li>
-        <li style="color:var(--text-secondary);font-size:0.9rem">🌕 <strong style="color:var(--gold)">Full Moon:</strong> Mid-month (15 Ramadan, 15 Sha'ban)</li>
-        <li style="color:var(--text-secondary);font-size:0.9rem">🌙 <strong style="color:var(--gold)">Lunar cycle:</strong> 29.5 days → 12 months = 354-day year</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 8: MARKET / HALAL FINANCE                             -->
-  <!-- ============================================================ -->
-  <section id="market" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">التمويل الإسلامي</div>
-      <h2 class="section-title">Live Market & <span>Halal Finance</span></h2>
-      <div class="divider"></div>
-      <p class="section-desc">Live gold and silver prices in USD and INR, Nisab values, and Islamic finance principles. Data refreshes from live APIs.</p>
-    </div>
-
-    <!-- Price Cards -->
-    <div class="price-cards section-animate">
-      <div class="price-card">
-        <div class="price-metal">🥇 Gold (XAU)</div>
-        <div class="price-value" id="gold-price">Loading...</div>
-        <div class="price-unit">per troy ounce (USD)</div>
-        <div class="price-change up" id="gold-price-inr">₹--/g</div>
-      </div>
-      <div class="price-card">
-        <div class="price-metal">🥈 Silver (XAG)</div>
-        <div class="price-value" id="silver-price">Loading...</div>
-        <div class="price-unit">per troy ounce (USD)</div>
-        <div class="price-change up" id="silver-price-inr">₹--/g</div>
-      </div>
-      <div class="price-card">
-        <div class="price-metal">💱 USD / INR</div>
-        <div class="price-value" style="font-size:1.5rem" id="usd-inr">Loading...</div>
-        <div class="price-unit">Exchange Rate</div>
-        <div class="price-change" style="color:var(--text-muted)">Live rate</div>
-      </div>
-      <div class="price-card">
-        <div class="price-metal">📅 Last Updated</div>
-        <div class="price-value" style="font-size:1.2rem" id="market-time">--:--</div>
-        <div class="price-unit">Local time</div>
-        <div class="price-change" style="color:var(--green-light)" id="market-status">Fetching...</div>
-      </div>
-    </div>
-
-    <!-- Nisab Display -->
-    <h3 class="section-animate" style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">⚖️ Current Nisab Values</h3>
-    <div class="nisab-display section-animate" id="market-nisab">
-      <div class="text-muted">Loading Nisab values...</div>
-    </div>
-
-    <!-- Islamic Finance Principles -->
-    <h3 class="section-animate" style="color:var(--gold);font-family:'Outfit',sans-serif;margin:2rem 0 1rem">🏦 Islamic Finance Principles</h3>
-    <div class="grid-3 section-animate">
-      <div class="card">
-        <div style="font-size:2rem;margin-bottom:0.8rem">🚫</div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:700;color:var(--red);margin-bottom:0.5rem">Riba (Interest) Prohibited</div>
-        <p style="color:var(--text-secondary);font-size:0.85rem">Charging or paying interest is strictly forbidden. <span style="font-family:'Amiri',serif;color:var(--gold-light)">وَأَحَلَّ اللَّهُ الْبَيْعَ وَحَرَّمَ الرِّبَا</span> — Al-Baqarah 2:275</p>
-      </div>
-      <div class="card">
-        <div style="font-size:2rem;margin-bottom:0.8rem">🤝</div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:700;color:var(--green-light);margin-bottom:0.5rem">Halal Trade Encouraged</div>
-        <p style="color:var(--text-secondary);font-size:0.85rem">Legitimate trade, profit-sharing (Mudarabah), partnerships (Musharakah) are encouraged in Islam.</p>
-      </div>
-      <div class="card">
-        <div style="font-size:2rem;margin-bottom:0.8rem">⚖️</div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:700;color:var(--gold);margin-bottom:0.5rem">Gharar (Uncertainty) Avoided</div>
-        <p style="color:var(--text-secondary);font-size:0.85rem">Excessive uncertainty or speculation (options, futures) is prohibited. Investments must be in tangible assets.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 9: PILLARS OF ISLAM & IMAN                            -->
-  <!-- ============================================================ -->
-  <section id="pillars" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">أركان الإسلام والإيمان</div>
-      <h2 class="section-title">Pillars of <span>Islam & Iman</span></h2>
-      <div class="divider"></div>
-      <p class="section-desc">The foundational principles every Muslim lives by — the Five Pillars of Islam and Six Pillars of Iman.</p>
-    </div>
-
-    <!-- Tabs -->
-    <div class="pillars-tabs section-animate">
-      <button class="pillar-tab active" data-target="tab-islam">🕋 5 Pillars of Islam</button>
-      <button class="pillar-tab" data-target="tab-iman">💎 6 Pillars of Iman</button>
-    </div>
-
-    <!-- 5 Pillars of Islam -->
-    <div class="tab-content active" id="tab-islam">
-      <div class="grid-3 section-animate" style="margin-top:1rem">
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">☝️</span>
-          <div class="pillar-arabic">الشهادة</div>
-          <div class="pillar-name">1. Shahada (Declaration of Faith)</div>
-          <p class="pillar-desc">Bearing witness that there is no god but Allah and that Muhammad ﷺ is His messenger. The foundation of Islam.</p>
-          <div class="pillar-quran">لَا إِلَٰهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">🙏</span>
-          <div class="pillar-arabic">الصلاة</div>
-          <div class="pillar-name">2. Salah (Prayer)</div>
-          <p class="pillar-desc">Five daily prayers — Fajr, Dhuhr, Asr, Maghrib, Isha. The direct connection between the worshiper and Allah.</p>
-          <div class="pillar-quran">إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَوْقُوتًا — 4:103</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">💰</span>
-          <div class="pillar-arabic">الزكاة</div>
-          <div class="pillar-name">3. Zakat (Charity)</div>
-          <p class="pillar-desc">Compulsory charity of 2.5% on accumulated wealth above Nisab. Purifies wealth and supports the community.</p>
-          <div class="pillar-quran">وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ — 2:43</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">🌙</span>
-          <div class="pillar-arabic">الصوم</div>
-          <div class="pillar-name">4. Sawm (Fasting)</div>
-          <p class="pillar-desc">Fasting from dawn to sunset during Ramadan. Spiritual purification, gratitude, and empathy for the needy.</p>
-          <div class="pillar-quran">يَا أَيُّهَا الَّذِينَ آمَنُوا كُتِبَ عَلَيْكُمُ الصِّيَامُ — 2:183</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">🕋</span>
-          <div class="pillar-arabic">الحج</div>
-          <div class="pillar-name">5. Hajj (Pilgrimage)</div>
-          <p class="pillar-desc">Pilgrimage to Mecca at least once in a lifetime for those who are able. The ultimate act of submission to Allah.</p>
-          <div class="pillar-quran">وَلِلَّهِ عَلَى النَّاسِ حِجُّ الْبَيْتِ مَنِ اسْتَطَاعَ إِلَيْهِ سَبِيلًا — 3:97</div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 6 Pillars of Iman -->
-    <div class="tab-content" id="tab-iman">
-      <div class="grid-3 section-animate" style="margin-top:1rem">
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">☝️</span>
-          <div class="pillar-arabic">الإيمان بالله</div>
-          <div class="pillar-name">1. Belief in Allah</div>
-          <p class="pillar-desc">Belief in the One God — His existence, oneness (Tawheed), names, attributes, and lordship.</p>
-          <div class="pillar-quran">قُلْ هُوَ اللَّهُ أَحَدٌ — Al-Ikhlas 112:1</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">👼</span>
-          <div class="pillar-arabic">الإيمان بالملائكة</div>
-          <div class="pillar-name">2. Belief in Angels</div>
-          <p class="pillar-desc">Belief in the angels — created from light, obedient to Allah, carrying out divine duties (Jibril, Mikail, Israfil, etc.).</p>
-          <div class="pillar-quran">وَالْمَلَائِكَةُ يُسَبِّحُونَ بِحَمْدِ رَبِّهِمْ — 42:5</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">📖</span>
-          <div class="pillar-arabic">الإيمان بالكتب</div>
-          <div class="pillar-name">3. Belief in Books</div>
-          <p class="pillar-desc">Belief in all divine scriptures — Torah (Tawrat), Psalms (Zabur), Gospel (Injeel), and the Quran (final revelation).</p>
-          <div class="pillar-quran">إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ — 15:9</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">🕊️</span>
-          <div class="pillar-arabic">الإيمان بالرسل</div>
-          <div class="pillar-name">4. Belief in Prophets</div>
-          <p class="pillar-desc">Belief in all prophets from Adam AS to Muhammad ﷺ (the seal of prophets). 25 are named in the Quran.</p>
-          <div class="pillar-quran">مَا كَانَ مُحَمَّدٌ أَبَا أَحَدٍ مِن رِّجَالِكُمْ وَلَكِن رَّسُولَ اللَّهِ — 33:40</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">⏰</span>
-          <div class="pillar-arabic">الإيمان باليوم الآخر</div>
-          <div class="pillar-name">5. Belief in the Last Day</div>
-          <p class="pillar-desc">Belief in the Day of Judgment — resurrection (Ba'ath), accounting (Hisab), paradise (Jannah) and hellfire (Jahannam).</p>
-          <div class="pillar-quran">كُلُّ نَفْسٍ ذَائِقَةُ الْمَوْتِ — 3:185</div>
-        </div>
-
-        <div class="card pillar-card">
-          <span class="pillar-icon">📐</span>
-          <div class="pillar-arabic">الإيمان بالقدر</div>
-          <div class="pillar-name">6. Belief in Divine Decree</div>
-          <p class="pillar-desc">Belief in Qadar — that Allah has decreed all things in His infinite knowledge, both good and bad come from Him.</p>
-          <div class="pillar-quran">إِنَّا كُلَّ شَيْءٍ خَلَقْنَاهُ بِقَدَرٍ — 54:49</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================================ -->
-  <!-- SECTION 10: ASMAUL HUSNA                                      -->
-  <!-- ============================================================ -->
-  <section id="asmaul-husna" class="section">
-    <div class="section-header section-animate">
-      <div class="section-subtitle">أسماء الله الحسنى</div>
-      <h2 class="section-title">The 99 Names <span>of Allah</span></h2>
-      <div class="divider"></div>
-      <p class="section-desc">All 99 beautiful names of Allah with Arabic, transliteration, meaning, and benefits. The Prophet ﷺ said: "Allah has 99 names; whoever memorizes them will enter Paradise."</p>
-    </div>
-
-    <!-- Search -->
-    <div class="names-search section-animate">
-      <input type="text" class="form-input" id="names-search" placeholder="🔍 Search by name, meaning, or transliteration..." />
-    </div>
-
-    <!-- Names Grid -->
-    <div class="names-grid section-animate" id="names-grid">
-      <div class="text-muted text-center" style="padding:2rem;grid-column:1/-1">Loading the 99 Names of Allah...</div>
-    </div>
-  </section>
-
+</div><!-- /container -->
 </main>
 
-<!-- Footer -->
-<footer style="background:var(--bg-secondary);border-top:1px solid var(--border);padding:3rem 2rem;text-align:center;position:relative;z-index:1">
-  <div style="font-family:'Amiri',serif;font-size:2rem;color:var(--gold);margin-bottom:0.5rem">
-    الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
-  </div>
-  <div style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem">"All praise is for Allah, Lord of all worlds" — Al-Fatiha 1:2</div>
-  <div style="color:var(--text-muted);font-size:0.8rem">
-    Made with ❤️ for personal use · Ratnipora, Pulwama, Kashmir, India<br>
-    All calculations should be verified with a qualified Islamic scholar for important decisions.
-  </div>
-  <div style="margin-top:1.5rem;display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
-    <span class="tag">GitHub Pages Ready</span>
-    <span class="tag">No Backend Required</span>
-    <span class="tag">Offline Capable</span>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-arabic">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
+  <p class="footer-text">
+    "All praise is for Allah, Lord of all worlds" — Al-Fatiha 1:2<br>
+    AD-Deen ul-Qayyim · Open-source Islamic Knowledge Engine
+  </p>
+  <div class="footer-tags">
+    <span class="tag">GitHub Pages</span>
+    <span class="tag">Free Forever</span>
+    <span class="tag">No Backend</span>
     <span class="tag">Mobile Friendly</span>
+    <span class="tag">Open Source</span>
   </div>
 </footer>
 
-<!-- Name Modal -->
-<div class="modal-overlay" id="name-modal" onclick="if(event.target===this)closeNameModal()">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeNameModal()">✕</button>
-    <div style="color:var(--text-muted);font-size:0.8rem;margin-bottom:0.5rem" id="modal-num">#1 of 99</div>
-    <div class="modal-arabic" id="modal-arabic">الرَّحْمَنُ</div>
-    <div class="modal-transliteration" id="modal-trans">Ar-Rahman</div>
-    <div class="modal-meaning" id="modal-meaning">The Most Gracious</div>
-    <div class="modal-benefit mt-2" id="modal-benefit">💡 Benefit...</div>
-  </div>
-</div>
-
-<!-- Main JS -->
-<script src="js/app.js"></script>
-
-<!-- Gregorian date display -->
 <script>
+// ─── STARS ───────────────────────────────────────────
+(function(){
+  const c = document.getElementById('bg-canvas');
+  const ctx = c.getContext('2d');
+  let stars=[];
+  function resize(){
+    c.width=window.innerWidth; c.height=window.innerHeight;
+    stars=Array.from({length:180},()=>({
+      x:Math.random()*c.width, y:Math.random()*c.height,
+      r:Math.random()*1.3+0.2, phase:Math.random()*Math.PI*2,
+      speed:Math.random()*0.004+0.002
+    }));
+  }
+  function draw(t){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      const a=0.25+0.5*Math.sin(t*s.speed+s.phase);
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,168,76,${a})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize(); window.addEventListener('resize',resize);
+  requestAnimationFrame(draw);
+})();
+
+// ─── NAV ─────────────────────────────────────────────
+document.getElementById('nav-toggle').addEventListener('click',function(){
+  document.getElementById('nav-links').classList.toggle('open');
+});
+
+// ─── CLOCKS ──────────────────────────────────────────
+const CITIES = [
+  {id:'mecca',  tz:'Asia/Riyadh',     dateId:'clock-mecca-date'},
+  {id:'london', tz:'Europe/London',   dateId:'clock-london-date'},
+  {id:'lahore', tz:'Asia/Karachi',    dateId:'clock-lahore-date'},
+];
+function updateClocks(){
+  const now = new Date();
+  CITIES.forEach(city=>{
+    const t = now.toLocaleTimeString('en-US',{timeZone:city.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    const d = now.toLocaleDateString('en-US',{timeZone:city.tz,weekday:'short',month:'short',day:'numeric'});
+    const el = document.getElementById('clock-'+city.id);
+    const del = document.getElementById(city.dateId);
+    if(el) el.textContent = t;
+    if(del) del.textContent = d;
+  });
+}
+updateClocks(); setInterval(updateClocks,1000);
+
+// ─── DATE BAR ────────────────────────────────────────
+function updateDateBar(){
+  const now = new Date();
   const gregEl = document.getElementById('greg-date-display');
-  if (gregEl) {
-    gregEl.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  }
+  const timeEl = document.getElementById('local-time-display');
+  if(gregEl) gregEl.textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  if(timeEl) timeEl.textContent = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
+}
+updateDateBar(); setInterval(updateDateBar,1000);
 
-  // Set today's date in converter
-  const convertInput = document.getElementById('greg-date');
-  if (convertInput) {
-    const today = new Date();
-    convertInput.value = today.toISOString().split('T')[0];
+// ─── GREGORIAN CALENDAR ──────────────────────────────
+function renderGregorianCalendar(){
+  const now = new Date();
+  const y=now.getFullYear(), m=now.getMonth(), today=now.getDate();
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  document.getElementById('greg-month-name').textContent = `${monthNames[m]} ${y}`;
+  const firstDay = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const grid = document.getElementById('greg-calendar');
+  grid.innerHTML = dayNames.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++) grid.innerHTML+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const cls = d===today ? 'cal-day today' : 'cal-day';
+    grid.innerHTML+=`<div class="${cls}">${d}</div>`;
   }
+}
+renderGregorianCalendar();
 
-  // Market time update
-  function updateMarketTime() {
-    const el = document.getElementById('market-time');
-    const statusEl = document.getElementById('market-status');
-    if (el) el.textContent = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-  }
-  updateMarketTime();
-  setInterval(updateMarketTime, 60000);
+// ─── PRAYER TIMES & SUN ARC ──────────────────────────
+let prayerData = null;
+const PRAYER_METHOD = 1; // UISK (Hanafi South Asia)
 
-  // Update USD/INR display
-  setTimeout(() => {
-    const usdInrEl = document.getElementById('usd-inr');
-    if (usdInrEl && window.appState?.INR_per_USD) {
-      usdInrEl.textContent = `₹${window.appState.INR_per_USD.toFixed(2)}`;
+async function fetchPrayers(){
+  try{
+    const d=new Date(), day=d.getDate(), mo=d.getMonth()+1, yr=d.getFullYear();
+    const url=`https://api.aladhan.com/v1/timingsByCity/${day}-${mo}-${yr}?city=Srinagar&country=India&method=${PRAYER_METHOD}&school=1`;
+    const r=await fetch(url);
+    const j=await r.json();
+    if(j.code===200){
+      prayerData=j.data.timings;
+      renderPrayerPills(prayerData);
+      drawSunArc(prayerData);
+      updateSunLabels(prayerData);
     }
-  }, 3000);
-</script>
+  }catch(e){
+    // Use fallback approximate times for Srinagar in July
+    prayerData={Fajr:'03:45',Sunrise:'05:20',Dhuhr:'12:15',Asr:'16:00',Maghrib:'19:15',Isha:'20:45'};
+    renderPrayerPills(prayerData);
+    drawSunArc(prayerData);
+    updateSunLabels(prayerData);
+  }
+}
 
+function timeToMins(t){ const[h,m]=t.split(':').map(Number); return h*60+m; }
+function minsToAMPM(mins){ const h=Math.floor(mins/60)%24,m=mins%60,ap=h>=12?'PM':'AM',h12=h%12||12; return `${h12}:${String(m).padStart(2,'0')} ${ap}`; }
+function formatTime(t){ const[h,m]=t.split(':').map(Number),ap=h>=12?'PM':'AM',h12=h%12||12; return `${h12}:${String(m).padStart(2,'0')} ${ap}`; }
+
+const PRAYERS_ORDER = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+const PRAYERS_ICONS = {Fajr:'🌅',Dhuhr:'☀️',Asr:'🌤️',Maghrib:'🌇',Isha:'🌙'};
+
+function getCurrentNextPrayer(timings){
+  const now=new Date(), nowMins=now.getHours()*60+now.getMinutes();
+  for(const p of PRAYERS_ORDER){
+    if(timeToMins(timings[p])>nowMins) return p;
+  }
+  return 'Fajr';
+}
+
+function renderPrayerPills(timings){
+  const next=getCurrentNextPrayer(timings);
+  const container=document.getElementById('prayer-pills');
+  container.innerHTML=PRAYERS_ORDER.map(p=>`
+    <div class="prayer-pill ${p===next?'active':''}">
+      <span class="pname">${PRAYERS_ICONS[p]} ${p}</span>
+      <span class="ptime">${formatTime(timings[p])}</span>
+    </div>
+  `).join('');
+  // Countdown
+  startPrayerCountdown(timings);
+}
+
+function updateSunLabels(timings){
+  const sunriseEl=document.getElementById('sunrise-time');
+  const sunsetEl=document.getElementById('sunset-time');
+  if(sunriseEl) sunriseEl.textContent=formatTime(timings.Sunrise);
+  if(sunsetEl) sunsetEl.textContent=formatTime(timings.Maghrib);
+}
+
+let countdownInterval=null;
+function startPrayerCountdown(timings){
+  if(countdownInterval) clearInterval(countdownInterval);
+  function update(){
+    const next=getCurrentNextPrayer(timings);
+    const nextEl=document.getElementById('next-prayer-label');
+    const cntEl=document.getElementById('prayer-countdown');
+    const now=new Date(), nowMins=now.getHours()*60+now.getMinutes();
+    let target=timeToMins(timings[next]);
+    let diff=(target-nowMins)*60-(now.getSeconds());
+    if(diff<0) diff+=86400;
+    const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
+    const hhmmss=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(nextEl) nextEl.textContent=`Next: ${next}`;
+    if(cntEl) cntEl.innerHTML=`Time until <strong>${next} (${formatTime(timings[next])})</strong> → <strong>${hhmmss}</strong>`;
+    // Redraw sun arc every minute
+    if(s===0) drawSunArc(timings);
+  }
+  update(); countdownInterval=setInterval(update,1000);
+}
+
+// ─── SUN ARC CANVAS ──────────────────────────────────
+function drawSunArc(timings){
+  const canvas=document.getElementById('sun-arc-canvas');
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth||700, H=160;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const cx=W/2, cy=H+10, R=H+10; // arc center below canvas bottom so semicircle shows
+
+  const fajrM  = timeToMins(timings.Fajr);
+  const sunriseM=timeToMins(timings.Sunrise);
+  const dhuhrM  = timeToMins(timings.Dhuhr);
+  const asrM    = timeToMins(timings.Asr);
+  const maghribM= timeToMins(timings.Maghrib);
+  const ishaM   = timeToMins(timings.Isha);
+  const now=new Date(), nowMins=now.getHours()*60+now.getMinutes()+(now.getSeconds()/60);
+
+  // Helper: map a time (in mins) to angle on semicircle (π to 0, left to right)
+  const mapToAngle=(mins)=>{
+    const t=Math.max(0,Math.min(1,(mins-sunriseM)/(maghribM-sunriseM)));
+    return Math.PI - t*Math.PI; // π (left) to 0 (right)
+  };
+  const angleToXY=(angle)=>({
+    x:cx+R*Math.cos(angle),
+    y:cy-R*Math.sin(angle)
+  });
+
+  // Background gradient
+  const isDaytime=nowMins>=sunriseM && nowMins<=maghribM;
+  const skyGrad=ctx.createLinearGradient(0,0,0,H);
+  if(isDaytime){
+    skyGrad.addColorStop(0,'rgba(15,30,60,0.9)');
+    skyGrad.addColorStop(1,'rgba(6,13,24,0)');
+  } else {
+    skyGrad.addColorStop(0,'rgba(5,10,25,0.95)');
+    skyGrad.addColorStop(1,'rgba(6,13,24,0)');
+  }
+  ctx.fillStyle=skyGrad;
+  ctx.fillRect(0,0,W,H);
+
+  // Horizon line
+  ctx.beginPath(); ctx.moveTo(20,H-4); ctx.lineTo(W-20,H-4);
+  ctx.strokeStyle='rgba(201,168,76,0.2)'; ctx.lineWidth=1; ctx.stroke();
+
+  // Draw arc path (faint guide)
+  ctx.beginPath();
+  ctx.arc(cx,cy,R,Math.PI,0,false);
+  ctx.strokeStyle='rgba(201,168,76,0.12)'; ctx.lineWidth=1.5;
+  ctx.setLineDash([4,8]); ctx.stroke(); ctx.setLineDash([]);
+
+  // Prayer markers on arc
+  const markers=[
+    {t:fajrM,   label:'Fajr',    color:'rgba(100,150,255,0.8)'},
+    {t:sunriseM, label:'Tulu\'', color:'rgba(255,200,80,0.8)'},
+    {t:dhuhrM,  label:'Dhuhr',  color:'rgba(255,220,50,1)'},
+    {t:asrM,    label:'Asr',    color:'rgba(255,160,60,0.9)'},
+    {t:maghribM,label:'Ghurub', color:'rgba(255,80,60,0.8)'},
+    {t:ishaM,   label:'Isha',   color:'rgba(120,100,220,0.8)'},
+  ];
+
+  markers.forEach(mk=>{
+    const angle=mapToAngle(mk.t);
+    const pos=angleToXY(angle);
+    if(pos.y<0||pos.y>H) return;
+    // Dot
+    ctx.beginPath(); ctx.arc(pos.x,pos.y,4,0,Math.PI*2);
+    ctx.fillStyle=mk.color; ctx.fill();
+    // Vertical guide line
+    ctx.beginPath(); ctx.moveTo(pos.x,pos.y+5); ctx.lineTo(pos.x,H-4);
+    ctx.strokeStyle='rgba(201,168,76,0.1)'; ctx.lineWidth=0.5; ctx.stroke();
+    // Label
+    ctx.font='bold 9px Inter'; ctx.fillStyle=mk.color;
+    ctx.textAlign='center';
+    const ly=Math.min(pos.y-8, H-22);
+    if(ly>0) ctx.fillText(mk.label,pos.x,ly);
+  });
+
+  // ── Current sun/moon position ──
+  const sunAngle=mapToAngle(nowMins);
+  const sunPos=angleToXY(sunAngle);
+
+  if(isDaytime && sunPos.y>=0 && sunPos.y<=H){
+    // Glowing sun
+    const sunGrad=ctx.createRadialGradient(sunPos.x,sunPos.y,0,sunPos.x,sunPos.y,20);
+    sunGrad.addColorStop(0,'rgba(255,220,80,0.8)');
+    sunGrad.addColorStop(0.4,'rgba(255,180,40,0.4)');
+    sunGrad.addColorStop(1,'rgba(255,150,0,0)');
+    ctx.beginPath(); ctx.arc(sunPos.x,sunPos.y,20,0,Math.PI*2);
+    ctx.fillStyle=sunGrad; ctx.fill();
+    // Sun core
+    ctx.beginPath(); ctx.arc(sunPos.x,sunPos.y,7,0,Math.PI*2);
+    ctx.fillStyle='#FFE04B'; ctx.fill();
+    ctx.strokeStyle='rgba(255,220,80,0.9)'; ctx.lineWidth=2; ctx.stroke();
+    // Rays
+    for(let i=0;i<8;i++){
+      const ra=i*Math.PI/4, rx=sunPos.x+Math.cos(ra)*11, ry=sunPos.y+Math.sin(ra)*11;
+      ctx.beginPath(); ctx.arc(rx,ry,1.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,220,80,0.5)'; ctx.fill();
+    }
+  } else {
+    // Moon (nighttime) — fixed position top center
+    const mx=cx, my=30;
+    const moonGrad=ctx.createRadialGradient(mx-3,my-3,0,mx,my,14);
+    moonGrad.addColorStop(0,'rgba(220,210,180,0.9)');
+    moonGrad.addColorStop(1,'rgba(160,150,120,0.3)');
+    ctx.beginPath(); ctx.arc(mx,my,12,0,Math.PI*2);
+    ctx.fillStyle=moonGrad; ctx.fill();
+    // Crescent shadow
+    ctx.beginPath(); ctx.arc(mx+5,my-2,9,0,Math.PI*2);
+    ctx.fillStyle='rgba(6,13,24,0.9)'; ctx.fill();
+    ctx.font='10px Inter'; ctx.fillStyle='rgba(180,170,140,0.6)';
+    ctx.textAlign='center'; ctx.fillText('🌙',mx,my+35);
+  }
+
+  // Day progress bar at bottom
+  const dayProgress=Math.max(0,Math.min(1,(nowMins-sunriseM)/(maghribM-sunriseM)));
+  ctx.beginPath(); ctx.moveTo(30,H-2); ctx.lineTo(W-30,H-2);
+  ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=4; ctx.stroke();
+  if(isDaytime){
+    ctx.beginPath(); ctx.moveTo(30,H-2); ctx.lineTo(30+(W-60)*dayProgress,H-2);
+    const pgGrad=ctx.createLinearGradient(30,0,W-30,0);
+    pgGrad.addColorStop(0,'rgba(100,150,255,0.7)');
+    pgGrad.addColorStop(0.5,'rgba(255,200,80,0.9)');
+    pgGrad.addColorStop(1,'rgba(255,80,60,0.7)');
+    ctx.strokeStyle=pgGrad; ctx.lineWidth=4;
+    ctx.lineCap='round'; ctx.stroke();
+  }
+}
+
+// ─── HIJRI DATE & CALENDAR ───────────────────────────
+async function fetchHijriData(){
+  try{
+    const d=new Date(), day=d.getDate(), mo=d.getMonth()+1, yr=d.getFullYear();
+    const r=await fetch(`https://api.aladhan.com/v1/gToH/${day}-${mo}-${yr}`);
+    const j=await r.json();
+    if(j.code===200){
+      const h=j.data.hijri;
+      const el=document.getElementById('hijri-date-display');
+      if(el) el.textContent=`${h.day} ${h.month.en} ${h.year} AH`;
+      renderHijriCalendar(h);
+    }
+  }catch(e){
+    const el=document.getElementById('hijri-date-display');
+    if(el) el.textContent='Hijri date unavailable';
+  }
+}
+
+function renderHijriCalendar(hijriData){
+  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const monthName=hijriData.month.en;
+  const year=hijriData.year;
+  const todayDay=parseInt(hijriData.day);
+  // Hijri months have 29 or 30 days
+  const daysInMonth=parseInt(hijriData.month.number)%2===1?30:29;
+
+  document.getElementById('hijri-month-name').textContent=`${monthName} ${year} AH`;
+
+  // We approximate weekday of 1st by offset from today's weekday
+  const today=new Date();
+  const todayWeekday=today.getDay();
+  const firstWeekday=(todayWeekday-((todayDay-1)%7)+7)%7;
+
+  const grid=document.getElementById('hijri-calendar');
+  grid.innerHTML=dayNames.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
+  for(let i=0;i<firstWeekday;i++) grid.innerHTML+=`<div class="cal-day empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const cls=d===todayDay?'cal-day today':'cal-day';
+    grid.innerHTML+=`<div class="${cls}">${d}</div>`;
+  }
+}
+
+// ─── RESIZE HANDLER ──────────────────────────────────
+window.addEventListener('resize',()=>{ if(prayerData) drawSunArc(prayerData); });
+
+// ─── INIT ─────────────────────────────────────────────
+fetchPrayers();
+fetchHijriData();
+</script>
 </body>
 </html>
