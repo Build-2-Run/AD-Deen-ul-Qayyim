@@ -1,10 +1,11 @@
-# 🕌 Islamic Knowledge Hub
+# 🕌 AD-Deen ul-Qayyim — الدِّينُ الْقَيِّمُ
 
-> A comprehensive personal Islamic reference website — Ratnipora, Pulwama, Kashmir, India
+> *An open-source knowledge engine dedicated to Islamic history, theology, and philosophy. Connecting traditional scholarship with modern digital accessibility.*
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ready-green?style=flat-square)](https://pages.github.com/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green?style=flat-square)](https://build2run.github.io/AD-Deen-ul-Qayyim/)
 [![No Backend](https://img.shields.io/badge/Backend-None%20Required-gold?style=flat-square)]()
 [![Mobile Ready](https://img.shields.io/badge/Mobile-Responsive-blue?style=flat-square)]()
+[![Open Source](https://img.shields.io/badge/Open%20Source-Islamic%20Knowledge-teal?style=flat-square)]()
 
 ---
 
@@ -28,25 +29,15 @@
 ## 🚀 Deploy to GitHub Pages (Free Hosting)
 
 ### Step 1: Create a GitHub Repository
-1. Go to [github.com](https://github.com) and sign in
-2. Click **"New Repository"**
-3. Name it anything (e.g., `islamic-hub` or `my-islam-site`)
-4. Set it to **Public**
-5. Click **"Create repository"**
+1. Go to [github.com/new](https://github.com/new) and sign in as **Build2Run**
+2. **Repository name**: `AD-Deen-ul-Qayyim`
+3. **Description**: *An open-source knowledge engine dedicated to Islamic history, theology, and philosophy. Connecting traditional scholarship with modern digital accessibility.*
+4. Set to **Public**
+5. ❌ **Do NOT** check "Initialize with README" (we already have one)
+6. Click **"Create repository"**
 
-### Step 2: Upload Your Files
-**Option A — Using GitHub website (simplest):**
-1. In your new repo, click **"Add file" → "Upload files"**
-2. Drag and drop ALL the files/folders from this project
-3. Click **"Commit changes"**
-
-**Option B — Using Git command line:**
+### Step 2: Push the Code (run once in your terminal)
 ```bash
-git init
-git add .
-git commit -m "Initial Islamic Hub website"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/islamic-hub.git
 git push -u origin main
 ```
 
@@ -54,7 +45,9 @@ git push -u origin main
 1. Go to your repo → **Settings** → **Pages**
 2. Under "Source", select **main branch** → **/ (root)**
 3. Click **Save**
-4. Wait 2-3 minutes, then visit: `https://YOUR_USERNAME.github.io/islamic-hub/`
+4. Wait 2–3 minutes, then visit:
+
+🌐 **https://build2run.github.io/AD-Deen-ul-Qayyim/**
 
 🎉 **Your site is now live for free, forever!**
 
