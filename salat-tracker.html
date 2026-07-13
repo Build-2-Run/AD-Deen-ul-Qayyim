@@ -30,8 +30,9 @@
     /* CURSOR */
     #cursor-dot{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--gold)}
     #cursor-ring{position:fixed;width:26px;height:26px;border:1.5px solid rgba(201,168,76,0.6);border-radius:50%;pointer-events:none;z-index:999998;transform:translate(-50%,-50%);transition:left .12s ease,top .12s ease}
-    .sparkle{position:fixed;pointer-events:none;z-index:999997;font-size:11px;color:var(--gold);animation:sp .7s ease forwards;transform:translate(-50%,-50%)}
-    @keyframes sp{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(0)}}
+    #sparkle-canvas {
+      position:fixed; inset:0; pointer-events:none; z-index:999995;
+    }
 
     /* NAV */
     nav{position:sticky;top:0;z-index:100;background:rgba(6,13,24,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem}
@@ -136,6 +137,7 @@
 <!-- CURSOR -->
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
+<canvas id="sparkle-canvas"></canvas>
 
 <!-- NAV -->
 <nav>
@@ -304,21 +306,85 @@
 // CURSOR
 // ─────────────────────────────────────────────────────────────
 const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
-const SPS=['✦','✧','★','⋆','·','✵'];
+const canvas = document.getElementById('sparkle-canvas');
+const ctx = canvas.getContext('2d');
 let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{
-  mx=e.clientX;my=e.clientY;
-  dot.style.left=mx+'px';dot.style.top=my+'px';
-  if(Math.random()<0.3){
-    const s=document.createElement('div');s.className='sparkle';
-    s.style.left=mx+'px';s.style.top=my+'px';
-    s.style.fontSize=(7+Math.random()*7)+'px';
-    s.style.color=`hsl(${40+Math.random()*20},90%,${60+Math.random()*15}%)`;
-    s.textContent=SPS[Math.floor(Math.random()*SPS.length)];
-    document.body.appendChild(s);setTimeout(()=>s.remove(),700);
+
+function resizeSparkleCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeSparkleCanvas();
+window.addEventListener('resize', resizeSparkleCanvas);
+
+const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"];
+let particles = [];
+
+const spawnParticles = (x, y) => {
+  for (let i = 0; i < 3; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 3 + 0.5;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    particles.push({
+      x,
+      y,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      color,
+    });
   }
+};
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  dot.style.left = mx + 'px';
+  dot.style.top = my + 'px';
+  spawnParticles(mx, my);
 });
-(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+
+(function animateSparkles() {
+  // Ease the ring cursor
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+
+  // Draw/animate canvas particles
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, i) => {
+    p.x += p.dx;
+    p.y += p.dy;
+    p.dx *= 0.92;
+    p.dy *= 0.92;
+
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Remove slow particles
+    if (Math.abs(p.dx) < 0.05 && Math.abs(p.dy) < 0.05) {
+      particles.splice(i, 1);
+    }
+  });
+
+  requestAnimationFrame(animateSparkles);
+})();
+
+document.addEventListener('mousedown', () => {
+  dot.style.width = '6px';
+  dot.style.height = '6px';
+  ring.style.width = '40px';
+  ring.style.height = '40px';
+});
+document.addEventListener('mouseup', () => {
+  dot.style.width = '10px';
+  dot.style.height = '10px';
+  ring.style.width = '28px';
+  ring.style.height = '28px';
+});
 
 // ─────────────────────────────────────────────────────────────
 // CONSTANTS
