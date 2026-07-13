@@ -143,18 +143,7 @@
       <p class="section-desc">Calculate your annual Zakat obligation based on live gold/silver prices.</p>
     </div>
 
-    <!-- Madhab & Currency Selector -->
-    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem" class="section-animate">
-      <div class="form-group" style="flex:1;min-width:200px;display:none">
-        <label class="form-label" for="madhab-select">⚖️ Madhab</label>
-        <select class="form-select" id="madhab-select">
-          <option value="hanafi" selected>Hanafi (Silver Nisab — Default)</option>
-          <option value="shafii">Shafi'i (Gold Nisab)</option>
-          <option value="maliki">Maliki (Gold Nisab)</option>
-          <option value="hanbali">Hanbali (Gold Nisab)</option>
-        </select>
-      </div>
-    </div>
+    <input type="hidden" id="madhab-select" value="hanafi" />
 
     <!-- Nisab Indicator -->
     <div id="nisab-display" class="nisab-indicator section-animate">
@@ -261,14 +250,7 @@
         <div class="card mb-2">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
             <h3 style="color:var(--gold);font-family:'Outfit',sans-serif">📋 Estate Details</h3>
-            <div class="form-group" style="margin:0;min-width:180px;display:none">
-              <select class="form-select" id="inheritance-madhab" style="padding:8px 12px;font-size:0.85rem">
-                <option value="hanafi" selected>Hanafi Madhab</option>
-                <option value="shafii">Shafi'i Madhab</option>
-                <option value="maliki">Maliki Madhab</option>
-                <option value="hanbali">Hanbali Madhab</option>
-              </select>
-            </div>
+            <input type="hidden" id="inheritance-madhab" value="hanafi" />
           </div>
 
           <div class="form-group">
