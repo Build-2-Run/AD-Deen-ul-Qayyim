@@ -1,0 +1,30 @@
+{
+  "recurring": [
+    {"name": "Muharram (Islamic New Year)", "hijriMonth": 1, "hijriDay": 1, "description": "First month of the Islamic calendar. The month of Allah.", "significance": "high"},
+    {"name": "Ashura", "hijriMonth": 1, "hijriDay": 10, "description": "Day of fasting — Moses was saved from Pharaoh. Day of mourning for Shia Muslims (martyrdom of Husain RA).", "significance": "high"},
+    {"name": "Mawlid an-Nabawi", "hijriMonth": 3, "hijriDay": 12, "description": "Birth of Prophet Muhammad ﷺ (12 Rabi al-Awwal).", "significance": "medium"},
+    {"name": "Isra wal Mi'raj", "hijriMonth": 7, "hijriDay": 27, "description": "Night Journey and Ascension of the Prophet ﷺ to the heavens.", "significance": "high"},
+    {"name": "Sha'ban 15 (Shab-e-Barat)", "hijriMonth": 8, "hijriDay": 15, "description": "Night of Forgiveness — night of worship and seeking forgiveness.", "significance": "medium"},
+    {"name": "Start of Ramadan", "hijriMonth": 9, "hijriDay": 1, "description": "Beginning of the holy month of fasting.", "significance": "high"},
+    {"name": "Laylat ul-Qadr", "hijriMonth": 9, "hijriDay": 27, "description": "Night of Power — better than a thousand months.", "significance": "high"},
+    {"name": "Eid ul-Fitr", "hijriMonth": 10, "hijriDay": 1, "description": "Festival of breaking the fast — celebration after Ramadan.", "significance": "high"},
+    {"name": "Arafah Day", "hijriMonth": 12, "hijriDay": 9, "description": "Day of Hajj — standing at Arafah. Fasting on this day expiates two years of sins.", "significance": "high"},
+    {"name": "Eid ul-Adha", "hijriMonth": 12, "hijriDay": 10, "description": "Festival of Sacrifice — commemorating Ibrahim's AS willingness to sacrifice his son.", "significance": "high"},
+    {"name": "Days of Tashreeq", "hijriMonth": 12, "hijriDay": 11, "description": "Days of Eid (11th, 12th, 13th Dhul Hijjah) — Qurbani can be done on these days.", "significance": "medium"},
+    {"name": "End of Dhul Hijjah", "hijriMonth": 12, "hijriDay": 30, "description": "End of the Islamic year.", "significance": "low"}
+  ],
+  "worldCities": [
+    {"name": "Mecca", "country": "Saudi Arabia", "timezone": "Asia/Riyadh", "lat": 21.3891, "lon": 39.8579, "method": 4},
+    {"name": "Madinah", "country": "Saudi Arabia", "timezone": "Asia/Riyadh", "lat": 24.5247, "lon": 39.5692, "method": 4},
+    {"name": "Jerusalem (Al-Quds)", "country": "Palestine", "timezone": "Asia/Jerusalem", "lat": 31.7683, "lon": 35.2137, "method": 5},
+    {"name": "Istanbul", "country": "Turkey", "timezone": "Europe/Istanbul", "lat": 41.0082, "lon": 28.9784, "method": 13},
+    {"name": "Cairo", "country": "Egypt", "timezone": "Africa/Cairo", "lat": 30.0444, "lon": 31.2357, "method": 5},
+    {"name": "Islamabad", "country": "Pakistan", "timezone": "Asia/Karachi", "lat": 33.6844, "lon": 73.0479, "method": 1},
+    {"name": "Dhaka", "country": "Bangladesh", "timezone": "Asia/Dhaka", "lat": 23.8103, "lon": 90.4125, "method": 1},
+    {"name": "Kuala Lumpur", "country": "Malaysia", "timezone": "Asia/Kuala_Lumpur", "lat": 3.1390, "lon": 101.6869, "method": 3},
+    {"name": "Jakarta", "country": "Indonesia", "timezone": "Asia/Jakarta", "lat": -6.2088, "lon": 106.8456, "method": 20},
+    {"name": "London", "country": "United Kingdom", "timezone": "Europe/London", "lat": 51.5074, "lon": -0.1278, "method": 2},
+    {"name": "New York", "country": "USA", "timezone": "America/New_York", "lat": 40.7128, "lon": -74.0060, "method": 2},
+    {"name": "Srinagar", "country": "India", "timezone": "Asia/Kolkata", "lat": 34.0837, "lon": 74.7973, "method": 1}
+  ]
+}

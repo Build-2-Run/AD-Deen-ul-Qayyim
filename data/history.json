@@ -1,0 +1,82 @@
+[
+  {
+    "era": "Pre-Islamic Arabia",
+    "period": "Before 610 CE",
+    "color": "#8B5E3C",
+    "icon": "🏜️",
+    "summary": "The Age of Ignorance (Jahiliyyah) — tribal Arabia, idol worship, social injustice",
+    "details": "Arabia before Islam was characterized by tribal warfare, idol worship (360 idols in the Kaaba), female infanticide, and extreme social inequality. The Quraysh tribe controlled Mecca and the sacred Kaaba, which had become a center of polytheistic worship. Desert trade routes connected Arabia to Persia, Byzantium, and Africa.",
+    "keyFigures": ["Hashim ibn Abd Manaf (Prophet's ancestor)", "Abd al-Muttalib (grandfather)", "Abu Talib (uncle)"],
+    "keyEvents": ["Building of the Kaaba by Ibrahim & Ismail", "Year of the Elephant (570 CE)", "Birth of Prophet Muhammad ﷺ (570 CE)"]
+  },
+  {
+    "era": "Prophethood & Revelation",
+    "period": "610 – 622 CE",
+    "color": "#c9a84c",
+    "icon": "📖",
+    "summary": "First revelation in Cave Hira — 13 years of Meccan preaching, persecution, and early converts",
+    "details": "In 610 CE, the Angel Jibril (Gabriel) revealed the first verses of the Quran to Prophet Muhammad ﷺ in Cave Hira. The early Muslim community faced severe persecution from the Quraysh. Key early converts included Khadijah RA, Ali RA, Abu Bakr RA, and Usman RA. The miraculous Night Journey (Isra wal Mi'raj) occurred during this period.",
+    "keyFigures": ["Prophet Muhammad ﷺ", "Khadijah bint Khuwaylid RA", "Abu Bakr As-Siddiq RA", "Ali ibn Abi Talib RA"],
+    "keyEvents": ["First Revelation (610 CE)", "Isra wal Mi'raj", "Hijra to Abyssinia", "Year of Sorrow (619 CE)"]
+  },
+  {
+    "era": "Hijra & Madinah Period",
+    "period": "622 – 632 CE",
+    "color": "#2ecc71",
+    "icon": "🕌",
+    "summary": "Migration to Madinah — establishment of Islamic state, major battles, Conquest of Mecca",
+    "details": "The migration (Hijra) to Madinah in 622 CE marks year 1 of the Islamic calendar. Prophet Muhammad ﷺ established the first Islamic constitution (Sahifa al-Madinah), built Masjid an-Nabawi, and led the Muslim community. Major battles: Badr (624), Uhud (625), Khandaq (627). The Quran was completed and Mecca was conquered peacefully in 630 CE.",
+    "keyFigures": ["Prophet Muhammad ﷺ", "Umar ibn al-Khattab RA", "Bilal ibn Rabah RA", "Salman al-Farisi RA"],
+    "keyEvents": ["Hijra to Madinah (622 CE)", "Battle of Badr (624 CE)", "Treaty of Hudaybiyyah (628 CE)", "Conquest of Mecca (630 CE)", "Farewell Sermon (632 CE)"]
+  },
+  {
+    "era": "Khulafa Rashideen",
+    "period": "632 – 661 CE",
+    "color": "#3498db",
+    "icon": "⚔️",
+    "summary": "The Rightly Guided Caliphs — Abu Bakr, Umar, Uthman, Ali — rapid Islamic expansion",
+    "details": "After the Prophet's passing, four righteous caliphs led the Muslim community. Abu Bakr RA unified Arabia and compiled the Quran. Umar RA expanded the empire to Persia, Egypt, and Syria. Uthman RA produced the standardized Quran and saw the empire reach North Africa and Central Asia. Ali RA faced the first civil war (Fitna). This era is considered the golden model of Islamic governance.",
+    "keyFigures": ["Abu Bakr As-Siddiq RA", "Umar ibn al-Khattab RA", "Uthman ibn Affan RA", "Ali ibn Abi Talib RA"],
+    "keyEvents": ["Compilation of Quran (Abu Bakr era)", "Conquest of Jerusalem (638 CE)", "Battle of Qadisiyyah", "Standardization of Quran (650 CE)", "Battle of Karbala (680 CE)"]
+  },
+  {
+    "era": "Umayyad Caliphate",
+    "period": "661 – 750 CE",
+    "color": "#9b59b6",
+    "icon": "🌍",
+    "summary": "Largest contiguous empire — spanning Spain to Central Asia, early Islamic art and architecture",
+    "details": "The Umayyads established the first hereditary Islamic dynasty with capital in Damascus. The empire expanded to its greatest territorial extent — from the Iberian Peninsula (Spain/Portugal) in the west to the Indus Valley in the east. This era saw the building of the Dome of the Rock in Jerusalem (691 CE) and the Great Mosque of Damascus. Arabic became the administrative language of the empire.",
+    "keyFigures": ["Muawiyah ibn Abi Sufyan", "Abd al-Malik ibn Marwan", "Umar ibn Abd al-Aziz (Omar II)", "Tariq ibn Ziyad"],
+    "keyEvents": ["Dome of the Rock built (691 CE)", "Conquest of Spain (711 CE)", "Battle of Tours (732 CE)", "Reforms of Umar II"]
+  },
+  {
+    "era": "Abbasid Caliphate",
+    "period": "750 – 1258 CE",
+    "color": "#e74c3c",
+    "icon": "📚",
+    "summary": "Islamic Golden Age — Baghdad as center of science, philosophy, medicine, and mathematics",
+    "details": "The Abbasids moved the capital to Baghdad and ushered in the Islamic Golden Age. The House of Wisdom (Bayt al-Hikmah) became the world's greatest center of learning. Muslim scholars preserved and advanced Greek knowledge, invented algebra (Al-Khwarizmi), revolutionized medicine (Ibn Sina), and made breakthroughs in optics (Ibn al-Haytham). The empire fell to the Mongol invasion in 1258 CE.",
+    "keyFigures": ["Harun al-Rashid", "Al-Ma'mun", "Al-Khwarizmi", "Ibn Sina (Avicenna)", "Al-Biruni"],
+    "keyEvents": ["House of Wisdom founded (830 CE)", "Algebra invented by Al-Khwarizmi", "Ibn Sina's Canon of Medicine", "Mongol destruction of Baghdad (1258 CE)"]
+  },
+  {
+    "era": "Ottoman Empire",
+    "period": "1299 – 1922 CE",
+    "color": "#e67e22",
+    "icon": "🏰",
+    "summary": "Last great Islamic caliphate — spanning three continents, preserving Islamic civilization",
+    "details": "The Ottoman Empire was one of history's longest-lasting empires, ruling for over 600 years. At its peak it controlled Anatolia, the Balkans, the Middle East, and North Africa. The conquest of Constantinople in 1453 CE by Sultan Mehmed II was a landmark event. The Ottomans were known for their legal system (Kanun), architecture (Hagia Sophia, Süleymaniye Mosque), and military power (Janissaries).",
+    "keyFigures": ["Osman I (Founder)", "Mehmed II (Fatih)", "Suleiman the Magnificent", "Selim I"],
+    "keyEvents": ["Founding of Ottoman state (1299 CE)", "Conquest of Constantinople (1453 CE)", "Selim I becomes Caliph (1517 CE)", "Battle of Lepanto (1571 CE)", "Abolition of Caliphate (1924 CE)"]
+  },
+  {
+    "era": "Modern Islamic World",
+    "period": "1900 CE – Present",
+    "color": "#1abc9c",
+    "icon": "🌐",
+    "summary": "Post-colonial Muslim nations, Islamic revival movements, 1.9 billion Muslims worldwide",
+    "details": "The 20th century saw the dissolution of the Ottoman Caliphate, creation of Muslim-majority nation-states, and the establishment of major Islamic organizations. Pakistan was created as a homeland for Muslims in 1947. The OIC (Organisation of Islamic Cooperation) was founded in 1969. Today, 1.9 billion Muslims form the second-largest religion, with Islam being the fastest-growing religion globally.",
+    "keyFigures": ["Muhammad Iqbal", "Muhammad Ali Jinnah", "King Abdulaziz (Saudi Arabia)", "Imam Khomeini"],
+    "keyEvents": ["Pakistan Independence (1947)", "OIC Founded (1969)", "Fall of Berlin Wall, fall of Soviet Union impacted Muslim states", "Arab Spring (2011)"]
+  }
+]
