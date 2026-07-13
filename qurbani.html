@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qurbani Guide — AD-Deen ul-Qayyim</title>
+  <meta name="description" content="A guide to Qurbani rules, eligible animals, distribution of meat, and obligation calculator." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    #cursor-dot {
+      position:fixed; width:10px; height:10px;
+      background:var(--gold);
+      border-radius:50%;
+      pointer-events:none; z-index:999999;
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 10px var(--gold);
+      transition:width 0.15s, height 0.15s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-ring {
+      position:fixed; width:26px; height:26px;
+      border:1.5px solid rgba(201,168,76,0.6);
+      border-radius:50%;
+      pointer-events:none; z-index:999998;
+      transform:translate(-50%,-50%);
+      transition:width 0.2s, height 0.2s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-dot.visible, #cursor-ring.visible { opacity:1; }
+    #sparkle-canvas {
+      position:fixed; inset:0; pointer-events:none; z-index:999995;
+    }
+    @media (max-width: 1024px) {
+      #cursor-dot, #cursor-ring, #sparkle-canvas {
+        display:none !important;
+      }
+      body {
+        cursor:auto !important;
+      }
+    }
+    body { cursor: none; }
+    .page-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .btn-back:hover {
+      color: var(--gold-light);
+      transform: translateX(-4px);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor elements -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<canvas id="sparkle-canvas"></canvas>
+
+<!-- Starfield canvas -->
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand">
+    <span class="brand-arabic">الإسلام</span>
+    <span>Islamic Hub</span>
+  </a>
+  <ul class="nav-links" id="nav-links" role="list">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="history.html">📜 History</a></li>
+    <li><a href="zakat.html">💰 Zakat</a></li>
+    <li><a href="mirath.html">⚖️ Mirath</a></li>
+    <li><a href="qurbani.html" class="active">🐑 Qurbani</a></li>
+    <li><a href="calendar.html">🌙 Calendar</a></li>
+    <li><a href="orrery.html">🌍 Solar System</a></li>
+    <li><a href="market.html">📈 Market</a></li>
+    <li><a href="pillars.html">🕋 Pillars</a></li>
+    <li><a href="asmaul-husna.html">📿 99 Names</a></li>
+  </ul>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+</nav>
+
+<main class="page-container">
+  <a href="index.html" class="btn-back">← Back to Home</a>
+  
+  <!-- QURBANI SECTION -->
+  <section id="qurbani" class="section" style="padding-top:0">
+    <div class="section-header section-animate">
+      <div class="section-subtitle">الأضحية</div>
+      <h2 class="section-title">Eid ul-Adha <span>Qurbani</span> Guide</h2>
+      <div class="divider"></div>
+      <p class="section-desc">The sacred sacrifice of Eid ul-Adha — commemorating Prophet Ibrahim's ﷺ devotion to Allah. Learn who must perform Qurbani, eligible animals, and distribution rules.</p>
+    </div>
+
+    <!-- Days Banner -->
+    <div class="card section-animate" style="background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.03));border-color:var(--border-bright);text-align:center;padding:2.5rem;margin-bottom:2rem">
+      <div style="font-family:'Amiri',serif;font-size:2.5rem;color:var(--gold);margin-bottom:0.5rem">إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem">Surah Al-Kawthar — "Indeed, We have granted you Al-Kawthar"</div>
+      <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
+        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
+          <div class="info-label">Start</div>
+          <div class="info-value">10 Dhul Hijjah</div>
+        </div>
+        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
+          <div class="info-label">End</div>
+          <div class="info-value">13 Dhul Hijjah</div>
+        </div>
+        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
+          <div class="info-label">Days of Sacrifice</div>
+          <div class="info-value">4 Days (Ayyam al-Nahr)</div>
+        </div>
+        <div class="hero-info-card" style="background:rgba(201,168,76,0.08)">
+          <div class="info-label">Best Time</div>
+          <div class="info-value">After Eid Prayer</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animal Types -->
+    <h3 class="section-animate" style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem">🐄 Eligible Animals for Qurbani</h3>
+    <div class="qurbani-type-cards section-animate">
+      <div class="card animal-card">
+        <span class="animal-icon">🐏</span>
+        <div class="animal-name">Goat / Sheep</div>
+        <div class="animal-shares">🎯 1 Share = 1 Person</div>
+        <div class="animal-age">Minimum age: 1 year (goat) or 6 months (sheep if plump)</div>
+        <div style="margin-top:0.8rem"><span class="tag">Most Common</span></div>
+      </div>
+      <div class="card animal-card">
+        <span class="animal-icon">🐄</span>
+        <div class="animal-name">Cow / Buffalo / Ox</div>
+        <div class="animal-shares">🎯 7 Shares = 7 People</div>
+        <div class="animal-age">Minimum age: 2 years</div>
+        <div style="margin-top:0.8rem"><span class="tag">7 Shares</span></div>
+      </div>
+      <div class="card animal-card">
+        <span class="animal-icon">🐪</span>
+        <div class="animal-name">Camel</div>
+        <div class="animal-shares">🎯 7 Shares = 7 People</div>
+        <div class="animal-age">Minimum age: 5 years</div>
+        <div style="margin-top:0.8rem"><span class="tag">7 Shares</span> <span class="tag">Most Merit</span></div>
+      </div>
+    </div>
+
+    <!-- Distribution -->
+    <h3 class="section-animate" style="color:var(--gold);font-family:'Outfit',sans-serif;margin:2rem 0 1rem">🥩 Meat Distribution Rules</h3>
+    <div class="distribution-visual section-animate">
+      <div class="distribution-part">
+        <div class="dist-fraction">⅓</div>
+        <div class="dist-label">🏠 Keep for yourself<br>and family</div>
+      </div>
+      <div class="distribution-part">
+        <div class="dist-fraction">⅓</div>
+        <div class="dist-label">👫 Gift to relatives,<br>friends & neighbors</div>
+      </div>
+      <div class="distribution-part">
+        <div class="dist-fraction">⅓</div>
+        <div class="dist-label">🤲 Give to the poor<br>and needy</div>
+      </div>
+    </div>
+
+    <!-- Qurbani Calculator -->
+    <div class="grid-2 section-animate" style="margin-top:2rem;align-items:start">
+      <div class="card">
+        <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1.5rem">🧮 Qurbani Eligibility Calculator</h3>
+        <div class="form-group">
+          <label class="form-label" for="qurbani-assets">Total Zakatable Assets (₹)</label>
+          <input type="number" class="form-input" id="qurbani-assets" placeholder="Enter your assets in INR" min="0" />
+          <small style="color:var(--text-muted);font-size:0.78rem">Include cash, gold, silver, savings (not house/car used for personal use)</small>
+        </div>
+        <button class="btn btn-gold" id="calc-qurbani" style="width:100%">🐑 Check Qurbani Obligation</button>
+        <div id="qurbani-result" style="margin-top:1rem"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:1rem">📜 Conditions for Qurbani</h3>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:0.7rem">
+          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Muslim (male or female)</li>
+          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Sane (Aaqil) and adult (Baligh)</li>
+          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Resident (Muqeem — not a traveler)</li>
+          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> Owner of Nisab (same as Zakat threshold)</li>
+          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--gold)">✓</span> On the days of Eid ul-Adha (10-13 Dhul Hijjah)</li>
+          <li style="display:flex;gap:0.8rem;color:var(--text-secondary);font-size:0.9rem"><span style="color:var(--red)">✗</span> Cutting nails/hair before sacrificing (Sunnah to avoid)</li>
+        </ul>
+        <div class="alert alert-info" style="margin-top:1rem;font-size:0.85rem">
+          💡 <strong>Note:</strong> Qurbani is obligatory (Wajib) or highly recommended (Sunnah Mu'akkadah) for eligible Muslims in their home city.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-arabic" style="text-align:center;font-family:'Amiri',serif;font-size:1.5rem;color:var(--gold);margin-top:2rem">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
+  <p style="text-align:center;color:var(--text3);font-size:0.78rem;margin-top:0.5rem">AD-Deen ul-Qayyim · Ratnipora, Kashmir</p>
+</footer>
+
+<!-- App scripts -->
+<script src="js/app.js" defer></script>
+<script>
+  // Canvas Sparkle script
+  const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
+  const canvas = document.getElementById('sparkle-canvas');
+  const ctx = canvas.getContext('2d');
+  let mx=0,my=0,rx=0,ry=0;
+
+  function resizeSparkleCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeSparkleCanvas();
+  window.addEventListener('resize', resizeSparkleCanvas);
+
+  const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"];
+  let particles = [];
+
+  const spawnParticles = (x, y) => {
+    for (let i = 0; i < 3; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 0.5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particles.push({ x, y, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed, color });
+    }
+  };
+
+  let cursorInitialized = false;
+  document.addEventListener('mousemove', e => {
+    if (!cursorInitialized) {
+      dot.classList.add('visible');
+      ring.classList.add('visible');
+      cursorInitialized = true;
+    }
+    mx = e.clientX;
+    my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+    spawnParticles(mx, my);
+  });
+
+  (function animateSparkles() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => {
+      p.x += p.dx; p.y += p.dy;
+      p.dx *= 0.92; p.dy *= 0.92;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+      return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
+    });
+    requestAnimationFrame(animateSparkles);
+  })();
+
+  document.addEventListener('mousedown', () => {
+    dot.style.width = '6px'; dot.style.height = '6px';
+    ring.style.width = '40px'; ring.style.height = '40px';
+  });
+  document.addEventListener('mouseup', () => {
+    dot.style.width = '10px'; dot.style.height = '10px';
+    ring.style.width = '26px'; ring.style.height = '26px';
+  });
+  
+  // NAV TOGGLE
+  document.getElementById('nav-toggle').addEventListener('click', () => {
+    document.getElementById('nav-links').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

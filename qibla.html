@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qibla Finder — AD-Deen ul-Qayyim</title>
+  <meta name="description" content="Calculate the direction of the Kaaba (Qibla) from your current location with an interactive compass." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    #cursor-dot {
+      position:fixed; width:10px; height:10px;
+      background:var(--gold);
+      border-radius:50%;
+      pointer-events:none; z-index:999999;
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 10px var(--gold);
+      transition:width 0.15s, height 0.15s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-ring {
+      position:fixed; width:26px; height:26px;
+      border:1.5px solid rgba(201,168,76,0.6);
+      border-radius:50%;
+      pointer-events:none; z-index:999998;
+      transform:translate(-50%,-50%);
+      transition:width 0.2s, height 0.2s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-dot.visible, #cursor-ring.visible { opacity:1; }
+    #sparkle-canvas {
+      position:fixed; inset:0; pointer-events:none; z-index:999995;
+    }
+    @media (max-width: 1024px) {
+      #cursor-dot, #cursor-ring, #sparkle-canvas {
+        display:none !important;
+      }
+      body {
+        cursor:auto !important;
+      }
+    }
+    body { cursor: none; }
+    .page-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .btn-back:hover {
+      color: var(--gold-light);
+      transform: translateX(-4px);
+    }
+    
+    /* Compass Styles */
+    .compass-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 2rem auto;
+      border-radius: 50%;
+      border: 3px solid var(--border-bright);
+      background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, rgba(6,13,24,0.6) 80%);
+      box-shadow: 0 0 25px rgba(201,168,76,0.15), inset 0 0 15px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .compass-dial {
+      position: absolute;
+      width: 90%;
+      height: 90%;
+      transition: transform 0.2s ease-out;
+    }
+    .compass-needle {
+      position: absolute;
+      width: 4px;
+      height: 70%;
+      background: linear-gradient(to bottom, var(--red) 50%, var(--gold) 50%);
+      border-radius: 4px;
+      transform-origin: center center;
+    }
+    .compass-needle::before {
+      content: 'N';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--red);
+    }
+    .qibla-needle {
+      position: absolute;
+      width: 6px;
+      height: 80%;
+      transform-origin: center center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .qibla-arrow {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 20px solid var(--gold);
+      filter: drop-shadow(0 0 4px var(--gold));
+    }
+    .qibla-icon-mecca {
+      font-size: 1.2rem;
+      margin-top: 4px;
+      transform: translateY(-8px);
+    }
+    .qibla-value-display {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor elements -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<canvas id="sparkle-canvas"></canvas>
+
+<!-- Starfield canvas -->
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand">
+    <span class="brand-arabic">الإسلام</span>
+    <span>Islamic Hub</span>
+  </a>
+  <ul class="nav-links" id="nav-links" role="list">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="history.html">📜 History</a></li>
+    <li><a href="zakat.html">💰 Zakat</a></li>
+    <li><a href="mirath.html">⚖️ Mirath</a></li>
+    <li><a href="qurbani.html">🐑 Qurbani</a></li>
+    <li><a href="calendar.html">🌙 Calendar</a></li>
+    <li><a href="orrery.html">🌍 Solar System</a></li>
+    <li><a href="market.html">📈 Market</a></li>
+    <li><a href="pillars.html">🕋 Pillars</a></li>
+    <li><a href="asmaul-husna.html">📿 99 Names</a></li>
+  </ul>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+</nav>
+
+<main class="page-container">
+  <a href="index.html" class="btn-back">← Back to Home</a>
+  
+  <!-- QIBLA FINDER SECTION -->
+  <section id="qibla" class="section" style="padding-top:0">
+    <div class="section-header section-animate">
+      <div class="section-subtitle">إتجاه القبلة</div>
+      <h2 class="section-title">Qibla <span>Finder</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">Locate the exact direction of the Kaaba in Mecca from your current position using GPS coordinates.</p>
+    </div>
+
+    <div class="card section-animate" style="max-width:600px;margin:0 auto">
+      <div id="qibla-status" style="text-align:center;font-size:0.9rem;color:var(--text-secondary)">
+        🌐 Requesting GPS location access...
+      </div>
+      
+      <!-- Compass Visualizer -->
+      <div class="compass-container">
+        <!-- Main Dial showing North needle -->
+        <div class="compass-dial" id="compass-dial">
+          <div class="compass-needle" style="margin: 0 auto;"></div>
+        </div>
+        <!-- Qibla Arrow overlays the dial -->
+        <div class="qibla-needle" id="qibla-needle">
+          <div class="qibla-arrow"></div>
+          <div class="qibla-icon-mecca">🕋</div>
+        </div>
+      </div>
+
+      <div class="qibla-value-display" id="qibla-bearing">--°</div>
+      <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem">Qibla angle from True North</p>
+
+      <div style="margin-top:2rem;padding:1rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px">
+        <h4 style="color:var(--gold);font-family:'Outfit',sans-serif;margin-bottom:0.5rem">💡 How to use:</h4>
+        <ul style="list-style:none;font-size:0.85rem;color:var(--text-secondary);display:flex;flex-direction:column;gap:0.4rem">
+          <li>1. Grant location permissions when prompted.</li>
+          <li>2. Hold your device flat (parallel to the ground).</li>
+          <li>3. Rotate your body until the gold arrow (🕋) points straight ahead.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-arabic" style="text-align:center;font-family:'Amiri',serif;font-size:1.5rem;color:var(--gold);margin-top:2rem">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
+  <p style="text-align:center;color:var(--text3);font-size:0.78rem;margin-top:0.5rem">AD-Deen ul-Qayyim · Ratnipora, Kashmir</p>
+</footer>
+
+<!-- App scripts -->
+<script src="js/app.js" defer></script>
+<script>
+  const statusEl = document.getElementById('qibla-status');
+  const bearingEl = document.getElementById('qibla-bearing');
+  const compassDial = document.getElementById('compass-dial');
+  const qiblaNeedle = document.getElementById('qibla-needle');
+
+  const MECCA_LAT = 21.4225;
+  const MECCA_LON = 39.8262;
+
+  // Degrees to Radians
+  function rad(deg) { return (deg * Math.PI) / 180; }
+  // Radians to Degrees
+  function deg(rad) { return (rad * 180) / Math.PI; }
+
+  // Qibla calculation
+  function calculateQibla(lat, lon) {
+    const phi = rad(lat);
+    const lambda = rad(lon);
+    const phiK = rad(MECCA_LAT);
+    const lambdaK = rad(MECCA_LON);
+    
+    const y = Math.sin(lambdaK - lambda);
+    const x = Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda);
+    
+    let qiblaBearing = deg(Math.atan2(y, x));
+    return (qiblaBearing + 360) % 360;
+  }
+
+  // Get current location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        const qiblaAngle = calculateQibla(lat, lon);
+        statusEl.innerHTML = `📍 Location obtained: <strong>${lat.toFixed(4)}°, ${lon.toFixed(4)}°</strong>`;
+        bearingEl.textContent = `${qiblaAngle.toFixed(1)}°`;
+        
+        // Point the Qibla arrow on the compass
+        qiblaNeedle.style.transform = `rotate(${qiblaAngle}deg)`;
+        
+        // Set up device orientation if supported
+        setupCompass();
+      },
+      (error) => {
+        statusEl.innerHTML = `⚠️ GPS Error: ${error.message}. Using Srinagar (Kashmir) coordinates as default.`;
+        // Default to Srinagar (Kashmir)
+        const qiblaAngle = calculateQibla(34.0837, 74.7973);
+        bearingEl.textContent = `${qiblaAngle.toFixed(1)}°`;
+        qiblaNeedle.style.transform = `rotate(${qiblaAngle}deg)`;
+      }
+    );
+  } else {
+    statusEl.innerHTML = `⚠️ Geolocation not supported. Defaulting to Srinagar (Kashmir).`;
+    const qiblaAngle = calculateQibla(34.0837, 74.7973);
+    bearingEl.textContent = `${qiblaAngle.toFixed(1)}°`;
+    qiblaNeedle.style.transform = `rotate(${qiblaAngle}deg)`;
+  }
+
+  function setupCompass() {
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      window.addEventListener('deviceorientation', handleOrientation, true);
+    }
+  }
+
+  function handleOrientation(e) {
+    // Check alpha (heading from north)
+    let heading = e.alpha;
+    if (e.webkitCompassHeading) {
+      heading = e.webkitCompassHeading; // iOS support
+    }
+    
+    if (heading !== null && heading !== undefined) {
+      // Rotate the compass dial opposite to heading
+      compassDial.style.transform = `rotate(${-heading}deg)`;
+    }
+  }
+
+  // Canvas Sparkle script
+  const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
+  const canvas = document.getElementById('sparkle-canvas');
+  const ctx = canvas.getContext('2d');
+  let mx=0,my=0,rx=0,ry=0;
+
+  function resizeSparkleCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeSparkleCanvas();
+  window.addEventListener('resize', resizeSparkleCanvas);
+
+  const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"];
+  let particles = [];
+
+  const spawnParticles = (x, y) => {
+    for (let i = 0; i < 3; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 0.5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particles.push({ x, y, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed, color });
+    }
+  };
+
+  let cursorInitialized = false;
+  document.addEventListener('mousemove', e => {
+    if (!cursorInitialized) {
+      dot.classList.add('visible');
+      ring.classList.add('visible');
+      cursorInitialized = true;
+    }
+    mx = e.clientX;
+    my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+    spawnParticles(mx, my);
+  });
+
+  (function animateSparkles() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => {
+      p.x += p.dx; p.y += p.dy;
+      p.dx *= 0.92; p.dy *= 0.92;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+      return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
+    });
+    requestAnimationFrame(animateSparkles);
+  })();
+
+  document.addEventListener('mousedown', () => {
+    dot.style.width = '6px'; dot.style.height = '6px';
+    ring.style.width = '40px'; ring.style.height = '40px';
+  });
+  document.addEventListener('mouseup', () => {
+    dot.style.width = '10px'; dot.style.height = '10px';
+    ring.style.width = '26px'; ring.style.height = '26px';
+  });
+  
+  // NAV TOGGLE
+  document.getElementById('nav-toggle').addEventListener('click', () => {
+    document.getElementById('nav-links').classList.toggle('open');
+  });
+</script>
+</body>
+</html>
