@@ -501,94 +501,301 @@ function calculateInheritance() {
 
 function computeInheritance(heirs, total, madhab) {
   let shares = [];
-  let remaining = 1.0; // fraction of estate
 
-  // Determine if deceased is male or female (simplified — we compute for general case)
-  const hasChildren = heirs.son > 0 || heirs.daughter > 0;
-  const hasMaleChild = heirs.son > 0;
+  // Basic flags
+  const hasSon = heirs.son > 0;
+  const hasDaughter = heirs.daughter > 0;
+  const hasChildren = hasSon || hasDaughter;
 
-  // FIXED SHARES (Fard)
-  // Spouse
+  // Parents existence
+  const hasFather = heirs.father > 0;
+  const hasMother = heirs.mother > 0;
+
+  // Siblings count
+  const totalSiblings = heirs.full_brother + heirs.full_sister;
+
+  // Map of fixed fard heirs
+  let fardHeirs = {};
+
+  // 1. Spouse Share (Surah An-Nisa 4:12)
   if (heirs.husband > 0) {
-    const share = hasChildren ? 1/4 : 1/2;
-    shares.push({ heir: 'Husband', count: 1, fraction: share, basis: hasChildren ? '1/4 (children exist)' : '1/2 (no children)' });
-    remaining -= share;
+    const fraction = hasChildren ? 1/4 : 1/2;
+    fardHeirs['Husband'] = {
+      fraction: fraction,
+      count: 1,
+      basis: hasChildren ? '1/4 (because deceased left children)' : '1/2 (because deceased left no children)'
+    };
   }
   if (heirs.wife > 0) {
-    const share = hasChildren ? 1/8 : 1/4;
-    const totalShare = share; // shared among wives
-    shares.push({ heir: 'Wife/Wives', count: heirs.wife, fraction: totalShare, basis: hasChildren ? '1/8 (children exist)' : '1/4 (no children)' });
-    remaining -= totalShare;
+    const fraction = hasChildren ? 1/8 : 1/4;
+    fardHeirs['Wife/Wives'] = {
+      fraction: fraction, // split among wives
+      count: heirs.wife,
+      basis: hasChildren ? '1/8 (because deceased left children)' : '1/4 (because deceased left no children)'
+    };
   }
 
-  // Mother
-  if (heirs.mother > 0) {
-    const share = (hasChildren || heirs.full_brother >= 2 || heirs.full_sister >= 2) ? 1/6 : 1/3;
-    shares.push({ heir: 'Mother', count: 1, fraction: share, basis: hasChildren ? '1/6 (children exist)' : '1/3' });
-    remaining -= share;
-  }
+  // 2. Mother's Share (Surah An-Nisa 4:11)
+  if (hasMother) {
+    let motherFraction = 1/3;
+    let basis = '1/3 (because deceased left no children and < 2 siblings)';
 
-  // Father (gets 1/6 if children exist, else asabah)
-  if (heirs.father > 0) {
-    if (hasChildren) {
-      shares.push({ heir: 'Father', count: 1, fraction: 1/6, basis: '1/6 (children exist)' });
-      remaining -= 1/6;
+    if (hasChildren || totalSiblings >= 2) {
+      motherFraction = 1/6;
+      basis = hasChildren ? '1/6 (because deceased left children)' : '1/6 (because deceased left 2 or more siblings)';
+    } else if (hasFather && (heirs.husband > 0 || heirs.wife > 0)) {
+      // Umariyyat / Gharrawayn Case (Father + Mother + Spouse)
+      // Mother receives 1/3 of the residue after spouse's share
+      if (heirs.husband > 0) {
+        motherFraction = 1/6; // 1/3 of (1 - 1/2) = 1/6
+        basis = '1/6 (Umariyyat: 1/3 of remainder after Husband\'s share)';
+      } else if (heirs.wife > 0) {
+        motherFraction = 1/4; // 1/3 of (1 - 1/4) = 1/4
+        basis = '1/4 (Umariyyat: 1/3 of remainder after Wife\'s share)';
+      }
     }
-    // else: father gets residual (asabah) — handled below
+
+    fardHeirs['Mother'] = {
+      fraction: motherFraction,
+      count: 1,
+      basis: basis
+    };
   }
 
-  // Daughters only (no sons) — get fixed fractions
-  if (heirs.daughter > 0 && heirs.son === 0) {
-    const share = heirs.daughter === 1 ? 1/2 : 2/3;
-    shares.push({ heir: 'Daughter(s)', count: heirs.daughter, fraction: share, basis: heirs.daughter === 1 ? '1/2 (single daughter)' : '2/3 (multiple daughters)' });
-    remaining -= share;
+  // 3. Father's Fixed Share (Surah An-Nisa 4:11 - gets 1/6 only if children exist, otherwise acts as Asabah/residual)
+  if (hasFather && hasChildren) {
+    fardHeirs['Father'] = {
+      fraction: 1/6,
+      count: 1,
+      basis: '1/6 (because deceased left children)'
+    };
   }
 
-  // RESIDUAL (Asabah) — Sons, Sons+Daughters (2:1 ratio), Father (if no children)
-  if (remaining > 0.001) {
-    if (heirs.son > 0) {
-      const totalParts = heirs.son * 2 + heirs.daughter; // son gets 2x daughter
-      const sonShare = (heirs.son * 2 / totalParts) * remaining;
-      const daughterShare = (heirs.daughter / totalParts) * remaining;
+  // 4. Daughters' Fixed Share (Surah An-Nisa 4:11 - only if there are no sons)
+  if (hasDaughter && !hasSon) {
+    const fraction = heirs.daughter === 1 ? 1/2 : 2/3;
+    const basis = heirs.daughter === 1 ? '1/2 (single daughter, no sons)' : '2/3 (multiple daughters, no sons)';
+    fardHeirs['Daughter(s)'] = {
+      fraction: fraction,
+      count: heirs.daughter,
+      basis: basis
+    };
+  }
+
+  // 5. Grandparents Fallbacks (if parents are absent)
+  if (heirs.maternal_grandmother > 0 && !hasMother) {
+    fardHeirs['Maternal Grandmother'] = {
+      fraction: 1/6,
+      count: 1,
+      basis: '1/6 (because Mother is absent)'
+    };
+  }
+  const hasGrandfather = heirs.paternal_grandfather > 0 && !hasFather;
+  if (hasGrandfather && hasChildren) {
+    fardHeirs['Paternal Grandfather'] = {
+      fraction: 1/6,
+      count: 1,
+      basis: '1/6 (because Father is absent and children exist)'
+    };
+  }
+
+  // 6. Sisters' Fixed Share (only if Kalalah: no children, no father, no grandfather, and no brothers)
+  const isKalalah = !hasChildren && !hasFather && !hasGrandfather;
+  if (isKalalah && heirs.full_sister > 0 && heirs.full_brother === 0) {
+    const fraction = heirs.full_sister === 1 ? 1/2 : 2/3;
+    const basis = heirs.full_sister === 1 ? '1/2 (single sister, Kalalah)' : '2/3 (multiple sisters, Kalalah)';
+    fardHeirs['Full Sister(s)'] = {
+      fraction: fraction,
+      count: heirs.full_sister,
+      basis: basis
+    };
+  }
+
+  // Sum up all fixed (Fard) shares to check for Aul
+  let sumFard = 0;
+  for (let heirName in fardHeirs) {
+    sumFard += fardHeirs[heirName].fraction;
+  }
+
+  // Aul (Reduction): Sum of shares exceeds 1.0
+  if (sumFard > 1.0001) {
+    for (let heirName in fardHeirs) {
+      const originalFraction = fardHeirs[heirName].fraction;
+      fardHeirs[heirName].fraction = originalFraction / sumFard;
+      fardHeirs[heirName].basis += ` (Reduced via Aul from ${formatFractionName(originalFraction)})`;
 
       shares.push({
-        heir: `Son(s)`,
-        count: heirs.son,
-        fraction: sonShare,
-        basis: `Residual (Asabah) — 2:1 ratio with daughters`
+        heir: heirName,
+        count: fardHeirs[heirName].count,
+        fraction: fardHeirs[heirName].fraction,
+        basis: fardHeirs[heirName].basis
       });
+    }
+    return finalizeSharesList(shares, total);
+  }
 
-      if (heirs.daughter > 0) {
-        shares.push({
-          heir: `Daughter(s)`,
+  // Standard case: Copy Fard shares to final results
+  for (let heirName in fardHeirs) {
+    shares.push({
+      heir: heirName,
+      count: fardHeirs[heirName].count,
+      fraction: fardHeirs[heirName].fraction,
+      basis: fardHeirs[heirName].basis
+    });
+  }
+
+  // Residue fraction
+  let remaining = 1.0 - sumFard;
+
+  // Asabah (Residual Heirs) distribution
+  if (remaining > 0.0001) {
+    let asabahShares = [];
+
+    // Priority 1: Sons & Daughters (as Asabah Bil-Ghayr)
+    if (hasSon) {
+      const totalParts = heirs.son * 2 + heirs.daughter;
+      asabahShares.push({
+        heir: 'Son(s)',
+        count: heirs.son,
+        fraction: (heirs.son * 2 / totalParts) * remaining,
+        basis: `Residual (Asabah Bil-Ghayr: 2:1 ratio with daughters)`
+      });
+      if (hasDaughter) {
+        asabahShares.push({
+          heir: 'Daughter(s)',
           count: heirs.daughter,
-          fraction: daughterShare,
-          basis: `Residual (Asabah) — 1:2 ratio with sons`
+          fraction: (heirs.daughter / totalParts) * remaining,
+          basis: `Residual (Asabah Bil-Ghayr: 1:2 ratio with sons)`
         });
       }
       remaining = 0;
-    } else if (heirs.father > 0 && !hasChildren) {
-      shares.push({ heir: 'Father', count: 1, fraction: remaining, basis: 'Residual (Asabah) — no children' });
+    }
+    // Priority 2: Father (gets entire residue as Asabah if no male descendants)
+    else if (hasFather) {
+      const fatherIdx = shares.findIndex(s => s.heir === 'Father');
+      if (fatherIdx !== -1) {
+        shares[fatherIdx].fraction += remaining;
+        shares[fatherIdx].basis = `1/6 fixed + Residual (Asabah — no sons) — total: ${formatFractionName(shares[fatherIdx].fraction)}`;
+      } else {
+        shares.push({
+          heir: 'Father',
+          count: 1,
+          fraction: remaining,
+          basis: 'Residual (Asabah — no children)'
+        });
+      }
       remaining = 0;
-    } else if (heirs.full_brother > 0 || heirs.full_sister > 0) {
-      // Full siblings get residual
-      const total = heirs.full_brother * 2 + heirs.full_sister;
-      if (total > 0) {
-        if (heirs.full_brother > 0) {
-          shares.push({ heir: 'Full Brother(s)', count: heirs.full_brother, fraction: (heirs.full_brother * 2 / total) * remaining, basis: 'Residual (Asabah)' });
-        }
+    }
+    // Priority 3: Paternal Grandfather (in absence of father)
+    else if (hasGrandfather) {
+      const gfIdx = shares.findIndex(s => s.heir === 'Paternal Grandfather');
+      if (gfIdx !== -1) {
+        shares[gfIdx].fraction += remaining;
+        shares[gfIdx].basis = `1/6 fixed + Residual (Asabah)`;
+      } else {
+        shares.push({
+          heir: 'Paternal Grandfather',
+          count: 1,
+          fraction: remaining,
+          basis: 'Residual (Asabah)'
+        });
+      }
+      remaining = 0;
+    }
+    // Priority 4: Siblings (Full Brothers / Full Sisters)
+    else if (isKalalah && (heirs.full_brother > 0 || heirs.full_sister > 0)) {
+      if (heirs.full_brother > 0) {
+        const totalParts = heirs.full_brother * 2 + heirs.full_sister;
+        asabahShares.push({
+          heir: 'Full Brother(s)',
+          count: heirs.full_brother,
+          fraction: (heirs.full_brother * 2 / totalParts) * remaining,
+          basis: 'Residual (Asabah Bil-Ghayr: 2:1 ratio)'
+        });
         if (heirs.full_sister > 0) {
-          shares.push({ heir: 'Full Sister(s)', count: heirs.full_sister, fraction: (heirs.full_sister / total) * remaining, basis: 'Residual (Asabah)' });
+          asabahShares.push({
+            heir: 'Full Sister(s)',
+            count: heirs.full_sister,
+            fraction: (heirs.full_sister / totalParts) * remaining,
+            basis: 'Residual (Asabah Bil-Ghayr: 1:2 ratio)'
+          });
         }
+        remaining = 0;
+      } else {
+        // Sisters act as Asabah Ma'al Ghayr if there are daughters (and no brothers/sons/father)
+        if (hasDaughter) {
+          asabahShares.push({
+            heir: 'Full Sister(s)',
+            count: heirs.full_sister,
+            fraction: remaining,
+            basis: 'Residual (Asabah Ma\'al Ghayr with daughters)'
+          });
+          remaining = 0;
+        }
+      }
+    }
+
+    if (asabahShares.length > 0) {
+      shares.push(...asabahShares);
+    }
+  }
+
+  // Radd (Return): If there is still residue and no Asabah heirs exist
+  if (remaining > 0.0001) {
+    // Radd is distributed proportionally among Fard heirs except Husband and Wife
+    let raddHeirs = shares.filter(s => s.heir !== 'Husband' && s.heir !== 'Wife/Wives');
+    if (raddHeirs.length > 0) {
+      const eligibleSum = raddHeirs.reduce((sum, h) => sum + h.fraction, 0);
+      shares.forEach(s => {
+        if (s.heir !== 'Husband' && s.heir !== 'Wife/Wives') {
+          const raddAmount = (s.fraction / eligibleSum) * remaining;
+          s.fraction += raddAmount;
+          s.basis += ` (+ Radd proportion)`;
+        }
+      });
+      remaining = 0;
+    } else {
+      // In the absolute absence of other heirs, give remaining back to Spouse (modern/civil Faraid fallback)
+      let spouseHeir = shares.find(s => s.heir === 'Husband' || s.heir === 'Wife/Wives');
+      if (spouseHeir) {
+        spouseHeir.fraction += remaining;
+        spouseHeir.basis += ` (+ Radd residue)`;
         remaining = 0;
       }
     }
   }
 
+  return finalizeSharesList(shares, total);
+}
+
+function formatFractionName(fraction) {
+  const common = [
+    { val: 1/2, name: '1/2' }, { val: 1/3, name: '1/3' }, { val: 2/3, name: '2/3' },
+    { val: 1/4, name: '1/4' }, { val: 3/4, name: '3/4' }, { val: 1/6, name: '1/6' },
+    { val: 5/6, name: '5/6' }, { val: 1/8, name: '1/8' }, { val: 3/8, name: '3/8' },
+    { val: 7/8, name: '7/8' }, { val: 1/12, name: '1/12' }, { val: 5/12, name: '5/12' },
+    { val: 7/12, name: '7/12' }, { val: 17/24, name: '17/24' }
+  ];
+  for (let item of common) {
+    if (Math.abs(item.val - fraction) < 0.005) return item.name;
+  }
+  return `${(fraction * 100).toFixed(1)}%`;
+}
+
+function finalizeSharesList(shares, total) {
+  const customOrder = ['Husband', 'Wife/Wives', 'Father', 'Mother', 'Son(s)', 'Daughter(s)', 'Maternal Grandmother', 'Paternal Grandfather', 'Full Brother(s)', 'Full Sister(s)'];
+  shares.sort((a, b) => {
+    let indexA = customOrder.indexOf(a.heir);
+    let indexB = customOrder.indexOf(b.heir);
+    if (indexA === -1) indexA = 99;
+    if (indexB === -1) indexB = 99;
+    return indexA - indexB;
+  });
+
   return shares.map(s => ({
     ...s,
     amount: s.fraction * total,
-    perPerson: s.fraction * total / s.count
+    perPerson: (s.fraction * total) / s.count
   }));
 }
 
