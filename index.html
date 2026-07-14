@@ -48,40 +48,7 @@
     ::-webkit-scrollbar-track { background:var(--bg); }
     ::-webkit-scrollbar-thumb { background:var(--gold-d); border-radius:3px; }
 
-    /* ── MAGIC CURSOR ── */
-    #cursor-dot {
-      position:fixed; width:10px; height:10px;
-      background:var(--gold);
-      border-radius:50%;
-      pointer-events:none; z-index:999999;
-      transform:translate(-50%,-50%);
-      box-shadow:0 0 12px var(--gold),0 0 24px rgba(201,168,76,0.5);
-      transition:width 0.15s, height 0.15s, opacity 0.3s;
-      opacity:0;
-    }
-    #cursor-ring {
-      position:fixed; width:28px; height:28px;
-      border:1.5px solid rgba(201,168,76,0.6);
-      border-radius:50%;
-      pointer-events:none; z-index:999998;
-      transform:translate(-50%,-50%);
-      transition:width 0.2s, height 0.2s, opacity 0.3s;
-      opacity:0;
-    }
-    #cursor-dot.visible, #cursor-ring.visible {
-      opacity:1;
-    }
-    #sparkle-canvas {
-      position:fixed; inset:0; pointer-events:none; z-index:999995;
-    }
-    @media (max-width: 1024px) {
-      #cursor-dot, #cursor-ring, #sparkle-canvas {
-        display:none !important;
-      }
-      body {
-        cursor:auto !important;
-      }
-    }
+
 
     /* ── STARS ── */
     #bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
@@ -322,23 +289,48 @@
       text-transform:uppercase; letter-spacing:0.12em;
     }
     .sections-grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-      gap:0.7rem; margin-bottom:2rem; animation:fadeInUp 0.8s ease 0.65s both;
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+      gap:0.9rem; margin-bottom:2.5rem; animation:fadeInUp 0.8s ease 0.65s both;
     }
     .section-card {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      padding:1.1rem 0.6rem; text-align:center; text-decoration:none;
+      padding:1.5rem 1rem; text-align:center; text-decoration:none;
       border-radius:var(--r); background:var(--card);
-      border:1px solid var(--border); color:var(--text2);
-      transition:var(--ease); gap:0.4rem; position:relative; overflow:hidden;
+      border:1px solid var(--border); color:#ffffff;
+      transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+      gap:0.5rem; position:relative; overflow:hidden;
+      background-size:cover; background-position:center; background-repeat:no-repeat;
+      height: 135px;
+      transform-style:preserve-3d;
+      perspective:1000px;
     }
-    .section-card:hover { border-color:var(--gold); color:var(--gold-l); transform:translateY(-4px); box-shadow:0 8px 30px var(--gold-glow); }
-    .section-card .sc-icon { font-size:1.7rem; }
-    .section-card .sc-name { font-size:0.72rem; font-weight:600; }
+    .section-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(12, 18, 30, 0.15) 0%, rgba(12, 18, 30, 0.88) 100%);
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+    .section-card:hover::after {
+      background: linear-gradient(180deg, rgba(12, 18, 30, 0.05) 0%, rgba(12, 18, 30, 0.95) 100%);
+    }
+    .section-card .sc-icon, .section-card .sc-name, .section-card .sc-badge {
+      position:relative; z-index:2;
+      transform:translateZ(25px);
+      transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .section-card .sc-icon { font-size:2rem; }
+    .section-card .sc-name { font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+    .section-card:hover {
+      border-color: oklch(65% 0.25 330 / 0.5) !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.75), 0 0 25px oklch(65% 0.25 330 / 0.18) !important;
+    }
+    .section-card:hover .sc-icon { transform:translateZ(35px) scale(1.15); }
+    .section-card:hover .sc-name { transform:translateZ(30px); }
     .section-card .sc-badge {
-      position:absolute; top:5px; right:5px;
+      position:absolute; top:8px; right:8px;
       background:var(--gold); color:var(--bg);
-      font-size:0.5rem; font-weight:800; padding:1px 5px; border-radius:8px;
+      font-size:0.55rem; font-weight:800; padding:2px 6px; border-radius:8px;
     }
 
     /* ── FOOTER ── */
@@ -358,18 +350,11 @@
 </head>
 <body>
 
-<!-- MAGIC CURSOR -->
-<div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
-<canvas id="sparkle-canvas"></canvas>
-
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
 <!-- NAV -->
 <nav aria-label="Main navigation">
-  <a href="index.html" class="nav-brand">
-    <span class="nav-brand-arabic">الدِّين</span> AD-Deen ul-Qayyim
-  </a>
+  <a href="index.html" class="nav-brand"><span class="brand-arabic">الدِّين</span> AD-Deen ul-Qayyim</a>
   <ul class="nav-links" id="nav-links">
     <li><a href="index.html">🏠 Home</a></li>
     <li><a href="history.html">📜 History</a></li>
@@ -393,9 +378,6 @@
   <!-- BISMILLAH -->
   <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
 
-  <!-- TITLE -->
-  <h1 class="site-title">AD-Deen ul-Qayyim &nbsp;·&nbsp; <span>الدِّينُ الْقَيِّمُ</span></h1>
-
   <!-- DATE BAR -->
   <div class="date-bar">
     <div class="date-chip">📅 <strong id="greg-date-display">—</strong></div>
@@ -403,21 +385,6 @@
     <div class="date-chip">⏰ <strong id="local-time-display">—</strong></div>
   </div>
 
-  <!-- ══ DAROOD IBRAHIM (above salat tracker) ══ -->
-  <div class="card darood-card">
-    <div class="darood-label">✦ Darood-e-Ibrahim — اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ ✦</div>
-    <div class="darood-arabic">
-      اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَّعَلٰٓى اٰلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلٰٓى اِبْرَاهِيْمَ وَعَلٰٓى اٰلِ اِبْرَاهِيْمَ اِنَّكَ حَمِيْدٌ مَّجِيْدٌ
-    </div>
-    <div class="darood-arabic" style="margin-top:0.6rem">
-      اَللّٰهُمَّ بَارِكْ عَلٰى مُحَمَّدٍ وَّعَلٰٓى اٰلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلٰٓى اِبْرَاهِيْمَ وَعَلٰٓى اٰلِ اِبْرَاهِيْمَ اِنَّكَ حَمِيْدٌ مَّجِيْدٌ
-    </div>
-    <div class="divider"></div>
-    <p class="darood-trans">
-      O Allah, send your grace upon Muhammad ﷺ and upon the family of Muhammad ﷺ, as You sent Your grace upon Ibrahim and upon the family of Ibrahim. Verily You are the Praiseworthy, the Glorious.<br>
-      O Allah, send Your blessings upon Muhammad ﷺ and upon the family of Muhammad ﷺ, as You sent Your blessings upon Ibrahim and upon the family of Ibrahim. Verily You are the Praiseworthy, the Glorious.
-    </p>
-  </div>
 
   <!-- ══ SUN ARC — SALAT TRACKER ══ -->
   <div class="prayer-tracker-wrap">
@@ -486,19 +453,6 @@
     <div class="prayer-countdown" id="prayer-countdown">Loading prayer times…</div>
   </div>
 
-  <!-- ══ CALENDARS ══ -->
-  <div class="calendars-row">
-    <div class="card cal-card">
-      <div class="cal-title">📅 Gregorian Calendar</div>
-      <div class="cal-month-name" id="greg-month-name">—</div>
-      <div class="cal-grid" id="greg-calendar"></div>
-    </div>
-    <div class="card cal-card">
-      <div class="cal-title">🌙 Hijri Calendar</div>
-      <div class="cal-month-name" id="hijri-month-name">—</div>
-      <div class="cal-grid" id="hijri-calendar"></div>
-    </div>
-  </div>
 
   <!-- ══ 3 CITY CLOCKS ══ -->
   <div class="clocks-row">
@@ -528,19 +482,19 @@
   <!-- ══ SECTIONS GRID ══ -->
   <div class="sections-title">✦ Explore All Sections ✦</div>
   <div class="sections-grid">
-    <a href="history.html" class="section-card"><span class="sc-icon">📜</span><span class="sc-name">Islamic History</span></a>
-    <a href="zakat.html" class="section-card"><span class="sc-icon">💰</span><span class="sc-name">Zakat Calculator</span></a>
-    <a href="mirath.html" class="section-card"><span class="sc-icon">⚖️</span><span class="sc-name">Mirath / Faraid</span></a>
-    <a href="qurbani.html" class="section-card"><span class="sc-icon">🐑</span><span class="sc-name">Qurbani Guide</span></a>
-    <a href="calendar.html" class="section-card"><span class="sc-icon">🌙</span><span class="sc-name">Hijri Calendar</span></a>
-    <a href="orrery.html" class="section-card"><span class="sc-icon">🌍</span><span class="sc-name">Solar System</span></a>
-    <a href="market.html" class="section-card"><span class="sc-icon">📈</span><span class="sc-name">Gold & Market</span></a>
-    <a href="pillars.html" class="section-card"><span class="sc-icon">🕋</span><span class="sc-name">Pillars of Islam</span></a>
-    <a href="asmaul-husna.html" class="section-card"><span class="sc-icon">📿</span><span class="sc-name">99 Names of Allah</span></a>
-    <a href="ramadan.html" class="section-card"><span class="sc-icon">🌙</span><span class="sc-name">Ramadan</span></a>
-    <a href="qibla.html" class="section-card"><span class="sc-icon">🧭</span><span class="sc-name">Qibla Finder</span></a>
-    <a href="duas.html" class="section-card"><span class="sc-icon">🤲</span><span class="sc-name">Duas Collection</span></a>
-    <a href="nature-divine.html" class="section-card"><span class="sc-icon">🌿</span><span class="sc-name">Nature & Divine</span></a>
+    <a href="history.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">📜</span><span class="sc-name">Islamic History</span></a>
+    <a href="zakat.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1589758438368-0ad531db3366?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">💰</span><span class="sc-name">Zakat Calculator</span></a>
+    <a href="mirath.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">⚖️</span><span class="sc-name">Mirath / Faraid</span></a>
+    <a href="qurbani.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1484557052118-f32bd25b45b5?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🐑</span><span class="sc-name">Qurbani Guide</span></a>
+    <a href="calendar.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌙</span><span class="sc-name">Hijri Calendar</span></a>
+    <a href="orrery.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌍</span><span class="sc-name">Solar System</span></a>
+    <a href="market.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1610379093359-4ec476859a8c?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">📈</span><span class="sc-name">Gold & Market</span></a>
+    <a href="pillars.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1591604021695-0c69b7c05981?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🕋</span><span class="sc-name">Pillars of Islam</span></a>
+    <a href="asmaul-husna.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">📿</span><span class="sc-name">99 Names of Allah</span></a>
+    <a href="ramadan.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1532244243669-e096472dfdb7?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌙</span><span class="sc-name">Ramadan</span></a>
+    <a href="qibla.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🧭</span><span class="sc-name">Qibla Finder</span></a>
+    <a href="duas.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🤲</span><span class="sc-name">Duas Collection</span></a>
+    <a href="nature-divine.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌿</span><span class="sc-name">Nature & Divine</span></a>
   </div>
 
 </section>
@@ -550,104 +504,11 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-arabic">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
-  <p class="footer-text">"All praise is for Allah, Lord of all worlds" — Al-Fatiha 1:2<br>AD-Deen ul-Qayyim · Open-source Islamic Knowledge Engine · Ratnipora, Kashmir</p>
-  <div class="footer-tags">
-    <span class="tag">GitHub Pages</span><span class="tag">Free Forever</span>
-    <span class="tag">No Backend</span><span class="tag">Open Source</span>
-    <span class="tag">Mobile Ready</span>
-  </div>
+  <p class="footer-text">"All praise is for Allah, Lord of all worlds" — Al-Fatiha 1:2<br>AD-Deen ul-Qayyim · Open-source Islamic Knowledge Engine</p>
 </footer>
 
 <script>
 'use strict';
-// ─────────────────────────────────────────────────────
-// MAGIC SPARK CURSOR
-// ─────────────────────────────────────────────────────
-const dot  = document.getElementById('cursor-dot');
-const ring = document.getElementById('cursor-ring');
-const canvas = document.getElementById('sparkle-canvas');
-const ctx = canvas.getContext('2d');
-let mx=0,my=0,rx=0,ry=0;
-
-function resizeSparkleCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeSparkleCanvas();
-window.addEventListener('resize', resizeSparkleCanvas);
-
-const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"];
-let particles = [];
-
-const spawnParticles = (x, y) => {
-  for (let i = 0; i < 3; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 3 + 0.5;
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    particles.push({
-      x,
-      y,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      color,
-    });
-  }
-};
-
-let cursorInitialized = false;
-
-document.addEventListener('mousemove', e => {
-  if (!cursorInitialized) {
-    dot.classList.add('visible');
-    ring.classList.add('visible');
-    cursorInitialized = true;
-  }
-  mx = e.clientX;
-  my = e.clientY;
-  dot.style.left = mx + 'px';
-  dot.style.top = my + 'px';
-  spawnParticles(mx, my);
-});
-
-(function animateSparkles() {
-  // Ease the ring cursor
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top = ry + 'px';
-
-  // Draw/animate canvas particles
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  particles = particles.filter(p => {
-    p.x += p.dx;
-    p.y += p.dy;
-    p.dx *= 0.92;
-    p.dy *= 0.92;
-
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-    ctx.fill();
-
-    return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
-  });
-
-  requestAnimationFrame(animateSparkles);
-})();
-
-document.addEventListener('mousedown', () => {
-  dot.style.width = '6px';
-  dot.style.height = '6px';
-  ring.style.width = '40px';
-  ring.style.height = '40px';
-});
-document.addEventListener('mouseup', () => {
-  dot.style.width = '10px';
-  dot.style.height = '10px';
-  ring.style.width = '28px';
-  ring.style.height = '28px';
-});
 
 // ─────────────────────────────────────────────────────
 // STARFIELD
@@ -719,13 +580,15 @@ updateDateBar(); setInterval(updateDateBar,1000);
 // GREGORIAN CALENDAR
 // ─────────────────────────────────────────────────────
 function renderGregorianCalendar(){
+  const g=document.getElementById('greg-calendar');
+  if(!g) return;
   const now=new Date();
   const y=now.getFullYear(),m=now.getMonth(),today=now.getDate();
   const mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const dn=['Su','Mo','Tu','We','Th','Fr','Sa'];
-  document.getElementById('greg-month-name').textContent=`${mn[m]} ${y}`;
+  const nameEl=document.getElementById('greg-month-name');
+  if(nameEl) nameEl.textContent=`${mn[m]} ${y}`;
   const fd=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate();
-  const g=document.getElementById('greg-calendar');
   g.innerHTML=dn.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
   for(let i=0;i<fd;i++) g.innerHTML+=`<div class="cal-day"></div>`;
   for(let d=1;d<=dim;d++){
@@ -744,7 +607,6 @@ async function fetchHijriData(){
   try{
     const now=new Date();
     const d=now.getDate(),mo=now.getMonth()+1,yr=now.getFullYear();
-    // Use timezone adjustment for India (+1 day adjustment if needed)
     const r=await fetch(`https://api.aladhan.com/v1/gToH/${d}-${mo}-${yr}?adjustment=0`);
     const j=await r.json();
     if(j.code===200){
@@ -754,22 +616,23 @@ async function fetchHijriData(){
       renderHijriCalendar(h);
     }
   }catch(e){
-    // Hardcoded fallback based on user's info: 27 Muharram 1448
     const el=document.getElementById('hijri-date-display');
     if(el) el.textContent='27 Muharram 1448 AH';
     renderHijriCalendarFallback();
   }
 }
 function renderHijriCalendar(h){
+  const g=document.getElementById('hijri-calendar');
+  if(!g) return;
   const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
   const todayDay=parseInt(h.day);
   const monthNum=parseInt(h.month.number);
   const daysInMonth=monthNum%2===1?30:29;
   const monthName=h.month.en; const year=h.year;
-  document.getElementById('hijri-month-name').textContent=`${monthName} ${year} AH`;
+  const nameEl=document.getElementById('hijri-month-name');
+  if(nameEl) nameEl.textContent=`${monthName} ${year} AH`;
   const today=new Date();
   const fd=(today.getDay()-((todayDay-1)%7)+7)%7;
-  const g=document.getElementById('hijri-calendar');
   g.innerHTML=dayNames.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
   for(let i=0;i<fd;i++) g.innerHTML+=`<div class="cal-day"></div>`;
   for(let d=1;d<=daysInMonth;d++){
@@ -779,11 +642,12 @@ function renderHijriCalendar(h){
   }
 }
 function renderHijriCalendarFallback(){
-  document.getElementById('hijri-month-name').textContent='Muharram 1448 AH';
-  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
   const g=document.getElementById('hijri-calendar');
+  if(!g) return;
+  const nameEl=document.getElementById('hijri-month-name');
+  if(nameEl) nameEl.textContent='Muharram 1448 AH';
+  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
   g.innerHTML=dayNames.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
-  // Approximate: 1 Muharram 1448 was approx a Sunday Jul 13 2026
   for(let i=0;i<0;i++) g.innerHTML+=`<div class="cal-day"></div>`;
   for(let d=1;d<=30;d++){
     const cls=d===27?'cal-day today':'cal-day';
@@ -1086,6 +950,23 @@ function drawSunArc(t){
 window.addEventListener('resize',()=>{ if(prayerData) drawSunArc(prayerData); });
 
 // ─────────────────────────────────────────────────────
+// 3D CARD TILT EFFECT
+// ─────────────────────────────────────────────────────
+document.querySelectorAll('.section-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const ax = -(y - rect.height / 2) / (rect.height / 2) * 15;
+    const ay = (x - rect.width / 2) / (rect.width / 2) * 15;
+    card.style.transform = `perspective(1000px) rotateX(${ax}deg) rotateY(${ay}deg) translateY(-4px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+  });
+});
+
+// ─────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────
 fetchPrayers();
@@ -1093,5 +974,6 @@ fetchHijriData();
 </script>
 </body>
 </html>
+
 
 
