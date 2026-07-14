@@ -1,501 +1,526 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AD-Deen ul-Qayyim — الدِّينُ الْقَيِّمُ</title>
-  <meta name="description" content="An open-source Islamic knowledge engine — Prayer times, Zakat, Inheritance, History, 99 Names, Ramadan, Qibla and more." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    /* ── TOKENS ── */
-    :root {
-      --bg:       #060d18;
-      --bg2:      #0b1425;
-      --bg3:      #101d35;
-      --card:     rgba(255,255,255,0.04);
-      --card-h:   rgba(255,255,255,0.08);
-      --gold:     #c9a84c;
-      --gold-l:   #e8c96a;
-      --gold-d:   #9a7a30;
-      --gold-glow:rgba(201,168,76,0.25);
-      --green:    #27ae60;
-      --red:      #e74c3c;
-      --orange:   #e67e22;
-      --text:     #f0e6d3;
-      --text2:    #a8b8cc;
-      --text3:    #6b7fa0;
-      --border:   rgba(201,168,76,0.15);
-      --border-b: rgba(201,168,76,0.4);
-      --r:        16px;
-      --r-sm:     10px;
-      --ease:     all 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    html { scroll-behavior:smooth; }
-    body {
-      font-family:'Inter',sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
-      overflow-x:hidden;
-      line-height:1.6;
-      cursor: none;
-    }
-    ::-webkit-scrollbar { width:5px; }
-    ::-webkit-scrollbar-track { background:var(--bg); }
-    ::-webkit-scrollbar-thumb { background:var(--gold-d); border-radius:3px; }
-
-
-
-    /* ── STARS ── */
-    #bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
-
-    /* ── NAV ── */
-    nav {
-      position:fixed; top:0; left:0; right:0; z-index:1000;
-      height:62px;
-      background:rgba(6,13,24,0.95);
-      backdrop-filter:blur(20px);
-      border-bottom:1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between;
-      padding:0 1.5rem;
-    }
-    .nav-brand {
-      display:flex; align-items:center; gap:10px;
-      text-decoration:none;
-      font-family:'Outfit',sans-serif; font-weight:700; font-size:1.05rem;
-      color:var(--gold); white-space:nowrap;
-    }
-    .nav-brand-arabic { font-family:'Amiri',serif; font-size:1.3rem; color:var(--gold-l); }
-    .nav-links { display:flex; gap:2px; list-style:none; overflow-x:auto; scrollbar-width:none; }
-    .nav-links::-webkit-scrollbar { display:none; }
-    .nav-links a {
-      color:var(--text2); text-decoration:none; font-size:0.75rem; font-weight:500;
-      padding:5px 9px; border-radius:20px; white-space:nowrap; transition:var(--ease);
-    }
-    .nav-links a:hover { color:var(--gold); background:var(--gold-glow); }
-    .nav-toggle { display:none; background:none; border:none; color:var(--gold); font-size:1.4rem; cursor:none; }
-    @media(max-width:768px){
-      .nav-links { display:none; flex-direction:column; position:absolute; top:62px; left:0; right:0; background:var(--bg); border-bottom:1px solid var(--border); padding:1rem; gap:0.3rem; }
-      .nav-links.open { display:flex; }
-      .nav-toggle { display:block; }
-    }
-
-    /* ── MAIN ── */
-    main { padding-top:62px; position:relative; z-index:1; }
-    .container { max-width:1200px; margin:0 auto; padding:0 1.5rem; }
-
-    /* ── GLASS CARD ── */
-    .card {
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--r);
-      backdrop-filter:blur(12px);
-      transition:var(--ease);
-      position:relative; overflow:hidden;
-    }
-    .card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:1px;
-      background:linear-gradient(90deg,transparent,var(--gold),transparent);
-      opacity:0; transition:var(--ease);
-    }
-    .card:hover::before { opacity:1; }
-    .card:hover { background:var(--card-h); border-color:var(--border-b); }
-
-    /* ── HERO ── */
-    #hero { padding:2rem 0 3rem; text-align:center; }
-    .bismillah {
-      font-family:'Amiri',serif;
-      font-size:clamp(1.6rem,4vw,2.8rem);
-      color:var(--gold-l);
-      text-shadow:0 0 40px var(--gold-glow);
-      margin-bottom:0.4rem;
-      animation:fadeInDown 0.8s ease;
-    }
-    .site-title {
-      font-family:'Outfit',sans-serif;
-      font-size:clamp(1.3rem,3vw,2.2rem);
-      font-weight:800; line-height:1.2;
-      margin-bottom:1.2rem;
-      animation:fadeInUp 0.8s ease 0.1s both;
-    }
-    .site-title span { background:linear-gradient(135deg,var(--gold),var(--gold-l)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-
-    /* ── DATE BAR ── */
-    .date-bar {
-      display:flex; justify-content:center; gap:0.8rem; flex-wrap:wrap;
-      margin-bottom:1.5rem; animation:fadeInUp 0.8s ease 0.2s both;
-    }
-    .date-chip {
-      background:rgba(201,168,76,0.08);
-      border:1px solid var(--border); border-radius:30px;
-      padding:6px 14px; font-size:0.8rem; color:var(--text2);
-      display:flex; align-items:center; gap:6px;
-    }
-    .date-chip strong { color:var(--gold-l); }
-
-    /* ── DAROOD IBRAHIM ── */
-    .darood-card {
-      padding:1.6rem 2rem; text-align:center;
-      margin-bottom:1.5rem;
-      background:linear-gradient(135deg,rgba(201,168,76,0.09),rgba(201,168,76,0.02));
-      animation:fadeInUp 0.8s ease 0.25s both;
-    }
-    .darood-label {
-      font-size:0.68rem; text-transform:uppercase; letter-spacing:0.15em;
-      color:var(--gold); margin-bottom:0.9rem; font-weight:700;
-    }
-    .darood-arabic {
-      font-family:'Amiri',serif;
-      font-size:clamp(1.05rem,2.3vw,1.4rem);
-      color:var(--gold-l); line-height:2.3; direction:rtl;
-    }
-    .darood-trans {
-      font-size:0.78rem; color:var(--text2); font-style:italic; line-height:1.8;
-      max-width:680px; margin:0.8rem auto 0;
-    }
-    .divider { width:50px; height:2px; background:linear-gradient(90deg,var(--gold),transparent); margin:0.8rem auto; border-radius:2px; }
-
-    /* ── SUN ARC TRACKER ── */
-    .prayer-tracker-wrap {
-      background:linear-gradient(135deg,rgba(11,20,37,0.9),rgba(6,13,24,0.95));
-      border:1px solid var(--border-b);
-      border-radius:var(--r);
-      padding:1.4rem 1.2rem 1rem;
-      margin-bottom:1.5rem;
-      animation:fadeInUp 0.8s ease 0.35s both;
-    }
-    .tracker-header {
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:0.8rem;
-    }
-    .tracker-label {
-      font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em;
-      color:var(--text3); font-weight:600;
-    }
-    .madhab-badge {
-      font-size:0.65rem; background:var(--gold-glow); border:1px solid var(--border-b);
-      color:var(--gold); padding:2px 8px; border-radius:20px;
-    }
-    #sun-arc-canvas { display:block; width:100%; max-width:760px; margin:0 auto; }
-
-    /* Twilight legend */
-    .twilight-legend {
-      display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;
-      margin:0.5rem 0 0.3rem;
-    }
-    .tl-item {
-      display:flex; align-items:center; gap:4px;
-      font-size:0.62rem; color:var(--text3);
-    }
-    .tl-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
-
-    /* Sun labels row */
-    .sun-labels {
-      display:grid; grid-template-columns:1fr auto 1fr;
-      align-items:center; max-width:760px; margin:0.3rem auto 0; padding:0 0.5rem;
-    }
-    .sun-label { font-size:0.68rem; color:var(--text3); }
-    .sun-label strong { display:block; color:var(--text2); font-size:0.78rem; }
-    .sun-label:last-child { text-align:right; }
-    .sun-label-center { text-align:center; }
-    #next-prayer-label { color:var(--gold); font-weight:700; font-size:0.75rem; }
-
-    /* Twilight info grid */
-    .twilight-grid {
-      display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem;
-      max-width:760px; margin:0.8rem auto 0;
-    }
-    @media(max-width:500px){ .twilight-grid { grid-template-columns:1fr; } }
-    .tl-card {
-      background:rgba(255,255,255,0.03); border:1px solid var(--border);
-      border-radius:var(--r-sm); padding:0.6rem 0.8rem; text-align:center;
-    }
-    .tl-card-title { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; font-weight:600; }
-    .tl-card-times { font-family:'Outfit',sans-serif; font-size:0.75rem; color:var(--text2); line-height:1.6; }
-
-    /* Prayer pills */
-    .prayer-row { display:flex; justify-content:center; gap:0.4rem; flex-wrap:wrap; margin-top:1rem; }
-    .prayer-pill {
-      background:rgba(255,255,255,0.04); border:1px solid var(--border);
-      border-radius:12px; padding:6px 10px; text-align:center;
-      min-width:68px; transition:var(--ease);
-    }
-    .prayer-pill.active {
-      background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.06));
-      border-color:var(--gold); box-shadow:0 0 16px var(--gold-glow);
-    }
-    .prayer-pill.makruh-pill { border-color:rgba(231,76,60,0.5); }
-    .prayer-pill .pname { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); display:block; }
-    .prayer-pill .ptime { font-family:'Outfit',sans-serif; font-size:0.88rem; font-weight:700; color:var(--text); }
-    .prayer-pill.active .pname { color:var(--gold); }
-    .prayer-pill.active .ptime { color:var(--gold-l); }
-
-    /* Makruh section */
-    .makruh-row {
-      display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;
-      margin-top:0.6rem;
-    }
-    .makruh-pill {
-      background:rgba(231,76,60,0.08); border:1px solid rgba(231,76,60,0.35);
-      border-radius:10px; padding:4px 10px; font-size:0.7rem;
-      color:rgba(231,76,60,0.9); display:flex; align-items:center; gap:4px;
-    }
-
-    /* Countdown */
-    .prayer-countdown {
-      text-align:center; margin-top:0.7rem;
-      font-size:0.82rem; color:var(--text2);
-    }
-    .prayer-countdown strong { color:var(--gold); font-family:'Outfit',sans-serif; font-size:0.95rem; }
-
-    /* ── CALENDARS ── */
-    .calendars-row {
-      display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;
-      margin-bottom:1.5rem; animation:fadeInUp 0.8s ease 0.45s both;
-    }
-    @media(max-width:600px){ .calendars-row { grid-template-columns:1fr; } }
-    .cal-card { padding:1.2rem; }
-    .cal-title { font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:700; color:var(--gold); margin-bottom:0.8rem; text-align:center; }
-    .cal-month-name { font-family:'Amiri',serif; font-size:1rem; color:var(--text); text-align:center; margin-bottom:0.5rem; }
-    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
-    .cal-day-hdr { text-align:center; font-size:0.58rem; text-transform:uppercase; color:var(--text3); padding:2px; }
-    .cal-day { text-align:center; font-size:0.72rem; padding:4px 2px; border-radius:6px; }
-    .cal-day.today { background:var(--gold); color:var(--bg); font-weight:800; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; margin:auto; }
-    .cal-day.other-month { color:var(--text3); }
-    .cal-day.friday { color:var(--gold); }
-
-    /* ── CITY CLOCKS ── */
-    .clocks-row {
-      display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem;
-      margin-bottom:1.5rem; animation:fadeInUp 0.8s ease 0.55s both;
-    }
-    @media(max-width:500px){ .clocks-row { grid-template-columns:1fr; } }
-    .clock-card { padding:1.3rem; text-align:center; }
-    .clock-city { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:0.2rem; }
-    .clock-flag { font-size:1.6rem; margin-bottom:0.2rem; }
-    .clock-time { font-family:'Outfit',sans-serif; font-size:1.7rem; font-weight:800; color:var(--gold-l); line-height:1; }
-    .clock-ampm { font-size:0.8rem; color:var(--gold); font-weight:600; margin-left:2px; }
-    .clock-date { font-size:0.68rem; color:var(--text2); margin-top:0.3rem; }
-    .clock-tz { font-size:0.6rem; color:var(--text3); }
-
-    /* ── SECTIONS GRID ── */
-    .sections-title {
-      font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:700;
-      color:var(--text3); text-align:center; margin-bottom:1rem;
-      text-transform:uppercase; letter-spacing:0.12em;
-    }
-    .sections-grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-      gap:0.9rem; margin-bottom:2.5rem; animation:fadeInUp 0.8s ease 0.65s both;
-    }
-    .section-card {
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      padding:1.5rem 1rem; text-align:center; text-decoration:none;
-      border-radius:var(--r); background:var(--card);
-      border:1px solid var(--border); color:#ffffff;
-      transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-      gap:0.5rem; position:relative; overflow:hidden;
-      background-size:cover; background-position:center; background-repeat:no-repeat;
-      height: 135px;
-      transform-style:preserve-3d;
-      perspective:1000px;
-    }
-    .section-card::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(12, 18, 30, 0.15) 0%, rgba(12, 18, 30, 0.88) 100%);
-      z-index: 1;
-      transition: opacity 0.3s ease;
-    }
-    .section-card:hover::after {
-      background: linear-gradient(180deg, rgba(12, 18, 30, 0.05) 0%, rgba(12, 18, 30, 0.95) 100%);
-    }
-    .section-card .sc-icon, .section-card .sc-name, .section-card .sc-badge {
-      position:relative; z-index:2;
-      transform:translateZ(25px);
-      transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .section-card .sc-icon { font-size:2rem; }
-    .section-card .sc-name { font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
-    .section-card:hover {
-      border-color: oklch(65% 0.25 330 / 0.5) !important;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.75), 0 0 25px oklch(65% 0.25 330 / 0.18) !important;
-    }
-    .section-card:hover .sc-icon { transform:translateZ(35px) scale(1.15); }
-    .section-card:hover .sc-name { transform:translateZ(30px); }
-    .section-card .sc-badge {
-      position:absolute; top:8px; right:8px;
-      background:var(--gold); color:var(--bg);
-      font-size:0.55rem; font-weight:800; padding:2px 6px; border-radius:8px;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background:var(--bg2); border-top:1px solid var(--border);
-      padding:2rem 1.5rem; text-align:center; position:relative; z-index:1;
-    }
-    .footer-arabic { font-family:'Amiri',serif; font-size:1.5rem; color:var(--gold); margin-bottom:0.3rem; }
-    .footer-text { color:var(--text3); font-size:0.78rem; line-height:1.8; }
-    .footer-tags { display:flex; justify-content:center; flex-wrap:wrap; gap:0.4rem; margin-top:0.8rem; }
-    .tag { display:inline-block; background:var(--gold-glow); border:1px solid var(--border); color:var(--gold); font-size:0.7rem; padding:2px 9px; border-radius:20px; }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeInUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AD-Deen ul-Qayyim — الدِّينُ الْقَيِّمُ</title>
+<meta name="description" content="An open-source Islamic knowledge engine — Prayer times, Zakat, Inheritance, History, 99 Names, Ramadan, Qibla and more." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ── TOKENS ── */
+:root {
+--bg: #060d18;
+--bg2: #0b1425;
+--bg3: #101d35;
+--card: rgba(255,255,255,0.04);
+--card-h: rgba(255,255,255,0.08);
+--gold: #c9a84c;
+--gold-l: #e8c96a;
+--gold-d: #9a7a30;
+--gold-glow:rgba(201,168,76,0.25);
+--green: #27ae60;
+--red: #e74c3c;
+--orange: #e67e22;
+--text: #f0e6d3;
+--text2: #a8b8cc;
+--text3: #6b7fa0;
+--border: rgba(201,168,76,0.15);
+--border-b: rgba(201,168,76,0.4);
+--r: 16px;
+--r-sm: 10px;
+--ease: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
+min-height:100vh;
+overflow-x:hidden;
+line-height:1.6;
+}
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--gold-d); border-radius:3px; }
+/* ── STARS ── */
+#bg-canvas { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
+/* ── NAV ── */
+nav {
+position:fixed; top:0; left:0; right:0; z-index:1000;
+height:62px;
+background:rgba(6,13,24,0.95);
+backdrop-filter:blur(20px);
+border-bottom:1px solid var(--border);
+display:flex; align-items:center; justify-content:space-between;
+padding:0 1.5rem;
+}
+.nav-brand {
+display:flex; align-items:center; gap:10px;
+text-decoration:none;
+font-family:'Outfit',sans-serif; font-weight:700; font-size:1.05rem;
+color:var(--gold); white-space:nowrap;
+}
+.nav-brand-arabic { font-family:'Amiri',serif; font-size:1.3rem; color:var(--gold-l); }
+.nav-links { display:flex; gap:2px; list-style:none; overflow-x:auto; scrollbar-width:none; }
+.nav-links::-webkit-scrollbar { display:none; }
+.nav-links a {
+color:var(--text2); text-decoration:none; font-size:0.75rem; font-weight:500;
+padding:5px 9px; border-radius:20px; white-space:nowrap; transition:var(--ease);
+}
+.nav-links a:hover { color:var(--gold); background:var(--gold-glow); }
+.nav-toggle { display:none; background:none; border:none; color:var(--gold); font-size:1.4rem; cursor:pointer; }
+@media(max-width:768px){
+.nav-links { display:none; flex-direction:column; position:absolute; top:62px; left:0; right:0; background:var(--bg); border-bottom:1px solid var(--border); padding:1rem; gap:0.3rem; }
+.nav-links.open { display:flex; }
+.nav-toggle { display:block; }
+}
+/* ── MAIN ── */
+main { padding-top:62px; position:relative; z-index:1; }
+.container { max-width:1200px; margin:0 auto; padding:0 1.5rem; }
+/* ── GLASS CARD ── */
+.card {
+background:var(--card);
+border:1px solid var(--border);
+border-radius:var(--r);
+backdrop-filter:blur(12px);
+transition:var(--ease);
+position:relative; overflow:hidden;
+}
+.card::before {
+content:''; position:absolute; top:0; left:0; right:0; height:1px;
+background:linear-gradient(90deg,transparent,var(--gold),transparent);
+opacity:0; transition:var(--ease);
+}
+.card:hover::before { opacity:1; }
+.card:hover { background:var(--card-h); border-color:var(--border-b); }
+/* ── HERO ── */
+#hero { padding:2rem 0 3rem; text-align:center; }
+.bismillah-wrap { margin-bottom:1.2rem; animation:fadeInDown 0.8s ease; perspective:800px; }
+.bismillah-img {
+width:min(340px,80vw); height:auto; display:block; margin:0 auto;
+filter:drop-shadow(0 12px 24px rgba(201,168,76,0.35)) drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+transition:transform 0.5s cubic-bezier(0.16,1,0.3,1);
+border-radius:14px;
+}
+.bismillah-img:hover { transform:rotateX(6deg) scale(1.03); }
+.site-title {
+font-family:'Outfit',sans-serif;
+font-size:clamp(1.3rem,3vw,2.2rem);
+font-weight:800; line-height:1.2;
+margin-bottom:1.2rem;
+animation:fadeInUp 0.8s ease 0.1s both;
+}
+.site-title span { background:linear-gradient(135deg,var(--gold),var(--gold-l)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+/* ── DATE BAR ── */
+.date-bar {
+display:flex; justify-content:center; gap:0.8rem; flex-wrap:wrap;
+margin-bottom:1.5rem; animation:fadeInUp 0.8s ease 0.2s both;
+}
+.date-bar {
+display:grid; grid-template-columns:repeat(3,1fr); gap:0; max-width:640px;
+margin:0 auto 1.6rem; animation:fadeInUp 0.8s ease 0.2s both;
+background:linear-gradient(145deg,rgba(16,29,53,0.9),rgba(6,13,24,0.95));
+border:1px solid var(--border-b); border-radius:var(--r);
+box-shadow:0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+overflow:hidden;
+}
+.date-chip {
+background:none; border:none; border-right:1px solid var(--border);
+border-radius:0; padding:0.9rem 0.6rem; display:flex; flex-direction:column;
+align-items:center; gap:4px; text-align:center;
+}
+.date-chip:last-child { border-right:none; }
+.date-chip-icon { font-size:1rem; opacity:0.8; }
+.date-chip-label { font-size:0.58rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--text3); font-weight:600; }
+.date-chip strong {
+font-family:'Orbitron',sans-serif; font-weight:700;
+font-size:clamp(0.85rem,2.4vw,1.15rem);
+color:var(--gold-l);
+text-shadow:0 0 18px var(--gold-glow), 0 0 3px rgba(232,201,106,0.6);
+letter-spacing:0.02em;
+}
+/* ── DAROOD IBRAHIM 3D ── */
+.darood-card-3d {
+position:relative; border-radius:var(--r); overflow:hidden;
+margin-bottom:1.6rem; min-height:260px;
+display:flex; align-items:center; justify-content:center;
+border:1px solid var(--border-b);
+box-shadow:0 25px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(201,168,76,0.1);
+animation:fadeInUp 0.8s ease 0.28s both;
+transform-style:preserve-3d; perspective:1200px;
+transition:transform 0.5s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
+}
+.darood-card-3d:hover { box-shadow:0 30px 60px rgba(0,0,0,0.65), 0 0 40px var(--gold-glow); }
+.darood-bg {
+position:absolute; inset:0;
+background-image:url('images/madina-nabawi.png');
+background-size:cover; background-position:center 60%;
+transform:scale(1.08); transition:transform 0.6s ease;
+}
+.darood-card-3d:hover .darood-bg { transform:scale(1.14); }
+.darood-overlay {
+position:absolute; inset:0;
+background:linear-gradient(180deg,rgba(6,13,24,0.55) 0%,rgba(6,13,24,0.78) 55%,rgba(6,13,24,0.93) 100%);
+}
+.darood-content {
+position:relative; z-index:2; padding:2.2rem 1.6rem; text-align:center;
+transform:translateZ(30px);
+}
+.darood-label {
+font-size:0.7rem; text-transform:uppercase; letter-spacing:0.2em;
+color:var(--gold-l); margin-bottom:1.1rem; font-weight:700;
+text-shadow:0 2px 10px rgba(0,0,0,0.8);
+}
+.darood-arabic {
+font-family:'Amiri',serif;
+font-size:clamp(1.2rem,3vw,1.7rem);
+color:#fff; line-height:2.2; direction:rtl;
+text-shadow:0 2px 14px rgba(0,0,0,0.85), 0 0 30px rgba(201,168,76,0.3);
+}
+.darood-trans {
+font-size:0.8rem; color:var(--text2); font-style:italic; line-height:1.85;
+max-width:600px; margin:1rem auto 0;
+text-shadow:0 2px 8px rgba(0,0,0,0.9);
+}
+.divider { width:50px; height:2px; background:linear-gradient(90deg,var(--gold),transparent); margin:0.8rem auto; border-radius:2px; }
+/* ── SUN ARC TRACKER ── */
+.prayer-tracker-wrap {
+background:linear-gradient(135deg,rgba(11,20,37,0.9),rgba(6,13,24,0.95));
+border:1px solid var(--border-b);
+border-radius:var(--r);
+padding:1.4rem 1.2rem 1rem;
+margin-bottom:1.5rem;
+animation:fadeInUp 0.8s ease 0.35s both;
+}
+.tracker-header {
+display:flex; justify-content:space-between; align-items:center;
+margin-bottom:0.8rem;
+}
+.tracker-label {
+font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em;
+color:var(--text3); font-weight:600;
+}
+.madhab-badge {
+font-size:0.65rem; background:var(--gold-glow); border:1px solid var(--border-b);
+color:var(--gold); padding:2px 8px; border-radius:20px;
+}
+#sun-arc-canvas { display:block; width:100%; max-width:760px; margin:0 auto; }
+/* Twilight legend */
+.twilight-legend {
+display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;
+margin:0.5rem 0 0.3rem;
+}
+.tl-item {
+display:flex; align-items:center; gap:4px;
+font-size:0.62rem; color:var(--text3);
+}
+.tl-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+/* Sun labels row */
+.sun-labels {
+display:grid; grid-template-columns:1fr auto 1fr;
+align-items:center; max-width:760px; margin:0.3rem auto 0; padding:0 0.5rem;
+}
+.sun-label { font-size:0.68rem; color:var(--text3); }
+.sun-label strong { display:block; color:var(--text2); font-size:0.78rem; }
+.sun-label:last-child { text-align:right; }
+.sun-label-center { text-align:center; }
+#next-prayer-label { color:var(--gold); font-weight:700; font-size:0.75rem; }
+/* Twilight info grid */
+.twilight-grid {
+display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem;
+max-width:760px; margin:0.8rem auto 0;
+}
+@media(max-width:500px){ .twilight-grid { grid-template-columns:1fr; } }
+.tl-card {
+background:rgba(255,255,255,0.03); border:1px solid var(--border);
+border-radius:var(--r-sm); padding:0.6rem 0.8rem; text-align:center;
+}
+.tl-card-title { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; font-weight:600; }
+.tl-card-times { font-family:'Outfit',sans-serif; font-size:0.75rem; color:var(--text2); line-height:1.6; }
+/* Prayer pills */
+.prayer-row { display:flex; justify-content:center; gap:0.4rem; flex-wrap:wrap; margin-top:1rem; }
+.prayer-pill {
+background:rgba(255,255,255,0.04); border:1px solid var(--border);
+border-radius:14px; padding:10px 16px; text-align:center;
+min-width:88px; transition:var(--ease);
+}
+.prayer-pill.active {
+background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.06));
+border-color:var(--gold); box-shadow:0 0 16px var(--gold-glow);
+}
+.prayer-pill.makruh-pill { border-color:rgba(231,76,60,0.5); }
+.prayer-pill .pname { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); display:block; margin-bottom:2px; }
+.prayer-pill .ptime { font-family:'Orbitron',sans-serif; font-size:1.35rem; font-weight:700; color:var(--text); text-shadow:0 0 12px rgba(255,255,255,0.08); }
+.prayer-pill.active .pname { color:var(--gold); }
+.prayer-pill.active .ptime { color:var(--gold-l); text-shadow:0 0 18px var(--gold-glow); }
+/* Makruh section */
+.makruh-row {
+display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;
+margin-top:0.6rem;
+}
+.makruh-pill {
+background:rgba(231,76,60,0.08); border:1px solid rgba(231,76,60,0.35);
+border-radius:10px; padding:4px 10px; font-size:0.7rem;
+color:rgba(231,76,60,0.9); display:flex; align-items:center; gap:4px;
+}
+/* Countdown */
+.prayer-countdown {
+text-align:center; margin-top:0.7rem;
+font-size:0.82rem; color:var(--text2);
+}
+.prayer-countdown strong { color:var(--gold); font-family:'Outfit',sans-serif; font-size:0.95rem; }
+/* ── CITY CLOCKS ── */
+.clocks-row {
+display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem;
+margin-bottom:1.5rem; animation:fadeInUp 0.8s ease 0.55s both;
+}
+@media(max-width:500px){ .clocks-row { grid-template-columns:1fr; } }
+.clock-card {
+padding:1.3rem; text-align:center; position:relative;
+background:linear-gradient(160deg,rgba(16,29,53,0.85),rgba(6,13,24,0.95));
+box-shadow:inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 34px rgba(0,0,0,0.45);
+}
+.clock-card::after {
+content:''; position:absolute; top:0; left:0; right:0; height:50%;
+background:linear-gradient(180deg,rgba(255,255,255,0.05),transparent);
+pointer-events:none; border-radius:var(--r) var(--r) 0 0;
+}
+.clock-city { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text3); margin-bottom:0.35rem; font-weight:600; }
+.clock-flag { font-size:1.6rem; margin-bottom:0.3rem; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+.clock-time {
+font-family:'Orbitron',sans-serif; font-size:1.55rem; font-weight:700;
+color:var(--gold-l); line-height:1; letter-spacing:0.03em;
+text-shadow:0 0 20px var(--gold-glow), 0 0 4px rgba(232,201,106,0.7);
+}
+.clock-ampm { font-size:0.72rem; font-family:'Orbitron',sans-serif; color:var(--gold); font-weight:600; margin-left:3px; }
+.clock-date { font-size:0.68rem; color:var(--text2); margin-top:0.4rem; }
+.clock-tz { font-size:0.58rem; color:var(--text3); margin-top:2px; }
+/* ── SECTIONS GRID ── */
+.sections-title {
+font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:700;
+color:var(--text3); text-align:center; margin-bottom:1rem;
+text-transform:uppercase; letter-spacing:0.12em;
+}
+.sections-grid {
+display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+gap:0.9rem; margin-bottom:2.5rem; animation:fadeInUp 0.8s ease 0.65s both;
+}
+.section-card {
+--accent: var(--gold);
+display:flex; flex-direction:column; align-items:center; justify-content:center;
+padding:1.6rem 1rem; text-align:center; text-decoration:none;
+border-radius:var(--r);
+background:
+radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%),
+linear-gradient(160deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+border:1px solid var(--border); color:#ffffff;
+transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+gap:0.6rem; position:relative; overflow:hidden;
+height: 140px;
+transform-style:preserve-3d;
+box-shadow:0 10px 22px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.section-card .sc-icon, .section-card .sc-name, .section-card .sc-badge {
+position:relative; z-index:2;
+transform:translateZ(25px);
+transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.section-card .sc-icon {
+font-size:2.1rem;
+filter:drop-shadow(0 4px 10px color-mix(in srgb, var(--accent) 60%, transparent));
+}
+.section-card .sc-name { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#ffffff; text-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+.section-card:hover {
+border-color: color-mix(in srgb, var(--accent) 60%, transparent) !important;
+background:
+radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 75%),
+linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+box-shadow: 0 20px 40px rgba(0,0,0,0.55), 0 0 30px color-mix(in srgb, var(--accent) 35%, transparent) !important;
+}
+.section-card:hover .sc-icon { transform:translateZ(38px) scale(1.18); }
+.section-card:hover .sc-name { transform:translateZ(30px); }
+.section-card .sc-badge {
+position:absolute; top:8px; right:8px;
+background:var(--accent); color:var(--bg);
+font-size:0.55rem; font-weight:800; padding:2px 6px; border-radius:8px;
+}
+/* ── FOOTER ── */
+footer {
+background:var(--bg2); border-top:1px solid var(--border);
+padding:2rem 1.5rem; text-align:center; position:relative; z-index:1;
+}
+.footer-arabic { font-family:'Amiri',serif; font-size:1.5rem; color:var(--gold); margin-bottom:0.3rem; }
+.footer-text { color:var(--text3); font-size:0.78rem; line-height:1.8; }
+.footer-tags { display:flex; justify-content:center; flex-wrap:wrap; gap:0.4rem; margin-top:0.8rem; }
+.tag { display:inline-block; background:var(--gold-glow); border:1px solid var(--border); color:var(--gold); font-size:0.7rem; padding:2px 9px; border-radius:20px; }
+/* ── ANIMATIONS ── */
+@keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+</style>
 </head>
 <body>
-
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
 <!-- NAV -->
 <nav aria-label="Main navigation">
-  <a href="index.html" class="nav-brand"><span class="brand-arabic">الدِّين</span> AD-Deen ul-Qayyim</a>
-  <ul class="nav-links" id="nav-links">
-    <li><a href="index.html">🏠 Home</a></li>
-    <li><a href="history.html">📜 History</a></li>
-    <li><a href="zakat.html">💰 Zakat</a></li>
-    <li><a href="mirath.html">⚖️ Mirath</a></li>
-    <li><a href="qurbani.html">🐑 Qurbani</a></li>
-    <li><a href="calendar.html">🌙 Calendar</a></li>
-    <li><a href="orrery.html">🌍 Solar System</a></li>
-    <li><a href="market.html">📈 Market</a></li>
-    <li><a href="pillars.html">🕋 Pillars</a></li>
-    <li><a href="asmaul-husna.html">📿 99 Names</a></li>
-    <li><a href="nature-divine.html">🌿 Nature & Divine</a></li>
-  </ul>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">☰</button>
+<a href="index.html" class="nav-brand"><span class="brand-arabic">الدِّين</span> AD-Deen ul-Qayyim</a>
+<ul class="nav-links" id="nav-links">
+<li><a href="index.html">🏠 Home</a></li>
+<li><a href="history.html">📜 History</a></li>
+<li><a href="zakat.html">💰 Zakat</a></li>
+<li><a href="mirath.html">⚖️ Mirath</a></li>
+<li><a href="qurbani.html">🐑 Qurbani</a></li>
+<li><a href="calendar.html">🌙 Calendar</a></li>
+<li><a href="orrery.html">🌍 Solar System</a></li>
+<li><a href="market.html">📈 Market</a></li>
+<li><a href="pillars.html">🕋 Pillars</a></li>
+<li><a href="asmaul-husna.html">📿 99 Names</a></li>
+<li><a href="nature-divine.html">🌿 Nature & Divine</a></li>
+</ul>
+<button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">☰</button>
 </nav>
 
 <main>
 <div class="container">
 <section id="hero">
 
-  <!-- BISMILLAH -->
-  <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+<!-- BISMILLAH (image) -->
+<div class="bismillah-wrap">
+<img src="images/bismillah.png" alt="بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ" class="bismillah-img tilt-card" />
+</div>
 
-  <!-- DATE BAR -->
-  <div class="date-bar">
-    <div class="date-chip">📅 <strong id="greg-date-display">—</strong></div>
-    <div class="date-chip">🌙 <strong id="hijri-date-display">—</strong></div>
-    <div class="date-chip">⏰ <strong id="local-time-display">—</strong></div>
-  </div>
+<!-- DATE BAR — 3D digital display -->
+<div class="date-bar tilt-card">
+<div class="date-chip"><span class="date-chip-icon">📅</span><span class="date-chip-label">Gregorian</span><strong id="greg-date-display">—</strong></div>
+<div class="date-chip"><span class="date-chip-icon">🌙</span><span class="date-chip-label">Hijri</span><strong id="hijri-date-display">—</strong></div>
+<div class="date-chip"><span class="date-chip-icon">⏰</span><span class="date-chip-label">Local Time</span><strong id="local-time-display">—</strong></div>
+</div>
 
+<!-- DAROOD IBRAHIM — 3D card with Madina backdrop -->
+<div class="darood-card-3d tilt-card">
+<div class="darood-bg"></div>
+<div class="darood-overlay"></div>
+<div class="darood-content">
+<div class="darood-label">✦ Darood Ibrahim ✦</div>
+<div class="darood-arabic">اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ<br><br>اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ</div>
+<div class="darood-trans">"O Allah, send blessings upon Muhammad and upon the family of Muhammad, as You sent blessings upon Ibrahim and upon the family of Ibrahim. Indeed, You are Praiseworthy and Glorious.<br>O Allah, send barakah upon Muhammad and upon the family of Muhammad, as You sent barakah upon Ibrahim and upon the family of Ibrahim. Indeed, You are Praiseworthy and Glorious."</div>
+</div>
+</div>
 
-  <!-- ══ SUN ARC — SALAT TRACKER ══ -->
-  <div class="prayer-tracker-wrap">
-    <div class="tracker-header">
-      <div class="tracker-label">🕌 Salat Tracker — Srinagar, Kashmir</div>
-      <div style="display:flex;align-items:center;gap:0.5rem">
-        <div class="madhab-badge">UISK Method</div>
-        <a href="salat-tracker.html" style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.1));border:1px solid var(--gold);border-radius:20px;padding:3px 12px;font-size:0.68rem;font-weight:700;color:var(--gold-l);text-decoration:none;transition:var(--ease)" onmouseover="this.style.background='linear-gradient(135deg,rgba(201,168,76,0.4),rgba(201,168,76,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.1))'">
-          🔍 Full View
-        </a>
-      </div>
-    </div>
+<!-- ══ SUN ARC — SALAT TRACKER ══ -->
+<div class="prayer-tracker-wrap">
+<div class="tracker-header">
+<div class="tracker-label">🕌 Salat Tracker — Srinagar, Kashmir</div>
+<div style="display:flex;align-items:center;gap:0.5rem">
+<div class="madhab-badge">UISK Method</div>
+<a href="salat-tracker.html" style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.1));border:1px solid var(--gold);border-radius:20px;padding:3px 12px;font-size:0.68rem;font-weight:700;color:var(--gold-l);text-decoration:none;transition:var(--ease)" onmouseover="this.style.background='linear-gradient(135deg,rgba(201,168,76,0.4),rgba(201,168,76,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.1))'">
+🔍 Full View
+</a>
+</div>
+</div>
 
-    <!-- Sun Arc Canvas -->
-    <canvas id="sun-arc-canvas" height="190" aria-label="Sun arc showing prayer and twilight times"></canvas>
+<!-- Sun Arc Canvas -->
+<canvas id="sun-arc-canvas" height="190" aria-label="Sun arc showing prayer and twilight times"></canvas>
 
-    <!-- Sun Labels -->
-    <div class="sun-labels">
-      <div class="sun-label">🌄 Tulu' ul-Shams<strong id="sunrise-time">—</strong></div>
-      <div class="sun-label sun-label-center"><span id="next-prayer-label">Next Prayer</span></div>
-      <div class="sun-label">Ghurub ul-Shams 🌇<strong id="sunset-time">—</strong></div>
-    </div>
+<!-- Sun Labels -->
+<div class="sun-labels">
+<div class="sun-label">🌄 Tulu' ul-Shams<strong id="sunrise-time">—</strong></div>
+<div class="sun-label sun-label-center"><span id="next-prayer-label">Next Prayer</span></div>
+<div class="sun-label">Ghurub ul-Shams 🌇<strong id="sunset-time">—</strong></div>
+</div>
 
-    <!-- Twilight Legend -->
-    <div class="twilight-legend">
-      <div class="tl-item"><div class="tl-dot" style="background:#1a1060"></div> Astronomical Twilight</div>
-      <div class="tl-item"><div class="tl-dot" style="background:#0d3070"></div> Nautical Twilight</div>
-      <div class="tl-item"><div class="tl-dot" style="background:#0d5090"></div> Civil Twilight</div>
-      <div class="tl-item"><div class="tl-dot" style="background:#c9a84c"></div> Daytime</div>
-      <div class="tl-item"><div class="tl-dot" style="background:#8b1a1a"></div> Makruh Times</div>
-    </div>
+<!-- Twilight Legend -->
+<div class="twilight-legend">
+<div class="tl-item"><div class="tl-dot" style="background:#1a1060"></div> Astronomical Twilight</div>
+<div class="tl-item"><div class="tl-dot" style="background:#0d3070"></div> Nautical Twilight</div>
+<div class="tl-item"><div class="tl-dot" style="background:#0d5090"></div> Civil Twilight</div>
+<div class="tl-item"><div class="tl-dot" style="background:#c9a84c"></div> Daytime</div>
+<div class="tl-item"><div class="tl-dot" style="background:#8b1a1a"></div> Makruh Times</div>
+</div>
 
-    <!-- Twilight Info Cards -->
-    <div class="twilight-grid">
-      <div class="tl-card">
-        <div class="tl-card-title" style="color:#5080c0">🔭 Astronomical Twilight</div>
-        <div class="tl-card-times" id="astro-tl-times">Sun 18° below horizon<br>—</div>
-      </div>
-      <div class="tl-card">
-        <div class="tl-card-title" style="color:#4090c8">⚓ Nautical Twilight</div>
-        <div class="tl-card-times" id="nautical-tl-times">Sun 12° below horizon<br>—</div>
-      </div>
-      <div class="tl-card">
-        <div class="tl-card-title" style="color:#40a0d0">🌆 Civil Twilight</div>
-        <div class="tl-card-times" id="civil-tl-times">Sun 6° below horizon<br>—</div>
-      </div>
-    </div>
+<!-- Twilight Info Cards -->
+<div class="twilight-grid">
+<div class="tl-card">
+<div class="tl-card-title" style="color:#5080c0">🔭 Astronomical Twilight</div>
+<div class="tl-card-times" id="astro-tl-times">Sun 18° below horizon<br>—</div>
+</div>
+<div class="tl-card">
+<div class="tl-card-title" style="color:#4090c8">⚓ Nautical Twilight</div>
+<div class="tl-card-times" id="nautical-tl-times">Sun 12° below horizon<br>—</div>
+</div>
+<div class="tl-card">
+<div class="tl-card-title" style="color:#40a0d0">🌆 Civil Twilight</div>
+<div class="tl-card-times" id="civil-tl-times">Sun 6° below horizon<br>—</div>
+</div>
+</div>
 
-    <!-- Prayer Pills -->
-    <div class="prayer-row" id="prayer-pills">
-      <div class="prayer-pill"><span class="pname">Fajr</span><span class="ptime">—</span></div>
-      <div class="prayer-pill"><span class="pname">Dhuhr</span><span class="ptime">—</span></div>
-      <div class="prayer-pill"><span class="pname">Asr</span><span class="ptime">—</span></div>
-      <div class="prayer-pill"><span class="pname">Maghrib</span><span class="ptime">—</span></div>
-      <div class="prayer-pill"><span class="pname">Isha</span><span class="ptime">—</span></div>
-    </div>
+<!-- Prayer Pills -->
+<div class="prayer-row" id="prayer-pills">
+<div class="prayer-pill"><span class="pname">Fajr</span><span class="ptime">—</span></div>
+<div class="prayer-pill"><span class="pname">Dhuhr</span><span class="ptime">—</span></div>
+<div class="prayer-pill"><span class="pname">Asr</span><span class="ptime">—</span></div>
+<div class="prayer-pill"><span class="pname">Maghrib</span><span class="ptime">—</span></div>
+<div class="prayer-pill"><span class="pname">Isha</span><span class="ptime">—</span></div>
+</div>
 
-    <!-- Makruh Times -->
-    <div class="makruh-row" id="makruh-row">
-      <div class="makruh-pill">⚠️ Makruh after Fajr: —</div>
-      <div class="makruh-pill">⚠️ Zawal (Istiwa): —</div>
-      <div class="makruh-pill">⚠️ Makruh before Maghrib: —</div>
-    </div>
+<!-- Makruh Times -->
+<div class="makruh-row" id="makruh-row">
+<div class="makruh-pill">⚠️ Makruh after Fajr: —</div>
+<div class="makruh-pill">⚠️ Zawal (Istiwa): —</div>
+<div class="makruh-pill">⚠️ Makruh before Maghrib: —</div>
+</div>
 
-    <!-- Countdown -->
-    <div class="prayer-countdown" id="prayer-countdown">Loading prayer times…</div>
-  </div>
+<!-- Countdown -->
+<div class="prayer-countdown" id="prayer-countdown">Loading prayer times…</div>
 
+</div>
 
-  <!-- ══ 3 CITY CLOCKS ══ -->
-  <div class="clocks-row">
-    <div class="card clock-card">
-      <div class="clock-flag">🕋</div>
-      <div class="clock-city">Mecca · Saudi Arabia</div>
-      <div class="clock-time" id="clock-mecca">--:--<span class="clock-ampm" id="ampm-mecca"></span></div>
-      <div class="clock-date" id="clock-mecca-date">—</div>
-      <div class="clock-tz">Arabia Standard Time (AST)</div>
-    </div>
-    <div class="card clock-card">
-      <div class="clock-flag">🇬🇧</div>
-      <div class="clock-city">London · United Kingdom</div>
-      <div class="clock-time" id="clock-london">--:--<span class="clock-ampm" id="ampm-london"></span></div>
-      <div class="clock-date" id="clock-london-date">—</div>
-      <div class="clock-tz">British Summer Time (BST)</div>
-    </div>
-    <div class="card clock-card">
-      <div class="clock-flag">🇵🇰</div>
-      <div class="clock-city">Lahore · Pakistan</div>
-      <div class="clock-time" id="clock-lahore">--:--<span class="clock-ampm" id="ampm-lahore"></span></div>
-      <div class="clock-date" id="clock-lahore-date">—</div>
-      <div class="clock-tz">Pakistan Standard Time (PKT)</div>
-    </div>
-  </div>
+<!-- ══ 3 CITY CLOCKS ══ -->
+<div class="clocks-row">
+<div class="card clock-card tilt-card">
+<div class="clock-flag">🕋</div>
+<div class="clock-city">Mecca · Saudi Arabia</div>
+<div class="clock-time" id="clock-mecca">--:--<span class="clock-ampm" id="ampm-mecca"></span></div>
+<div class="clock-date" id="clock-mecca-date">—</div>
+<div class="clock-tz">Arabia Standard Time (AST)</div>
+</div>
+<div class="card clock-card tilt-card">
+<div class="clock-flag">🇬🇧</div>
+<div class="clock-city">London · United Kingdom</div>
+<div class="clock-time" id="clock-london">--:--<span class="clock-ampm" id="ampm-london"></span></div>
+<div class="clock-date" id="clock-london-date">—</div>
+<div class="clock-tz">British Summer Time (BST)</div>
+</div>
+<div class="card clock-card tilt-card">
+<div class="clock-flag">🇵🇰</div>
+<div class="clock-city">Lahore · Pakistan</div>
+<div class="clock-time" id="clock-lahore">--:--<span class="clock-ampm" id="ampm-lahore"></span></div>
+<div class="clock-date" id="clock-lahore-date">—</div>
+<div class="clock-tz">Pakistan Standard Time (PKT)</div>
+</div>
+</div>
 
-  <!-- ══ SECTIONS GRID ══ -->
-  <div class="sections-title">✦ Explore All Sections ✦</div>
-  <div class="sections-grid">
-    <a href="history.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">📜</span><span class="sc-name">Islamic History</span></a>
-    <a href="zakat.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1589758438368-0ad531db3366?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">💰</span><span class="sc-name">Zakat Calculator</span></a>
-    <a href="mirath.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">⚖️</span><span class="sc-name">Mirath / Faraid</span></a>
-    <a href="qurbani.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1484557052118-f32bd25b45b5?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🐑</span><span class="sc-name">Qurbani Guide</span></a>
-    <a href="calendar.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌙</span><span class="sc-name">Hijri Calendar</span></a>
-    <a href="orrery.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌍</span><span class="sc-name">Solar System</span></a>
-    <a href="market.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1610379093359-4ec476859a8c?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">📈</span><span class="sc-name">Gold & Market</span></a>
-    <a href="pillars.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1591604021695-0c69b7c05981?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🕋</span><span class="sc-name">Pillars of Islam</span></a>
-    <a href="asmaul-husna.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">📿</span><span class="sc-name">99 Names of Allah</span></a>
-    <a href="ramadan.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1532244243669-e096472dfdb7?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌙</span><span class="sc-name">Ramadan</span></a>
-    <a href="qibla.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🧭</span><span class="sc-name">Qibla Finder</span></a>
-    <a href="duas.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🤲</span><span class="sc-name">Duas Collection</span></a>
-    <a href="nature-divine.html" class="section-card" style="background-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=400&auto=format&fit=crop')"><span class="sc-icon">🌿</span><span class="sc-name">Nature & Divine</span></a>
-  </div>
+<!-- ══ SECTIONS GRID ══ -->
+<div class="sections-title">✦ Explore All Sections ✦</div>
+<div class="sections-grid">
+<a href="history.html" class="section-card tilt-card" style="--accent:#c9a84c"><span class="sc-icon">📜</span><span class="sc-name">Islamic History</span></a>
+<a href="zakat.html" class="section-card tilt-card" style="--accent:#27ae60"><span class="sc-icon">💰</span><span class="sc-name">Zakat Calculator</span></a>
+<a href="mirath.html" class="section-card tilt-card" style="--accent:#8b5cf6"><span class="sc-icon">⚖️</span><span class="sc-name">Mirath / Faraid</span></a>
+<a href="qurbani.html" class="section-card tilt-card" style="--accent:#e67e22"><span class="sc-icon">🐑</span><span class="sc-name">Qurbani Guide</span></a>
+<a href="calendar.html" class="section-card tilt-card" style="--accent:#6366f1"><span class="sc-icon">🌙</span><span class="sc-name">Hijri Calendar</span></a>
+<a href="orrery.html" class="section-card tilt-card" style="--accent:#14b8a6"><span class="sc-icon">🌍</span><span class="sc-name">Solar System</span></a>
+<a href="market.html" class="section-card tilt-card" style="--accent:#e8c96a"><span class="sc-icon">📈</span><span class="sc-name">Gold & Market</span></a>
+<a href="pillars.html" class="section-card tilt-card" style="--accent:#e74c3c"><span class="sc-icon">🕋</span><span class="sc-name">Pillars of Islam</span></a>
+<a href="asmaul-husna.html" class="section-card tilt-card" style="--accent:#c9a84c"><span class="sc-icon">📿</span><span class="sc-name">99 Names of Allah</span></a>
+<a href="ramadan.html" class="section-card tilt-card" style="--accent:#a855f7"><span class="sc-icon">🌙</span><span class="sc-name">Ramadan</span></a>
+<a href="qibla.html" class="section-card tilt-card" style="--accent:#06b6d4"><span class="sc-icon">🧭</span><span class="sc-name">Qibla Finder</span></a>
+<a href="duas.html" class="section-card tilt-card" style="--accent:#ec4899"><span class="sc-icon">🤲</span><span class="sc-name">Duas Collection</span></a>
+<a href="nature-divine.html" class="section-card tilt-card" style="--accent:#22c55e"><span class="sc-icon">🌿</span><span class="sc-name">Nature & Divine</span></a>
+</div>
 
 </section>
 </div>
@@ -503,8 +528,8 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-arabic">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
-  <p class="footer-text">"All praise is for Allah, Lord of all worlds" — Al-Fatiha 1:2<br>AD-Deen ul-Qayyim · Open-source Islamic Knowledge Engine</p>
+<div class="footer-arabic">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
+<p class="footer-text">"All praise is for Allah, Lord of all worlds" — Al-Fatiha 1:2<br>AD-Deen ul-Qayyim · Open-source Islamic Knowledge Engine</p>
 </footer>
 
 <script>
@@ -514,14 +539,14 @@
 // STARFIELD
 // ─────────────────────────────────────────────────────
 (function(){
-  const c=document.getElementById('bg-canvas');
-  const ctx=c.getContext('2d');
-  let stars=[];
-  function resize(){ c.width=innerWidth; c.height=innerHeight;
-    stars=Array.from({length:200},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+0.2,phase:Math.random()*Math.PI*2,speed:Math.random()*0.004+0.002})); }
-  function draw(t){ ctx.clearRect(0,0,c.width,c.height);
-    stars.forEach(s=>{ const a=0.2+0.5*Math.sin(t*s.speed+s.phase); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(201,168,76,${a})`; ctx.fill(); }); requestAnimationFrame(draw); }
-  resize(); addEventListener('resize',resize); requestAnimationFrame(draw);
+const c=document.getElementById('bg-canvas');
+const ctx=c.getContext('2d');
+let stars=[];
+function resize(){ c.width=innerWidth; c.height=innerHeight;
+stars=Array.from({length:200},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+0.2,phase:Math.random()*Math.PI*2,speed:Math.random()*0.004+0.002})); }
+function draw(t){ ctx.clearRect(0,0,c.width,c.height);
+stars.forEach(s=>{ const a=0.2+0.5*Math.sin(t*s.speed+s.phase); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(201,168,76,${a})`; ctx.fill(); }); requestAnimationFrame(draw); }
+resize(); addEventListener('resize',resize); requestAnimationFrame(draw);
 })();
 
 // ─────────────────────────────────────────────────────
@@ -542,25 +567,25 @@ function addMinsT(t,delta){ const[h,m]=t.split(':').map(Number); const total=h*6
 // CITY CLOCKS — 12HR FORMAT
 // ─────────────────────────────────────────────────────
 const CITIES=[
-  {id:'mecca', tz:'Asia/Riyadh'},
-  {id:'london',tz:'Europe/London'},
-  {id:'lahore',tz:'Asia/Karachi'},
+{id:'mecca', tz:'Asia/Riyadh'},
+{id:'london',tz:'Europe/London'},
+{id:'lahore',tz:'Asia/Karachi'},
 ];
 function updateClocks(){
-  const now=new Date();
-  CITIES.forEach(city=>{
-    const t=now.toLocaleTimeString('en-US',{timeZone:city.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
-    // Split time from AM/PM
-    const parts=t.match(/(\d+:\d+:\d+)\s*(AM|PM)/i)||['','--:--:--',''];
-    const timePart=parts[1]||t; const ampm=parts[2]||'';
-    const d=now.toLocaleDateString('en-US',{timeZone:city.tz,weekday:'short',month:'short',day:'numeric'});
-    const el=document.getElementById('clock-'+city.id);
-    const ap=document.getElementById('ampm-'+city.id);
-    const del=document.getElementById('clock-'+city.id+'-date');
-    if(el){ const hm=timePart.substring(0,5); el.childNodes[0].textContent=hm; }
-    if(ap) ap.textContent=ampm;
-    if(del) del.textContent=d;
-  });
+const now=new Date();
+CITIES.forEach(city=>{
+const t=now.toLocaleTimeString('en-US',{timeZone:city.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+// Split time from AM/PM
+const parts=t.match(/(\d+:\d+:\d+)\s*(AM|PM)/i)||['','--:--:--',''];
+const timePart=parts[1]||t; const ampm=parts[2]||'';
+const d=now.toLocaleDateString('en-US',{timeZone:city.tz,weekday:'short',month:'short',day:'numeric'});
+const el=document.getElementById('clock-'+city.id);
+const ap=document.getElementById('ampm-'+city.id);
+const del=document.getElementById('clock-'+city.id+'-date');
+if(el){ const hm=timePart.substring(0,5); el.childNodes[0].textContent=hm; }
+if(ap) ap.textContent=ampm;
+if(del) del.textContent=d;
+});
 }
 updateClocks(); setInterval(updateClocks,1000);
 
@@ -568,380 +593,313 @@ updateClocks(); setInterval(updateClocks,1000);
 // DATE BAR
 // ─────────────────────────────────────────────────────
 function updateDateBar(){
-  const now=new Date();
-  const ge=document.getElementById('greg-date-display');
-  const te=document.getElementById('local-time-display');
-  if(ge) ge.textContent=now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Kolkata'});
-  if(te) te.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
+const now=new Date();
+const ge=document.getElementById('greg-date-display');
+const te=document.getElementById('local-time-display');
+if(ge) ge.textContent=now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Kolkata'});
+if(te) te.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
 }
 updateDateBar(); setInterval(updateDateBar,1000);
 
 // ─────────────────────────────────────────────────────
-// GREGORIAN CALENDAR
-// ─────────────────────────────────────────────────────
-function renderGregorianCalendar(){
-  const g=document.getElementById('greg-calendar');
-  if(!g) return;
-  const now=new Date();
-  const y=now.getFullYear(),m=now.getMonth(),today=now.getDate();
-  const mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const dn=['Su','Mo','Tu','We','Th','Fr','Sa'];
-  const nameEl=document.getElementById('greg-month-name');
-  if(nameEl) nameEl.textContent=`${mn[m]} ${y}`;
-  const fd=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate();
-  g.innerHTML=dn.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
-  for(let i=0;i<fd;i++) g.innerHTML+=`<div class="cal-day"></div>`;
-  for(let d=1;d<=dim;d++){
-    const weekDay=(fd+d-1)%7;
-    const isFri=weekDay===5;
-    const cls=d===today?'cal-day today':(isFri?'cal-day friday':'cal-day');
-    g.innerHTML+=`<div class="${cls}">${d}</div>`;
-  }
-}
-renderGregorianCalendar();
-
-// ─────────────────────────────────────────────────────
-// HIJRI CALENDAR
+// HIJRI DATE (for date bar chip)
 // ─────────────────────────────────────────────────────
 async function fetchHijriData(){
-  try{
-    const now=new Date();
-    const d=now.getDate(),mo=now.getMonth()+1,yr=now.getFullYear();
-    const r=await fetch(`https://api.aladhan.com/v1/gToH/${d}-${mo}-${yr}?adjustment=0`);
-    const j=await r.json();
-    if(j.code===200){
-      const h=j.data.hijri;
-      const el=document.getElementById('hijri-date-display');
-      if(el) el.textContent=`${h.day} ${h.month.en} ${h.year} AH`;
-      renderHijriCalendar(h);
-    }
-  }catch(e){
-    const el=document.getElementById('hijri-date-display');
-    if(el) el.textContent='27 Muharram 1448 AH';
-    renderHijriCalendarFallback();
-  }
+try{
+const now=new Date();
+const d=now.getDate(),mo=now.getMonth()+1,yr=now.getFullYear();
+const r=await fetch(`https://api.aladhan.com/v1/gToH/${d}-${mo}-${yr}?adjustment=0`);
+const j=await r.json();
+if(j.code===200){
+const h=j.data.hijri;
+const el=document.getElementById('hijri-date-display');
+if(el) el.textContent=`${h.day} ${h.month.en} ${h.year} AH`;
 }
-function renderHijriCalendar(h){
-  const g=document.getElementById('hijri-calendar');
-  if(!g) return;
-  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
-  const todayDay=parseInt(h.day);
-  const monthNum=parseInt(h.month.number);
-  const daysInMonth=monthNum%2===1?30:29;
-  const monthName=h.month.en; const year=h.year;
-  const nameEl=document.getElementById('hijri-month-name');
-  if(nameEl) nameEl.textContent=`${monthName} ${year} AH`;
-  const today=new Date();
-  const fd=(today.getDay()-((todayDay-1)%7)+7)%7;
-  g.innerHTML=dayNames.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
-  for(let i=0;i<fd;i++) g.innerHTML+=`<div class="cal-day"></div>`;
-  for(let d=1;d<=daysInMonth;d++){
-    const weekDay=(fd+d-1)%7; const isFri=weekDay===5;
-    const cls=d===todayDay?'cal-day today':(isFri?'cal-day friday':'cal-day');
-    g.innerHTML+=`<div class="${cls}">${d}</div>`;
-  }
+}catch(e){
+const el=document.getElementById('hijri-date-display');
+if(el) el.textContent='27 Muharram 1448 AH';
 }
-function renderHijriCalendarFallback(){
-  const g=document.getElementById('hijri-calendar');
-  if(!g) return;
-  const nameEl=document.getElementById('hijri-month-name');
-  if(nameEl) nameEl.textContent='Muharram 1448 AH';
-  const dayNames=['Su','Mo','Tu','We','Th','Fr','Sa'];
-  g.innerHTML=dayNames.map(d=>`<div class="cal-day-hdr">${d}</div>`).join('');
-  for(let i=0;i<0;i++) g.innerHTML+=`<div class="cal-day"></div>`;
-  for(let d=1;d<=30;d++){
-    const cls=d===27?'cal-day today':'cal-day';
-    g.innerHTML+=`<div class="${cls}">${d}</div>`;
-  }
 }
 
 // ─────────────────────────────────────────────────────
 // PRAYER TIMES + SUN ARC + TWILIGHT + MAKRUH
 // ─────────────────────────────────────────────────────
 let prayerData=null;
-
 async function fetchPrayers(){
-  try{
-    const d=new Date(),day=d.getDate(),mo=d.getMonth()+1,yr=d.getFullYear();
-    const url=`https://api.aladhan.com/v1/timingsByCity/${day}-${mo}-${yr}?city=Srinagar&country=India&method=1&school=1`;
-    const r=await fetch(url); const j=await r.json();
-    if(j.code===200){ prayerData=j.data.timings; }
-  }catch(e){}
-  // Fallback for Srinagar, Kashmir, July
-  if(!prayerData) prayerData={Fajr:'03:42',Sunrise:'05:20',Dhuhr:'12:14',Asr:'16:05',Sunset:'19:09',Maghrib:'19:09',Isha:'20:47',Imsak:'03:32',Midnight:'00:14'};
-  setupTracker(prayerData);
+try{
+const d=new Date(),day=d.getDate(),mo=d.getMonth()+1,yr=d.getFullYear();
+const url=`https://api.aladhan.com/v1/timingsByCity/${day}-${mo}-${yr}?city=Srinagar&country=India&method=1&school=1`;
+const r=await fetch(url); const j=await r.json();
+if(j.code===200){ prayerData=j.data.timings; }
+}catch(e){}
+// Fallback for Srinagar, Kashmir, July
+if(!prayerData) prayerData={Fajr:'03:42',Sunrise:'05:20',Dhuhr:'12:14',Asr:'16:05',Sunset:'19:09',Maghrib:'19:09',Isha:'20:47',Imsak:'03:32',Midnight:'00:14'};
+setupTracker(prayerData);
 }
-
 function setupTracker(t){
-  // ── Twilight approximations (degrees from horizon = minutes offset from sunrise/sunset) ──
-  // Astronomical (18°): ~72 min | Nautical (12°): ~48 min | Civil (6°): ~24 min
-  const srM=timeToMins(t.Sunrise), ssM=timeToMins(t.Sunset||t.Maghrib);
-  const fajrM=timeToMins(t.Fajr);
+// ── Twilight approximations (degrees from horizon = minutes offset from sunrise/sunset) ──
+// Astronomical (18°): ~72 min | Nautical (12°): ~48 min | Civil (6°): ~24 min
+const srM=timeToMins(t.Sunrise), ssM=timeToMins(t.Sunset||t.Maghrib);
+const fajrM=timeToMins(t.Fajr);
 
-  // Morning twilight times
-  const astroMornStart=fajrM-5;          // Astronomical twilight ≈ Fajr
-  const nautMornStart =fajrM+25;         // Nautical twilight starts ~25min after Fajr
-  const civilMornStart=fajrM+50;         // Civil twilight starts ~50min after Fajr
-  // Evening twilight times
-  const civilEveEnd   =ssM+26;
-  const nautEveEnd    =ssM+56;
-  const astroEveEnd   =timeToMins(t.Isha);
+// Morning twilight times
+const astroMornStart=fajrM-5; // Astronomical twilight ≈ Fajr
+const nautMornStart =fajrM+25; // Nautical twilight starts ~25min after Fajr
+const civilMornStart=fajrM+50; // Civil twilight starts ~50min after Fajr
 
-  // Makruh times
-  const mak1Start=srM;     const mak1End=srM+20;    // After sunrise
-  const mak2Start=timeToMins(t.Dhuhr)-10; const mak2End=timeToMins(t.Dhuhr);   // Zawal
-  const mak3Start=ssM-20;  const mak3End=ssM;       // Before sunset
+// Evening twilight times
+const civilEveEnd =ssM+26;
+const nautEveEnd =ssM+56;
+const astroEveEnd =timeToMins(t.Isha);
 
-  // Update twilight info cards
-  document.getElementById('astro-tl-times').innerHTML=
-    `☀️ ${minsTo12(astroMornStart)} – ${minsTo12(nautMornStart)}<br>🌑 ${minsTo12(nautEveEnd)} – ${minsTo12(astroEveEnd)}`;
-  document.getElementById('nautical-tl-times').innerHTML=
-    `☀️ ${minsTo12(nautMornStart)} – ${minsTo12(civilMornStart)}<br>🌑 ${minsTo12(civilEveEnd)} – ${minsTo12(nautEveEnd)}`;
-  document.getElementById('civil-tl-times').innerHTML=
-    `☀️ ${minsTo12(civilMornStart)} – ${minsTo12(srM)}<br>🌑 ${minsTo12(ssM)} – ${minsTo12(civilEveEnd)}`;
+// Makruh times
+const mak1Start=srM; const mak1End=srM+20; // After sunrise
+const mak2Start=timeToMins(t.Dhuhr)-10; const mak2End=timeToMins(t.Dhuhr); // Zawal
+const mak3Start=ssM-20; const mak3End=ssM; // Before sunset
 
-  // Update sunrise / sunset
-  document.getElementById('sunrise-time').textContent=fmt12(t.Sunrise);
-  document.getElementById('sunset-time').textContent=fmt12(t.Sunset||t.Maghrib);
+// Update twilight info cards
+document.getElementById('astro-tl-times').innerHTML=
+`☀️ ${minsTo12(astroMornStart)} – ${minsTo12(nautMornStart)}<br>🌑 ${minsTo12(nautEveEnd)} – ${minsTo12(astroEveEnd)}`;
+document.getElementById('nautical-tl-times').innerHTML=
+`☀️ ${minsTo12(nautMornStart)} – ${minsTo12(civilMornStart)}<br>🌑 ${minsTo12(civilEveEnd)} – ${minsTo12(nautEveEnd)}`;
+document.getElementById('civil-tl-times').innerHTML=
+`☀️ ${minsTo12(civilMornStart)} – ${minsTo12(srM)}<br>🌑 ${minsTo12(ssM)} – ${minsTo12(civilEveEnd)}`;
 
-  // Update makruh pills
-  const mr=document.getElementById('makruh-row');
-  mr.innerHTML=`
-    <div class="makruh-pill">⚠️ After Sunrise: ${minsTo12(mak1Start)} – ${minsTo12(mak1End)}</div>
-    <div class="makruh-pill">⚠️ Zawal (Istiwa): ${minsTo12(mak2Start)} – ${minsTo12(mak2End)}</div>
-    <div class="makruh-pill">⚠️ Before Sunset: ${minsTo12(mak3Start)} – ${minsTo12(mak3End)}</div>
-  `;
+// Update sunrise / sunset
+document.getElementById('sunrise-time').textContent=fmt12(t.Sunrise);
+document.getElementById('sunset-time').textContent=fmt12(t.Sunset||t.Maghrib);
 
-  renderPrayerPills(t);
-  drawSunArc(t);
-  startCountdown(t);
+// Update makruh pills
+const mr=document.getElementById('makruh-row');
+mr.innerHTML=`
+<div class="makruh-pill">⚠️ After Sunrise: ${minsTo12(mak1Start)} – ${minsTo12(mak1End)}</div>
+<div class="makruh-pill">⚠️ Zawal (Istiwa): ${minsTo12(mak2Start)} – ${minsTo12(mak2End)}</div>
+<div class="makruh-pill">⚠️ Before Sunset: ${minsTo12(mak3Start)} – ${minsTo12(mak3End)}</div>
+`;
+
+renderPrayerPills(t);
+drawSunArc(t);
+startCountdown(t);
 }
-
 const PRAYERS=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
 const PICONS={Fajr:'🌅',Dhuhr:'☀️',Asr:'🌤️',Maghrib:'🌇',Isha:'🌙'};
-
 function getCurrentNext(t){
-  const now=new Date(),nm=now.getHours()*60+now.getMinutes();
-  for(const p of PRAYERS){ if(timeToMins(t[p])>nm) return p; }
-  return 'Fajr';
+const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+for(const p of PRAYERS){ if(timeToMins(t[p])>nm) return p; }
+return 'Fajr';
 }
-
 function renderPrayerPills(t){
-  const next=getCurrentNext(t);
-  document.getElementById('prayer-pills').innerHTML=PRAYERS.map(p=>`
-    <div class="prayer-pill ${p===next?'active':''}">
-      <span class="pname">${PICONS[p]} ${p}</span>
-      <span class="ptime">${fmt12(t[p])}</span>
-    </div>`).join('');
+const next=getCurrentNext(t);
+document.getElementById('prayer-pills').innerHTML=PRAYERS.map(p=>`
+<div class="prayer-pill ${p===next?'active':''}">
+<span class="pname">${PICONS[p]} ${p}</span>
+<span class="ptime">${fmt12(t[p])}</span>
+</div>`).join('');
 }
-
 let cdInterval=null;
 function startCountdown(t){
-  if(cdInterval) clearInterval(cdInterval);
-  function tick(){
-    const next=getCurrentNext(t);
-    const now=new Date(),nm=now.getHours()*60+now.getMinutes();
-    let diff=(timeToMins(t[next])-nm)*60-now.getSeconds();
-    if(diff<0) diff+=86400;
-    const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
-    const hms=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    const nl=document.getElementById('next-prayer-label');
-    const cd=document.getElementById('prayer-countdown');
-    if(nl) nl.textContent=`Next: ${next} (${fmt12(t[next])})`;
-    if(cd) cd.innerHTML=`Time remaining → <strong>${hms}</strong>`;
-    if(s===0){ renderPrayerPills(t); drawSunArc(t); }
-  }
-  tick(); cdInterval=setInterval(tick,1000);
+if(cdInterval) clearInterval(cdInterval);
+function tick(){
+const next=getCurrentNext(t);
+const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+let diff=(timeToMins(t[next])-nm)*60-now.getSeconds();
+if(diff<0) diff+=86400;
+const h=Math.floor(diff/3600),m=Math.floor((diff%3600)/60),s=diff%60;
+const hms=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+const nl=document.getElementById('next-prayer-label');
+const cd=document.getElementById('prayer-countdown');
+if(nl) nl.textContent=`Next: ${next} (${fmt12(t[next])})`;
+if(cd) cd.innerHTML=`Time remaining → <strong>${hms}</strong>`;
+if(s===0){ renderPrayerPills(t); drawSunArc(t); }
+}
+tick(); cdInterval=setInterval(tick,1000);
 }
 
 // ─────────────────────────────────────────────────────
 // SUN ARC CANVAS — WITH TWILIGHT ZONES + MAKRUH
 // ─────────────────────────────────────────────────────
 function drawSunArc(t){
-  const canvas=document.getElementById('sun-arc-canvas');
-  if(!canvas) return;
-  const dpr=Math.min(window.devicePixelRatio||1,2);
-  const W=canvas.offsetWidth||760,H=190;
-  canvas.width=W*dpr; canvas.height=H*dpr;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
+const canvas=document.getElementById('sun-arc-canvas');
+if(!canvas) return;
+const dpr=Math.min(window.devicePixelRatio||1,2);
+const W=canvas.offsetWidth||760,H=190;
+canvas.width=W*dpr; canvas.height=H*dpr;
+canvas.style.width=W+'px'; canvas.style.height=H+'px';
+const ctx=canvas.getContext('2d');
+ctx.scale(dpr,dpr);
 
-  const fajrM =timeToMins(t.Fajr);
-  const srM   =timeToMins(t.Sunrise);
-  const dhuhrM=timeToMins(t.Dhuhr);
-  const asrM  =timeToMins(t.Asr);
-  const ssM   =timeToMins(t.Sunset||t.Maghrib);
-  const ishaM =timeToMins(t.Isha);
-  const now=new Date(),nowM=now.getHours()*60+now.getMinutes()+(now.getSeconds()/60);
+const fajrM =timeToMins(t.Fajr);
+const srM =timeToMins(t.Sunrise);
+const dhuhrM=timeToMins(t.Dhuhr);
+const asrM =timeToMins(t.Asr);
+const ssM =timeToMins(t.Sunset||t.Maghrib);
+const ishaM =timeToMins(t.Isha);
+const now=new Date(),nowM=now.getHours()*60+now.getMinutes()+(now.getSeconds()/60);
 
-  // Twilight offsets
-  const astroMornEnd=fajrM+25, nautMornEnd=fajrM+50;
-  const civilEveEnd=ssM+26, nautEveEnd=ssM+56, astroEveEnd=ishaM;
-  // Makruh
-  const mak1S=srM, mak1E=srM+20;
-  const mak2S=dhuhrM-10, mak2E=dhuhrM;
-  const mak3S=ssM-20, mak3E=ssM;
+// Twilight offsets
+const astroMornEnd=fajrM+25, nautMornEnd=fajrM+50;
+const civilEveEnd=ssM+26, nautEveEnd=ssM+56, astroEveEnd=ishaM;
 
-  // Arc range: from fajrM to ishaM
-  const rangeStart=fajrM-5, rangeEnd=ishaM+5;
-  const rangeDur=rangeEnd-rangeStart;
+// Makruh
+const mak1S=srM, mak1E=srM+20;
+const mak2S=dhuhrM-10, mak2E=dhuhrM;
+const mak3S=ssM-20, mak3E=ssM;
 
-  // Map time (mins) → x position
-  const tx=m=>Math.max(0,Math.min(W,((m-rangeStart)/rangeDur)*W));
+// Arc range: from fajrM to ishaM
+const rangeStart=fajrM-5, rangeEnd=ishaM+5;
+const rangeDur=rangeEnd-rangeStart;
 
-  // Arc params — semicircle from bottom
-  const cx=W/2, baseY=H-8, arcH=H-20;
+// Map time (mins) → x position
+const tx=m=>Math.max(0,Math.min(W,((m-rangeStart)/rangeDur)*W));
 
-  // Map time → angle on arc (π to 0, left to right)
-  const tAngle=m=>{
-    const ratio=(m-rangeStart)/rangeDur;
-    return Math.PI*(1-ratio);
-  };
-  const arcPt=m=>({
-    x:cx+(cx-20)*Math.cos(tAngle(m)),
-    y:baseY-arcH*Math.sin(tAngle(m))
-  });
+// Arc params — semicircle from bottom
+const cx=W/2, baseY=H-8, arcH=H-20;
 
-  // ── 1. Sky gradient background ──
-  const skyGrad=ctx.createLinearGradient(0,0,W,0);
-  skyGrad.addColorStop(0,         'rgba(8,4,30,0.95)');          // deep night
-  skyGrad.addColorStop(((fajrM-rangeStart)/rangeDur),'rgba(15,8,50,0.9)');  // astro twi
-  skyGrad.addColorStop(((astroMornEnd-rangeStart)/rangeDur),'rgba(15,25,80,0.85)'); // nautical
-  skyGrad.addColorStop(((nautMornEnd-rangeStart)/rangeDur),'rgba(15,50,110,0.8)');  // civil
-  skyGrad.addColorStop(((srM-rangeStart)/rangeDur),   'rgba(255,140,50,0.3)');      // sunrise
-  skyGrad.addColorStop(((dhuhrM-rangeStart)/rangeDur),'rgba(255,200,80,0.12)');     // midday
-  skyGrad.addColorStop(((ssM-rangeStart)/rangeDur),   'rgba(255,80,30,0.3)');       // sunset
-  skyGrad.addColorStop(((civilEveEnd-rangeStart)/rangeDur),'rgba(80,20,80,0.6)');   // civil eve
-  skyGrad.addColorStop(((nautEveEnd-rangeStart)/rangeDur),'rgba(20,10,60,0.8)');    // nautical eve
-  skyGrad.addColorStop(1,'rgba(8,4,30,0.95)');                    // night
+// Map time → angle on arc (π to 0, left to right)
+const tAngle=m=>{
+const ratio=(m-rangeStart)/rangeDur;
+return Math.PI*(1-ratio);
+};
+const arcPt=m=>({
+x:cx+(cx-20)*Math.cos(tAngle(m)),
+y:baseY-arcH*Math.sin(tAngle(m))
+});
 
-  ctx.fillStyle=skyGrad; ctx.fillRect(0,0,W,H);
+// ── 1. Sky gradient background ──
+const skyGrad=ctx.createLinearGradient(0,0,W,0);
+skyGrad.addColorStop(0, 'rgba(8,4,30,0.95)'); // deep night
+skyGrad.addColorStop(((fajrM-rangeStart)/rangeDur),'rgba(15,8,50,0.9)'); // astro twi
+skyGrad.addColorStop(((astroMornEnd-rangeStart)/rangeDur),'rgba(15,25,80,0.85)'); // nautical
+skyGrad.addColorStop(((nautMornEnd-rangeStart)/rangeDur),'rgba(15,50,110,0.8)'); // civil
+skyGrad.addColorStop(((srM-rangeStart)/rangeDur), 'rgba(255,140,50,0.3)'); // sunrise
+skyGrad.addColorStop(((dhuhrM-rangeStart)/rangeDur),'rgba(255,200,80,0.12)'); // midday
+skyGrad.addColorStop(((ssM-rangeStart)/rangeDur), 'rgba(255,80,30,0.3)'); // sunset
+skyGrad.addColorStop(((civilEveEnd-rangeStart)/rangeDur),'rgba(80,20,80,0.6)'); // civil eve
+skyGrad.addColorStop(((nautEveEnd-rangeStart)/rangeDur),'rgba(20,10,60,0.8)'); // nautical eve
+skyGrad.addColorStop(1,'rgba(8,4,30,0.95)'); // night
+ctx.fillStyle=skyGrad; ctx.fillRect(0,0,W,H);
 
-  // ── 2. Horizon fill (ground below baseline) ──
-  ctx.fillStyle='rgba(6,13,24,0.8)'; ctx.fillRect(0,baseY,W,H-baseY);
+// ── 2. Horizon fill (ground below baseline) ──
+ctx.fillStyle='rgba(6,13,24,0.8)'; ctx.fillRect(0,baseY,W,H-baseY);
 
-  // ── 3. Twilight zone bands (below arc, above horizon) ──
-  function drawBand(tStart,tEnd,color){
-    ctx.beginPath();
-    ctx.moveTo(tx(tStart),baseY);
-    // Draw arc segment from tStart to tEnd
-    const steps=20;
-    for(let i=0;i<=steps;i++){
-      const tm=tStart+(tEnd-tStart)*(i/steps);
-      const p=arcPt(tm);
-      if(i===0) ctx.moveTo(p.x,Math.min(p.y,baseY));
-      else ctx.lineTo(p.x,Math.min(p.y,baseY));
-    }
-    ctx.lineTo(tx(tEnd),baseY);
-    ctx.closePath();
-    ctx.fillStyle=color; ctx.fill();
-  }
+// ── 3. Twilight zone bands (below arc, above horizon) ──
+function drawBand(tStart,tEnd,color){
+ctx.beginPath();
+ctx.moveTo(tx(tStart),baseY);
+// Draw arc segment from tStart to tEnd
+const steps=20;
+for(let i=0;i<=steps;i++){
+const tm=tStart+(tEnd-tStart)*(i/steps);
+const p=arcPt(tm);
+if(i===0) ctx.moveTo(p.x,Math.min(p.y,baseY));
+else ctx.lineTo(p.x,Math.min(p.y,baseY));
+}
+ctx.lineTo(tx(tEnd),baseY);
+ctx.closePath();
+ctx.fillStyle=color; ctx.fill();
+}
+// Twilight bands
+drawBand(fajrM-5, astroMornEnd, 'rgba(20,10,80,0.35)'); // Astronomical (morning)
+drawBand(astroMornEnd, nautMornEnd,'rgba(15,40,100,0.35)'); // Nautical (morning)
+drawBand(nautMornEnd, srM, 'rgba(20,80,140,0.35)'); // Civil (morning)
+drawBand(ssM, civilEveEnd, 'rgba(180,80,20,0.25)'); // Civil (evening)
+drawBand(civilEveEnd, nautEveEnd,'rgba(100,20,120,0.3)'); // Nautical (evening)
+drawBand(nautEveEnd, ishaM+5, 'rgba(20,10,80,0.35)'); // Astronomical (evening)
 
-  // Twilight bands
-  drawBand(fajrM-5, astroMornEnd, 'rgba(20,10,80,0.35)');     // Astronomical (morning)
-  drawBand(astroMornEnd, nautMornEnd,'rgba(15,40,100,0.35)');  // Nautical (morning)
-  drawBand(nautMornEnd, srM,      'rgba(20,80,140,0.35)');     // Civil (morning)
-  drawBand(ssM, civilEveEnd,      'rgba(180,80,20,0.25)');     // Civil (evening)
-  drawBand(civilEveEnd, nautEveEnd,'rgba(100,20,120,0.3)');    // Nautical (evening)
-  drawBand(nautEveEnd, ishaM+5,   'rgba(20,10,80,0.35)');      // Astronomical (evening)
+// Makruh zones (red overlay)
+drawBand(mak1S, mak1E, 'rgba(180,30,30,0.3)');
+drawBand(mak2S, mak2E, 'rgba(180,30,30,0.3)');
+drawBand(mak3S, mak3E, 'rgba(180,30,30,0.3)');
 
-  // Makruh zones (red overlay)
-  drawBand(mak1S, mak1E, 'rgba(180,30,30,0.3)');
-  drawBand(mak2S, mak2E, 'rgba(180,30,30,0.3)');
-  drawBand(mak3S, mak3E, 'rgba(180,30,30,0.3)');
+// ── 4. Arc guide line ──
+ctx.beginPath();
+const steps=80;
+for(let i=0;i<=steps;i++){
+const m=rangeStart+(rangeDur*i/steps);
+const p=arcPt(m);
+if(p.y<0||p.y>baseY) continue;
+if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+}
+ctx.strokeStyle='rgba(201,168,76,0.2)'; ctx.lineWidth=1;
+ctx.setLineDash([3,7]); ctx.stroke(); ctx.setLineDash([]);
 
-  // ── 4. Arc guide line ──
-  ctx.beginPath();
-  const steps=80;
-  for(let i=0;i<=steps;i++){
-    const m=rangeStart+(rangeDur*i/steps);
-    const p=arcPt(m);
-    if(p.y<0||p.y>baseY) continue;
-    if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
-  }
-  ctx.strokeStyle='rgba(201,168,76,0.2)'; ctx.lineWidth=1;
-  ctx.setLineDash([3,7]); ctx.stroke(); ctx.setLineDash([]);
+// ── 5. Prayer markers ──
+const markers=[
+{m:fajrM, label:'Fajr', color:'rgba(120,130,255,0.9)'},
+{m:srM, label:'Tulu\'', color:'rgba(255,200,80,1)'},
+{m:dhuhrM, label:'Dhuhr', color:'rgba(255,230,60,1)'},
+{m:asrM, label:'Asr', color:'rgba(255,160,50,0.9)'},
+{m:ssM, label:'Ghurub', color:'rgba(255,90,50,0.9)'},
+{m:ishaM, label:'Isha', color:'rgba(150,100,255,0.9)'},
+];
+markers.forEach(mk=>{
+const p=arcPt(mk.m);
+if(p.y<0||p.y>baseY+2) return;
+// Vertical guide
+ctx.beginPath(); ctx.moveTo(p.x,p.y+4); ctx.lineTo(p.x,baseY);
+ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=0.8; ctx.stroke();
+// Dot
+ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2);
+ctx.fillStyle=mk.color; ctx.fill();
+// Label
+ctx.font='bold 9px Inter'; ctx.fillStyle=mk.color; ctx.textAlign='center';
+const ly=Math.max(8,Math.min(p.y-8,baseY-14));
+ctx.fillText(mk.label,p.x,ly);
+});
+// Makruh labels
+[[mak1S+10,'Karahat'],[mak2S+5,'Zawal'],[mak3S+10,'Karahat']].forEach(([m,lbl])=>{
+const p=arcPt(m);
+if(p.y>0&&p.y<baseY){ ctx.font='bold 8px Inter'; ctx.fillStyle='rgba(220,80,80,0.9)'; ctx.textAlign='center'; ctx.fillText(lbl,p.x,baseY-4); }
+});
 
-  // ── 5. Prayer markers ──
-  const markers=[
-    {m:fajrM,  label:'Fajr',   color:'rgba(120,130,255,0.9)'},
-    {m:srM,    label:'Tulu\'', color:'rgba(255,200,80,1)'},
-    {m:dhuhrM, label:'Dhuhr',  color:'rgba(255,230,60,1)'},
-    {m:asrM,   label:'Asr',    color:'rgba(255,160,50,0.9)'},
-    {m:ssM,    label:'Ghurub', color:'rgba(255,90,50,0.9)'},
-    {m:ishaM,  label:'Isha',   color:'rgba(150,100,255,0.9)'},
-  ];
-  markers.forEach(mk=>{
-    const p=arcPt(mk.m);
-    if(p.y<0||p.y>baseY+2) return;
-    // Vertical guide
-    ctx.beginPath(); ctx.moveTo(p.x,p.y+4); ctx.lineTo(p.x,baseY);
-    ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=0.8; ctx.stroke();
-    // Dot
-    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2);
-    ctx.fillStyle=mk.color; ctx.fill();
-    // Label
-    ctx.font='bold 9px Inter'; ctx.fillStyle=mk.color; ctx.textAlign='center';
-    const ly=Math.max(8,Math.min(p.y-8,baseY-14));
-    ctx.fillText(mk.label,p.x,ly);
-  });
+// ── 6. Horizon line ──
+ctx.beginPath(); ctx.moveTo(10,baseY); ctx.lineTo(W-10,baseY);
+ctx.strokeStyle='rgba(201,168,76,0.3)'; ctx.lineWidth=1; ctx.stroke();
+ctx.font='bold 8px Inter'; ctx.fillStyle='rgba(201,168,76,0.35)'; ctx.textAlign='left';
+ctx.fillText('HORIZON',12,baseY-3);
 
-  // Makruh labels
-  [[mak1S+10,'Karahat'],[mak2S+5,'Zawal'],[mak3S+10,'Karahat']].forEach(([m,lbl])=>{
-    const p=arcPt(m);
-    if(p.y>0&&p.y<baseY){ ctx.font='bold 8px Inter'; ctx.fillStyle='rgba(220,80,80,0.9)'; ctx.textAlign='center'; ctx.fillText(lbl,p.x,baseY-4); }
-  });
+// ── 7. Sun or Moon ──
+const isDaytime=nowM>=srM && nowM<=ssM;
+const inRange=nowM>=rangeStart && nowM<=rangeEnd;
+const sunPt=inRange?arcPt(nowM):null;
+if(isDaytime && sunPt && sunPt.y>=0 && sunPt.y<=baseY){
+// Glow
+const g=ctx.createRadialGradient(sunPt.x,sunPt.y,0,sunPt.x,sunPt.y,22);
+g.addColorStop(0,'rgba(255,230,80,0.85)'); g.addColorStop(0.45,'rgba(255,180,40,0.4)'); g.addColorStop(1,'transparent');
+ctx.beginPath(); ctx.arc(sunPt.x,sunPt.y,22,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+// Core
+ctx.beginPath(); ctx.arc(sunPt.x,sunPt.y,7,0,Math.PI*2);
+ctx.fillStyle='#FFE84B'; ctx.fill();
+ctx.strokeStyle='rgba(255,230,80,0.9)'; ctx.lineWidth=2; ctx.stroke();
+// Rays
+for(let i=0;i<8;i++){ const ra=i*Math.PI/4; ctx.beginPath(); ctx.arc(sunPt.x+Math.cos(ra)*12,sunPt.y+Math.sin(ra)*12,1.8,0,Math.PI*2); ctx.fillStyle='rgba(255,220,80,0.45)'; ctx.fill(); }
+} else if(nowM<srM && sunPt && sunPt.y>=0 && sunPt.y<=baseY){
+// Moon (pre-sunrise)
+ctx.beginPath(); ctx.arc(sunPt.x,sunPt.y,9,0,Math.PI*2);
+const mg=ctx.createRadialGradient(sunPt.x-3,sunPt.y-3,0,sunPt.x,sunPt.y,9);
+mg.addColorStop(0,'rgba(230,220,190,0.95)'); mg.addColorStop(1,'rgba(150,140,100,0.5)');
+ctx.fillStyle=mg; ctx.fill();
+ctx.beginPath(); ctx.arc(sunPt.x+4,sunPt.y-2,7,0,Math.PI*2);
+ctx.fillStyle='rgba(6,13,24,0.95)'; ctx.fill();
+} else {
+// Night — fixed moon at top
+const mx2=W-40, my2=25;
+const mg=ctx.createRadialGradient(mx2-3,my2-3,0,mx2,my2,12);
+mg.addColorStop(0,'rgba(230,220,190,0.9)'); mg.addColorStop(1,'rgba(100,90,60,0.2)');
+ctx.beginPath(); ctx.arc(mx2,my2,11,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
+ctx.beginPath(); ctx.arc(mx2+6,my2-2,8,0,Math.PI*2); ctx.fillStyle='rgba(6,13,24,0.95)'; ctx.fill();
+}
 
-  // ── 6. Horizon line ──
-  ctx.beginPath(); ctx.moveTo(10,baseY); ctx.lineTo(W-10,baseY);
-  ctx.strokeStyle='rgba(201,168,76,0.3)'; ctx.lineWidth=1; ctx.stroke();
-  ctx.font='bold 8px Inter'; ctx.fillStyle='rgba(201,168,76,0.35)'; ctx.textAlign='left';
-  ctx.fillText('HORIZON',12,baseY-3);
-
-  // ── 7. Sun or Moon ──
-  const isDaytime=nowM>=srM && nowM<=ssM;
-  const inRange=nowM>=rangeStart && nowM<=rangeEnd;
-  const sunPt=inRange?arcPt(nowM):null;
-
-  if(isDaytime && sunPt && sunPt.y>=0 && sunPt.y<=baseY){
-    // Glow
-    const g=ctx.createRadialGradient(sunPt.x,sunPt.y,0,sunPt.x,sunPt.y,22);
-    g.addColorStop(0,'rgba(255,230,80,0.85)'); g.addColorStop(0.45,'rgba(255,180,40,0.4)'); g.addColorStop(1,'transparent');
-    ctx.beginPath(); ctx.arc(sunPt.x,sunPt.y,22,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
-    // Core
-    ctx.beginPath(); ctx.arc(sunPt.x,sunPt.y,7,0,Math.PI*2);
-    ctx.fillStyle='#FFE84B'; ctx.fill();
-    ctx.strokeStyle='rgba(255,230,80,0.9)'; ctx.lineWidth=2; ctx.stroke();
-    // Rays
-    for(let i=0;i<8;i++){ const ra=i*Math.PI/4; ctx.beginPath(); ctx.arc(sunPt.x+Math.cos(ra)*12,sunPt.y+Math.sin(ra)*12,1.8,0,Math.PI*2); ctx.fillStyle='rgba(255,220,80,0.45)'; ctx.fill(); }
-  } else if(nowM<srM && sunPt && sunPt.y>=0 && sunPt.y<=baseY){
-    // Moon (pre-sunrise)
-    ctx.beginPath(); ctx.arc(sunPt.x,sunPt.y,9,0,Math.PI*2);
-    const mg=ctx.createRadialGradient(sunPt.x-3,sunPt.y-3,0,sunPt.x,sunPt.y,9);
-    mg.addColorStop(0,'rgba(230,220,190,0.95)'); mg.addColorStop(1,'rgba(150,140,100,0.5)');
-    ctx.fillStyle=mg; ctx.fill();
-    ctx.beginPath(); ctx.arc(sunPt.x+4,sunPt.y-2,7,0,Math.PI*2);
-    ctx.fillStyle='rgba(6,13,24,0.95)'; ctx.fill();
-  } else {
-    // Night — fixed moon at top
-    const mx2=W-40, my2=25;
-    const mg=ctx.createRadialGradient(mx2-3,my2-3,0,mx2,my2,12);
-    mg.addColorStop(0,'rgba(230,220,190,0.9)'); mg.addColorStop(1,'rgba(100,90,60,0.2)');
-    ctx.beginPath(); ctx.arc(mx2,my2,11,0,Math.PI*2); ctx.fillStyle=mg; ctx.fill();
-    ctx.beginPath(); ctx.arc(mx2+6,my2-2,8,0,Math.PI*2); ctx.fillStyle='rgba(6,13,24,0.95)'; ctx.fill();
-  }
-
-  // ── 8. Day progress bar ──
-  const dayProg=Math.max(0,Math.min(1,(nowM-srM)/(ssM-srM)));
-  ctx.beginPath(); ctx.moveTo(20,H-3); ctx.lineTo(W-20,H-3);
-  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.stroke();
-  if(isDaytime){
-    const pg=ctx.createLinearGradient(20,0,W-20,0);
-    pg.addColorStop(0,'rgba(80,130,255,0.7)'); pg.addColorStop(0.5,'rgba(255,200,80,0.9)'); pg.addColorStop(1,'rgba(255,70,50,0.7)');
-    ctx.beginPath(); ctx.moveTo(20,H-3); ctx.lineTo(20+(W-40)*dayProg,H-3);
-    ctx.strokeStyle=pg; ctx.lineWidth=3; ctx.stroke();
-  }
+// ── 8. Day progress bar ──
+const dayProg=Math.max(0,Math.min(1,(nowM-srM)/(ssM-srM)));
+ctx.beginPath(); ctx.moveTo(20,H-3); ctx.lineTo(W-20,H-3);
+ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.stroke();
+if(isDaytime){
+const pg=ctx.createLinearGradient(20,0,W-20,0);
+pg.addColorStop(0,'rgba(80,130,255,0.7)'); pg.addColorStop(0.5,'rgba(255,200,80,0.9)'); pg.addColorStop(1,'rgba(255,70,50,0.7)');
+ctx.beginPath(); ctx.moveTo(20,H-3); ctx.lineTo(20+(W-40)*dayProg,H-3);
+ctx.strokeStyle=pg; ctx.lineWidth=3; ctx.stroke();
+}
 }
 
 // ─────────────────────────────────────────────────────
@@ -952,18 +910,18 @@ window.addEventListener('resize',()=>{ if(prayerData) drawSunArc(prayerData); })
 // ─────────────────────────────────────────────────────
 // 3D CARD TILT EFFECT
 // ─────────────────────────────────────────────────────
-document.querySelectorAll('.section-card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const ax = -(y - rect.height / 2) / (rect.height / 2) * 15;
-    const ay = (x - rect.width / 2) / (rect.width / 2) * 15;
-    card.style.transform = `perspective(1000px) rotateX(${ax}deg) rotateY(${ay}deg) translateY(-4px)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
-  });
+document.querySelectorAll('.tilt-card').forEach(card => {
+card.addEventListener('mousemove', e => {
+const rect = card.getBoundingClientRect();
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+const ax = -(y - rect.height / 2) / (rect.height / 2) * 10;
+const ay = (x - rect.width / 2) / (rect.width / 2) * 10;
+card.style.transform = `perspective(1000px) rotateX(${ax}deg) rotateY(${ay}deg) translateY(-4px)`;
+});
+card.addEventListener('mouseleave', () => {
+card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+});
 });
 
 // ─────────────────────────────────────────────────────
@@ -974,8 +932,3 @@ fetchHijriData();
 </script>
 </body>
 </html>
-
-
-
-
-
