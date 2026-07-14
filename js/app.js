@@ -241,53 +241,135 @@ function startCountdown() {
 }
 
 // ---- PREMIUM 3D & HOVER EFFECTS ----
+// ---- PREMIUM 3D & HOVER EFFECTS ----
 function initPremiumEffects() {
-  // 1. Inject Vercel Grain overlay
-  if (!document.querySelector('.vercel-grain')) {
-    const grain = document.createElement('div');
-    grain.className = 'vercel-grain';
-    document.body.prepend(grain);
+  // 1. Inject Noise Overlay
+  if (!document.querySelector('.noise-overlay')) {
+    const noise = document.createElement('div');
+    noise.className = 'noise-overlay';
+    document.body.prepend(noise);
   }
 
-  // 2. Initialize Subsurface Card glows
-  document.querySelectorAll('.card, .section-card, .name-card, .timeline-card, .heir-input-card, .pillar-tab').forEach(card => {
-    card.classList.add('sss-card');
-    
-    // Create glow element inside the card
-    if (!card.querySelector('.subsurface-glow')) {
-      const glow = document.createElement('div');
-      glow.className = 'subsurface-glow';
-      card.appendChild(glow);
-    }
+  // 2. Inject and Setup Spectral Cursor
+  let cursor = document.getElementById('cursor');
+  if (!cursor) {
+    cursor = document.createElement('div');
+    cursor.id = 'cursor';
+    cursor.className = 'spectral-cursor';
+    document.body.appendChild(cursor);
+  }
 
-    // Follow cursor
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const glow = card.querySelector('.subsurface-glow');
-      if (glow) {
-        glow.style.left = `${x}px`;
-        glow.style.top = `${y}px`;
+  const moveCursor = (e) => {
+    if (cursor) {
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+    }
+  };
+  window.addEventListener('mousemove', moveCursor);
+
+  // Setup cursor hovering triggers
+  const interactiveSelector = '.btn, .btn-gold, .nav-links a, .nav-brand, .view-toggle-btn, .section-card, .card, .pillar-tab, .name-card, .timeline-card, .heir-input-card, a, button, select, input, textarea, [role="button"]';
+  
+  const setupCursorHovering = () => {
+    document.querySelectorAll(interactiveSelector).forEach(el => {
+      // Avoid duplicate listeners
+      if (!el.dataset.cursorBound) {
+        el.dataset.cursorBound = 'true';
+        el.addEventListener('mouseenter', () => cursor?.classList.add('hovering'));
+        el.addEventListener('mouseleave', () => cursor?.classList.remove('hovering'));
       }
     });
-  });
+  };
+  setupCursorHovering();
+  // Periodically run to catch dynamically loaded elements
+  setInterval(setupCursorHovering, 2000);
 
-  // 3. Initialize Interactive Buttons (sss-btn) glow coordinates
-  document.querySelectorAll('.btn, .btn-gold, .nav-links a, .nav-brand, .view-toggle-btn').forEach(btn => {
-    btn.classList.add('sss-btn');
-    btn.addEventListener('mousemove', e => {
-      const rect = btn.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      btn.style.setProperty('--x', `${x}px`);
-      btn.style.setProperty('--y', `${y}px`);
+  // 3. Initialize Spotlight Cards & Inject Border Masks
+  const setupSpotlightCards = () => {
+    document.querySelectorAll('.card, .section-card, .name-card, .timeline-card, .heir-input-card, .pillar-tab, .spotlight-card').forEach(card => {
+      // Inject gradient border mask
+      if (!card.querySelector('.gradient-border-mask')) {
+        const borderMask = document.createElement('div');
+        borderMask.className = 'gradient-border-mask';
+        card.appendChild(borderMask);
+      }
+
+      if (!card.dataset.spotlightBound) {
+        card.dataset.spotlightBound = 'true';
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      }
     });
-  });
+  };
+  setupSpotlightCards();
+  setInterval(setupSpotlightCards, 2000);
 
-  // 4. Initialize Bloom Reveal on scroll
+  // 4. Initialize Magnetic Buttons
+  const setupMagneticButtons = () => {
+    document.querySelectorAll('.btn, .btn-gold, .view-toggle-btn, .magnetic-btn, .nav-brand').forEach(btn => {
+      if (!btn.dataset.magneticBound) {
+        btn.dataset.magneticBound = 'true';
+        
+        btn.addEventListener('mousemove', e => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          btn.style.setProperty('--x', `${x}px`);
+          btn.style.setProperty('--y', `${y}px`);
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const deltaX = (x - centerX) * 0.15;
+          const deltaY = (y - centerY) * 0.15;
+
+          btn.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = 'translate3d(0px, 0px, 0)';
+        });
+      }
+    });
+  };
+  setupMagneticButtons();
+  setInterval(setupMagneticButtons, 2000);
+
+  // 5. Initialize Atmospheric Orbs in Background
+  if (!document.querySelector('.atmospheric-orb')) {
+    const orb1 = document.createElement('div');
+    orb1.className = 'atmospheric-orb bg-magenta/20 animate-pulse-slow';
+    orb1.style.width = '45vw';
+    orb1.style.height = '45vw';
+    orb1.style.top = '15%';
+    orb1.style.left = '10%';
+    orb1.style.background = 'oklch(65% 0.25 330 / 0.15)';
+    document.body.prepend(orb1);
+
+    const orb2 = document.createElement('div');
+    orb2.className = 'atmospheric-orb bg-amber/10 animate-pulse-slow';
+    orb2.style.width = '35vw';
+    orb2.style.height = '35vw';
+    orb2.style.bottom = '15%';
+    orb2.style.right = '10%';
+    orb2.style.background = 'oklch(70% 0.2 45 / 0.08)';
+    document.body.prepend(orb2);
+  }
+
+  // 6. Initialize Vignette
+  if (!document.querySelector('.vignette')) {
+    const vignette = document.createElement('div');
+    vignette.className = 'vignette';
+    document.body.prepend(vignette);
+  }
+
+  // 7. Initialize Bloom Reveal on scroll
   if (!window.IntersectionObserver) {
-    document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap').forEach(el => {
+    document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap, .spotlight-card').forEach(el => {
       el.classList.add('bloom-reveal', 'active');
     });
     return;
@@ -308,10 +390,9 @@ function initPremiumEffects() {
     });
   }, observerOptions);
 
-  document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap').forEach(el => {
+  document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap, .spotlight-card').forEach(el => {
     el.classList.add('bloom-reveal');
     const rect = el.getBoundingClientRect();
-    // If element is already in the viewport on load, activate it immediately
     if (rect.top >= 0 && rect.top < (window.innerHeight || 800)) {
       el.classList.add('active');
     } else {
