@@ -286,10 +286,17 @@ function initPremiumEffects() {
   });
 
   // 4. Initialize Bloom Reveal on scroll
+  if (!window.IntersectionObserver) {
+    document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap').forEach(el => {
+      el.classList.add('bloom-reveal', 'active');
+    });
+    return;
+  }
+
   const observerOptions = {
     root: null,
-    rootMargin: '0px 0px -10% 0px',
-    threshold: 0.05
+    rootMargin: '0px 0px -5% 0px',
+    threshold: 0.02
   };
 
   const bloomObserver = new IntersectionObserver((entries) => {
@@ -303,7 +310,13 @@ function initPremiumEffects() {
 
   document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap').forEach(el => {
     el.classList.add('bloom-reveal');
-    bloomObserver.observe(el);
+    const rect = el.getBoundingClientRect();
+    // If element is already in the viewport on load, activate it immediately
+    if (rect.top >= 0 && rect.top < (window.innerHeight || 800)) {
+      el.classList.add('active');
+    } else {
+      bloomObserver.observe(el);
+    }
   });
 }
 
