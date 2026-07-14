@@ -1126,3 +1126,172 @@ main { padding-top: 70px; position: relative; z-index: 1; }
   color: var(--gold);
   font-weight: 600;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   PREMIUM 3D & GLOWING EFFECTS (Vercel & Apple style)
+   ───────────────────────────────────────────────────────────── */
+
+/* Vercel Grain Overlay */
+.vercel-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+}
+
+/* Subsurface Glow Card styling */
+.card, .section-card, .name-card, .timeline-card, .heir-input-card, .pillar-tab {
+  position: relative !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: oklch(75% 0.2 45 / 0.02) !important;
+  border: 0.5px solid oklch(75% 0.2 45 / 0.15) !important;
+  box-shadow: inset 0 1px 1px oklch(90% 0.1 50 / 0.05),
+    0 20px 40px rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.card::before, .section-card::before, .name-card::before, .timeline-card::before, .heir-input-card::before, .pillar-tab::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    145deg,
+    oklch(75% 0.2 45 / 0.4),
+    transparent 40%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card:hover, .section-card:hover, .name-card:hover, .timeline-card:hover, .heir-input-card:hover, .pillar-tab:hover {
+  background: oklch(75% 0.2 45 / 0.04) !important;
+  border-color: oklch(75% 0.2 45 / 0.3) !important;
+  transform: translateY(-4px);
+  box-shadow: inset 0 0 40px oklch(75% 0.2 45 / 0.1),
+    0 20px 45px rgba(0, 0, 0, 0.6);
+}
+
+/* Subsurface hover spotlight */
+.subsurface-glow {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(
+    circle,
+    oklch(75% 0.2 45 / 0.28) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(35px);
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+.card:hover .subsurface-glow,
+.section-card:hover .subsurface-glow,
+.name-card:hover .subsurface-glow,
+.timeline-card:hover .subsurface-glow,
+.heir-input-card:hover .subsurface-glow,
+.pillar-tab:hover .subsurface-glow {
+  opacity: 1;
+}
+
+/* oklch Organic Glow Bleed Text */
+.section-title span, .nav-brand span, .nav-brand-arabic, .brand-arabic, .site-title span, .glow-bleed {
+  background: linear-gradient(
+    135deg,
+    oklch(90% 0.1 50) 0%,
+    oklch(75% 0.2 45) 40%,
+    oklch(65% 0.25 30) 100%
+  ) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: organicPulse 4s ease-in-out infinite alternate;
+  will-change: filter;
+}
+
+@keyframes organicPulse {
+  0% {
+    filter: drop-shadow(0 0 10px oklch(75% 0.2 45 / 0.15));
+  }
+  100% {
+    filter: drop-shadow(0 0 25px oklch(65% 0.25 30 / 0.45))
+      drop-shadow(0 0 6px oklch(90% 0.1 50 / 0.3));
+  }
+}
+
+/* Premium 3D Glow Buttons (sss-btn) */
+.btn-gold, .btn, .view-toggle-btn {
+  position: relative;
+  overflow: hidden;
+  background: oklch(65% 0.25 30 / 0.05) !important;
+  border: 0.5px solid oklch(75% 0.2 45 / 0.2) !important;
+  border-radius: 999px !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: inset 0 0 0px oklch(75% 0.2 45 / 0);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-gold::before, .btn::before, .view-toggle-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--x, 50%) var(--y, 50%),
+    oklch(90% 0.1 50 / 0.4) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.btn-gold:hover, .btn:hover, .view-toggle-btn:hover {
+  box-shadow: inset 0 0 30px oklch(75% 0.2 45 / 0.3),
+    0 10px 30px oklch(65% 0.25 30 / 0.2) !important;
+  border-color: oklch(90% 0.1 50 / 0.5) !important;
+  transform: translateY(-2px);
+  color: var(--gold-light) !important;
+}
+
+.btn-gold:hover::before, .btn:hover::before, .view-toggle-btn:hover::before {
+  opacity: 1;
+}
+
+/* Bloom Reveal Scroll Animation */
+.bloom-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(7px);
+  transition:
+    opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1.2s ease !important;
+}
+
+.bloom-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+}
+

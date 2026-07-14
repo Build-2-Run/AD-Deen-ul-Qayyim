@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAsmaUlHusna();
   initScrollAnimations();
   startCountdown();
+  initPremiumEffects();
 });
 
 // ---- NAVIGATION ----
@@ -237,6 +238,73 @@ function startCountdown() {
 
   setInterval(updateCountdown, 1000);
   updateCountdown();
+}
+
+// ---- PREMIUM 3D & HOVER EFFECTS ----
+function initPremiumEffects() {
+  // 1. Inject Vercel Grain overlay
+  if (!document.querySelector('.vercel-grain')) {
+    const grain = document.createElement('div');
+    grain.className = 'vercel-grain';
+    document.body.prepend(grain);
+  }
+
+  // 2. Initialize Subsurface Card glows
+  document.querySelectorAll('.card, .section-card, .name-card, .timeline-card, .heir-input-card, .pillar-tab').forEach(card => {
+    card.classList.add('sss-card');
+    
+    // Create glow element inside the card
+    if (!card.querySelector('.subsurface-glow')) {
+      const glow = document.createElement('div');
+      glow.className = 'subsurface-glow';
+      card.appendChild(glow);
+    }
+
+    // Follow cursor
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const glow = card.querySelector('.subsurface-glow');
+      if (glow) {
+        glow.style.left = `${x}px`;
+        glow.style.top = `${y}px`;
+      }
+    });
+  });
+
+  // 3. Initialize Interactive Buttons (sss-btn) glow coordinates
+  document.querySelectorAll('.btn, .btn-gold, .nav-links a, .nav-brand, .view-toggle-btn').forEach(btn => {
+    btn.classList.add('sss-btn');
+    btn.addEventListener('mousemove', e => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      btn.style.setProperty('--x', `${x}px`);
+      btn.style.setProperty('--y', `${y}px`);
+    });
+  });
+
+  // 4. Initialize Bloom Reveal on scroll
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -10% 0px',
+    threshold: 0.05
+  };
+
+  const bloomObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        bloomObserver.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.card, .section-card, .section-header, .name-card, .timeline-item, .verse-card, .chart-card, .tree-wrap').forEach(el => {
+    el.classList.add('bloom-reveal');
+    bloomObserver.observe(el);
+  });
 }
 
 // ---- HIJRI DATE ----
