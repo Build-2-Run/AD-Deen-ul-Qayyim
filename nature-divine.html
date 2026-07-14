@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nature & The Divine — AD-Deen ul-Qayyim</title>
+  <meta name="description" content="Explore the intersection of Quranic theology, Islamic jurisprudence, modern taxonomy, and comparative biology." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    /* Custom style overrides for Nature & Divine */
+    #cursor-dot {
+      position:fixed; width:10px; height:10px;
+      background:var(--gold);
+      border-radius:50%;
+      pointer-events:none; z-index:999999;
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 10px var(--gold);
+      transition:width 0.15s, height 0.15s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-ring {
+      position:fixed; width:26px; height:26px;
+      border:1.5px solid rgba(201,168,76,0.6);
+      border-radius:50%;
+      pointer-events:none; z-index:999998;
+      transform:translate(-50%,-50%);
+      transition:width 0.2s, height 0.2s, opacity 0.3s;
+      opacity:0;
+    }
+    #cursor-dot.visible, #cursor-ring.visible { opacity:1; }
+    #sparkle-canvas {
+      position:fixed; inset:0; pointer-events:none; z-index:999995;
+    }
+    @media (max-width: 1024px) {
+      #cursor-dot, #cursor-ring, #sparkle-canvas {
+        display:none !important;
+      }
+      body {
+        cursor:auto !important;
+      }
+    }
+    body { cursor: none; }
+    .page-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .btn-back:hover {
+      color: var(--gold-light);
+      transform: translateX(-4px);
+    }
+
+    /* Comparison Grid & Cards */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media(max-width: 768px) {
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+    .comp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .comp-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-bright);
+      box-shadow: var(--shadow-gold);
+    }
+    .comp-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Verses section */
+    .verse-card {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+    .verse-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--border-bright);
+    }
+    .arabic-text {
+      font-family: 'Amiri', serif;
+      font-size: 1.6rem;
+      color: var(--text-primary);
+      line-height: 2.2;
+      margin-bottom: 1rem;
+      text-align: right;
+    }
+    .english-translation {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      font-style: italic;
+      border-left: 3px solid var(--gold);
+      padding-left: 1rem;
+    }
+
+    /* Comparison Table styling */
+    .verdict-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.01);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .verdict-table th, .verdict-table td {
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.88rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .verdict-table th {
+      background: rgba(201, 168, 76, 0.1);
+      color: var(--gold-light);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+    }
+    .verdict-table tr:last-child td {
+      border-bottom: none;
+    }
+    .verdict-table td strong {
+      color: var(--text-primary);
+    }
+
+    /* Visual diagrams */
+    .diagram-container {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .svg-diagram {
+      background: rgba(8, 14, 26, 0.5);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .svg-caption {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+
+    /* Charts Layout */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media(max-width: 768px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .chart-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .chart-box {
+      flex-grow: 1;
+      position: relative;
+      height: 220px;
+    }
+
+    /* Taxonomy tree styles */
+    .tree-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .taxonomy-branch {
+      margin-left: 1.5rem;
+      border-left: 1px dashed rgba(201, 168, 76, 0.3);
+      padding-left: 1rem;
+      margin-top: 0.5rem;
+      position: relative;
+    }
+    .taxonomy-branch::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 12px;
+      height: 1px;
+      border-top: 1px dashed rgba(201, 168, 76, 0.3);
+    }
+    .tree-node-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .tree-node-title:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--gold);
+    }
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+    .badge-halal { background: rgba(39, 174, 96, 0.15); color: var(--green-light); border: 1px solid rgba(39, 174, 96, 0.3); }
+    .badge-haram { background: rgba(231, 76, 60, 0.15); color: var(--red); border: 1px solid rgba(231, 76, 60, 0.3); }
+    .tree-children {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tree-branch-open > .tree-children {
+      max-height: 500px;
+    }
+    .tree-icon {
+      font-size: 0.75rem;
+      color: var(--gold);
+      transition: transform 0.3s ease;
+    }
+    .tree-branch-open > .tree-node-title > .tree-icon {
+      transform: rotate(90deg);
+    }
+    .leaf-node {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 3px 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor elements -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<canvas id="sparkle-canvas"></canvas>
+
+<!-- Starfield background -->
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-brand-arabic">الإسلام</span>
+    <span>Islamic Hub</span>
+  </a>
+  <ul class="nav-links" id="nav-links" role="list">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="history.html">📜 History</a></li>
+    <li><a href="zakat.html">💰 Zakat</a></li>
+    <li><a href="mirath.html">⚖️ Mirath</a></li>
+    <li><a href="qurbani.html">🐑 Qurbani</a></li>
+    <li><a href="calendar.html">🌙 Calendar</a></li>
+    <li><a href="orrery.html">🌍 Solar System</a></li>
+    <li><a href="market.html">📈 Market</a></li>
+    <li><a href="pillars.html">🕋 Pillars</a></li>
+    <li><a href="asmaul-husna.html">📿 99 Names</a></li>
+    <li><a href="nature-divine.html" class="active">🌿 Nature & Divine</a></li>
+  </ul>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">☰</button>
+</nav>
+
+<main class="page-container">
+  <a href="index.html" class="btn-back">← Back to Home</a>
+
+  <!-- SECTION HEADER -->
+  <section class="section" style="padding:0; min-height:auto">
+    <div class="section-header section-animate">
+      <div class="section-subtitle">الخلق والآيات</div>
+      <h2 class="section-title">Nature & <span>The Divine</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc">
+        Exploring the deep harmony between Quranic theology, Islamic dietary laws, comparative biology, and modern zoological taxonomy.
+      </p>
+    </div>
+
+    <!-- SUBSECTION: PROHIBITION OF PORK -->
+    <div class="card mb-3" style="padding: 2.5rem 2rem;">
+      <div style="text-align: center; margin-bottom: 2.5rem;">
+        <span style="font-family: 'Amiri', serif; font-size: 1.3rem; color: var(--gold); display: block; margin-bottom: 0.5rem;">حُرِّمَتْ عَلَيْكُمُ الْمَيْتَةُ وَالدَّمُ وَلَحْمُ الْخِنزِيرِ</span>
+        <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--text-primary);">
+          The Divine Prohibition: Quranic Decree & Scientific Wisdom
+        </h3>
+        <div class="divider" style="margin: 1rem auto; width: 80px; height: 3px; background: var(--gold); border-radius: 2px;"></div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 750px; margin: 0 auto; line-height: 1.6;">
+          An examination of the prohibition of swine flesh (pork) in Islam, contrasting the biological taxonomy, anatomy, digestive differences, and sanitary parameters of monogastric swine vs. grazing ruminants.
+        </p>
+      </div>
+
+      <!-- SECTION 1: THE QURANIC FOUNDATION -->
+      <div class="mb-3">
+        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+          1. The Quranic Decree
+        </h4>
+        <div class="verse-container" style="display:flex; flex-direction:column; gap:1.2rem;">
+          
+          <!-- Baqarah 2:173 -->
+          <div class="verse-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.82rem; color:var(--gold)">
+              <span>Surah Al-Baqarah (2:173)</span>
+              <span>The Prohibition</span>
+            </div>
+            <p class="arabic-text" dir="rtl">
+              إِنَّمَا حَرَّمَ عَلَيْكُمُ الْمَيْتَةَ وَالدَّمَ وَلَحْمَ الْخِنزِيرِ وَمَا أُهِلَّ بِهِ لِغَيْرِ اللَّهِ ۖ فَمَنِ اضْطُرَّ غَيْرَ بَاغٍ وَلَا عَادٍ فَلَا إِثْمَ عَلَيْهِ ۚ إِنَّ اللَّهَ غَفُورٌ رَّحِيمٌ
+            </p>
+            <p class="english-translation">
+              "He has only forbidden to you dead animals, blood, the flesh of swine, and that which has been dedicated to other than Allah. But whoever is forced [by necessity], neither desiring [it] nor transgressing [its limit], there is no sin upon him. Indeed, Allah is Forgiving and Merciful."
+            </p>
+          </div>
+
+          <!-- Al-An'am 6:145 -->
+          <div class="verse-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.82rem; color:var(--gold)">
+              <span>Surah Al-An'am (6:145)</span>
+              <span>Impurity (Rijs)</span>
+            </div>
+            <p class="arabic-text" dir="rtl">
+              قُل لَّآ أَجِدُ فِى مَآ أُوحِىَ إِلَىَّ مُحَرَّمًا عَلَىٰ طَاعِمٍۢ يَطْعَمُهُۥٓ إِلَّآ أَن يَكُونَ مَيْتَةً أَوْ دَمًۢا مَّسْفُوحًا أَوْ لَحْمَ خِنزِيرٍۢ فَإِنَّهُۥ رِجْسٌ أَوْ فِسْقًا أُهِلَّ لِغَيْرِ ٱللَّهِ بِهِ
+            </p>
+            <p class="english-translation">
+              "Say, 'I do not find in what has been revealed to me anything forbidden to an eater who would eat it unless it be a dead animal or spilled blood or the flesh of swine - for indeed, it is impure (rijs) - or it be disobedience, dedicated to other than Allah...'"
+            </p>
+          </div>
+
+          <!-- Al-A'raf 7:157 -->
+          <div class="verse-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.82rem; color:var(--gold)">
+              <span>Surah Al-A'raf (7:157)</span>
+              <span>Good vs. Evil Things</span>
+            </div>
+            <p class="arabic-text" dir="rtl">
+              وَيُحِلُّ لَهُمُ ٱلطَّيِّبَـٰتِ وَيُحَرِّمُ عَلَيْهِمُ ٱلْخَبَـٰٓئِثَ
+            </p>
+            <p class="english-translation">
+              "...and makes lawful for them the good things (tayyibat) and prohibits for them the evil and impure things (khaba'ith)..."
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 2: THE "FAMILY" QUESTION & THE ISLAMIC CRITERION -->
+      <div class="mb-3">
+        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+          2. The "Family" Question & The Islamic Criterion
+        </h4>
+        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1rem">
+          <strong>Taxonomic Clarification:</strong> While pigs and cows belong to the same taxonomic order (<em>Artiodactyla</em> - even-toed ungulates), they diverged over 50 million years ago and belong to completely separate biological families. 
+        </p>
+
+        <!-- Diagrams row -->
+        <div class="diagram-container">
+          <!-- Split Hoof SVG -->
+          <div class="svg-diagram">
+            <span style="font-size:0.8rem; font-weight:600; color:var(--gold-light); margin-bottom:0.5rem">Cloven Hoof (Bovidae)</span>
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <!-- Background Outer -->
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="1.5"/>
+              <!-- Symmetrical split toes -->
+              <path d="M35 15 C35 35, 48 55, 48 85 L25 85 C22 55, 18 35, 35 15 Z" fill="var(--gold-dark)" opacity="0.8"/>
+              <path d="M65 15 C65 35, 52 55, 52 85 L75 85 C78 55, 82 35, 65 15 Z" fill="var(--gold)" opacity="0.9"/>
+            </svg>
+            <div class="svg-caption">2 symmetrical, weight-bearing digits with hard outer keratin casings. Clean, dry structure.</div>
+          </div>
+
+          <!-- Pig Foot SVG -->
+          <div class="svg-diagram">
+            <span style="font-size:0.8rem; font-weight:600; color:var(--red); margin-bottom:0.5rem">Pig Foot (Suidae)</span>
+            <svg viewBox="0 0 100 100" width="80" height="80">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(231,76,60,0.2)" stroke-width="1.5"/>
+              <!-- Four toes total: 2 main weight-bearing + 2 side dewclaws -->
+              <path d="M38 18 C38 35, 47 50, 47 80 L30 80 C27 50, 24 35, 38 18 Z" fill="#7a2a2a" opacity="0.8"/>
+              <path d="M62 18 C62 35, 53 50, 53 80 L70 80 C73 50, 76 35, 62 18 Z" fill="#a83c3c" opacity="0.9"/>
+              <!-- Dewclaws (side toes) -->
+              <path d="M18 45 C15 50, 15 58, 22 62 L22 52 Z" fill="#5c1f1f"/>
+              <path d="M82 45 C85 50, 85 58, 78 62 L78 52 Z" fill="#5c1f1f"/>
+            </svg>
+            <div class="svg-caption">4 toes total (2 main + 2 lateral dewclaws) which touch muddy ground. Anatomically distinct.</div>
+          </div>
+
+          <!-- 4-Chambered Stomach SVG -->
+          <div class="svg-diagram" style="width:340px">
+            <span style="font-size:0.8rem; font-weight:600; color:var(--gold-light); margin-bottom:0.5rem">Stomach Structure Comparison</span>
+            <div style="display:flex; justify-content:space-around; width:100%; align-items:center; margin-top:0.5rem">
+              <!-- Cow Stomach (4 Chamber) -->
+              <div style="text-align:center">
+                <svg viewBox="0 0 80 80" width="70" height="70">
+                  <path d="M10 40 C10 10, 70 10, 70 40 C70 70, 10 70, 10 40 Z" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+                  <!-- Inner chambers partitions -->
+                  <path d="M25 22 C32 40, 48 40, 55 22" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
+                  <path d="M40 20 L40 60" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
+                  <circle cx="20" cy="40" r="4" fill="var(--gold-light)"/>
+                  <circle cx="35" cy="50" r="4" fill="var(--gold-light)"/>
+                  <circle cx="50" cy="35" r="4" fill="var(--gold-light)"/>
+                  <circle cx="62" cy="45" r="4" fill="var(--gold-light)"/>
+                </svg>
+                <div style="font-size:0.65rem; color:var(--gold); margin-top:0.3rem">Ruminant (4-Chambered)</div>
+              </div>
+              <div style="font-size:1.2rem; color:var(--text-muted)">vs</div>
+              <!-- Pig Stomach (1 Chamber) -->
+              <div style="text-align:center">
+                <svg viewBox="0 0 80 80" width="70" height="70">
+                  <path d="M15 35 C15 15, 65 15, 65 45 C65 60, 45 65, 15 35 Z" fill="none" stroke="var(--red)" stroke-width="1.5"/>
+                  <circle cx="40" cy="40" r="6" fill="#a83c3c"/>
+                </svg>
+                <div style="font-size:0.65rem; color:var(--red); margin-top:0.3rem">Monogastric (1-Chambered)</div>
+              </div>
+            </div>
+            <div class="svg-caption">Ruminants ferment complex plant fibers inside 4 distinct compartments. Monogastric systems possess simple, fast-transit digestion.</div>
+          </div>
+        </div>
+
+        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1rem">
+          <strong>The Islamic Jurisprudential Rule:</strong> In Islamic dietary law (Fiqh), grazing land mammals must meet two strict biological criteria to be permissible:
+        </p>
+
+        <!-- Verdict Table -->
+        <table class="verdict-table">
+          <thead>
+            <tr>
+              <th>Biological Feature</th>
+              <th>🐄 Cow / Sheep / Goat / Deer / Buffalo</th>
+              <th>🐖 Pig</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Taxonomic Family</strong></td>
+              <td><strong>Bovidae</strong> (or Cervidae for deer)</td>
+              <td><strong>Suidae</strong> (Swine family)</td>
+            </tr>
+            <tr>
+              <td><strong>Stomach Structure</strong></td>
+              <td>4-Chambered (Rumen, Reticulum, Omasum, Abomasum)</td>
+              <td>1-Chambered (Simple Stomach)</td>
+            </tr>
+            <tr>
+              <td><strong>Chews Cud? (Rumination)</strong></td>
+              <td><strong>Yes</strong> (Regurgitates and re-chews food to break down cellulose)</td>
+              <td><strong>No</strong> (Biologically incapable of rumination)</td>
+            </tr>
+            <tr>
+              <td><strong>Hoof Structure</strong></td>
+              <td>Cloven Hoof (Split hoof with 2 main toes)</td>
+              <td>Cloven (2 main toes + 2 lateral dewclaws)</td>
+            </tr>
+            <tr>
+              <td><strong>Islamic Verdict</strong></td>
+              <td><span class="badge badge-halal">Halal (Permitted)</span></td>
+              <td><span class="badge badge-haram">Haram (Forbidden)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <p style="color:var(--text-muted); font-size:0.78rem; font-style:italic; margin-top:0.8rem; line-height:1.5;">
+          * Note on the Camel: The camel is an exception in Islamic law. It has padded toes rather than hard hooves, but is explicitly permitted in the Quran. Biologically, camels possess a 3-chambered pseudo-ruminant digestive system which allows them to chew the cud, grouping them metabolically with clean grazing animals.
+        </p>
+      </div>
+
+      <!-- SECTION 3: SCIENTIFIC ANALYSIS & STATISTICS -->
+      <div class="mb-3" style="margin-top:2rem">
+        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+          3. Comparative Scientific Analysis
+        </h4>
+        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1.5rem">
+          Modern comparative biology reveals stark metabolic and hygienic differences between ruminant systems and the simple digestive system of swine.
+        </p>
+
+        <!-- Charts grid -->
+        <div class="charts-grid">
+          <!-- Chart 1: Stomach Capacity -->
+          <div class="chart-card">
+            <div class="chart-title">🥛 Stomach Size & Fermentation Capacity (Liters)</div>
+            <div class="chart-box">
+              <canvas id="stomachChart"></canvas>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
+              Ruminants ferment cellulose into nutritious short-chain fatty acids over a slow, safe multi-day cycle.
+            </div>
+          </div>
+
+          <!-- Chart 2: Fat Composition -->
+          <div class="chart-card">
+            <div class="chart-title">🥩 Conjugated Linoleic Acid (CLA) Content (Relative)</div>
+            <div class="chart-box">
+              <canvas id="fatChart"></canvas>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
+              Ruminant fat naturally contains up to 5x more beneficial CLA. simple stomachs cannot produce this compound.
+            </div>
+          </div>
+
+          <!-- Chart 3: Zoonotic Parasite Prevalence -->
+          <div class="chart-card">
+            <div class="chart-title">🐛 Historical Zoonotic Parasite Prevalence (Pre-Modern)</div>
+            <div class="chart-box">
+              <canvas id="parasiteChart"></canvas>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
+              Swine diet (including carrion/decay) historically resulted in high carriage of <em>Trichinella spiralis</em>.
+            </div>
+          </div>
+
+          <!-- Chart 4: Toxin Accumulation Rate -->
+          <div class="chart-card">
+            <div class="chart-title">⚠️ Toxin & Heavy Metal Bio-Accumulation Index</div>
+            <div class="chart-box">
+              <canvas id="toxinChart"></canvas>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
+              Fast absorption and lack of complex foregut filtration causes pigs to accumulate toxins into fat tissues up to 4x faster.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: THE PERMITTED GROUP (BOVIDAE) & ARTIODACTYLA TREE -->
+      <div>
+        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+          4. Taxonomic Tree of Order Artiodactyla (Even-Toed)
+        </h4>
+        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1.2rem">
+          Click on branches of the taxonomic tree of Order <strong>Artiodactyla</strong> to expand and explore the families, their representative species, and their Islamic dietary status:
+        </p>
+
+        <!-- Interactive Taxonomy Tree -->
+        <div class="tree-wrap">
+          <!-- Root -->
+          <div style="font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--gold-light)">
+            🌱 Order: Artiodactyla <span style="font-size:0.8rem; color:var(--text-muted); font-weight:normal">(~300 Species including Whales)</span>
+          </div>
+
+          <!-- Suborder 1: Suina -->
+          <div class="taxonomy-branch">
+            <div class="tree-node-title" onclick="toggleBranch(this)">
+              <span class="tree-icon">▶</span> 🐖 Suborder: Suina <span style="font-size:0.75rem; color:var(--text-muted)">(Pig-like, Monogastric)</span>
+            </div>
+            <div class="tree-children">
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-haram">Haram</span> Family: Suidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Wild Boar, Domestic Pig, Warthog</div>
+              </div>
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-haram">Haram</span> Family: Tayassuidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Collared Peccary, White-lipped Peccary</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suborder 2: Tylopoda -->
+          <div class="taxonomy-branch">
+            <div class="tree-node-title" onclick="toggleBranch(this)">
+              <span class="tree-icon">▶</span> 🐫 Suborder: Tylopoda <span style="font-size:0.75rem; color:var(--text-muted)">(Pad-footed, Pseudo-ruminant)</span>
+            </div>
+            <div class="tree-children">
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Camelidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Dromedary Camel, Bactrian Camel, Llama, Alpaca</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suborder 3: Ruminantia -->
+          <div class="taxonomy-branch">
+            <div class="tree-node-title" onclick="toggleBranch(this)">
+              <span class="tree-icon">▶</span> 🐄 Suborder: Ruminantia <span style="font-size:0.75rem; color:var(--text-muted)">(Cud-chewers, 4-Chambered Stomach)</span>
+            </div>
+            <div class="tree-children">
+              <div class="taxonomy-branch">
+                <div class="tree-node-title" onclick="toggleBranch(this)"><span class="tree-icon">▶</span> <span class="badge badge-halal">Halal</span> Family: Bovidae <span style="font-size:0.72rem; color:var(--gold)">(The Cattle Group)</span></div>
+                <div class="tree-children">
+                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Bovinae:</strong> Cattle (Cow), Water Buffalo, Cape Buffalo, Bison, Nilgai</div>
+                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Caprinae:</strong> Domestic Sheep, Domestic Goats, Markhor, Ibex</div>
+                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Antilopinae:</strong> Gazelles, Impalas, Springboks</div>
+                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Alcelaphinae:</strong> Wildebeests, Hartebeests</div>
+                </div>
+              </div>
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Cervidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Red Deer, Moose, Elk, Reindeer, Fallow Deer</div>
+              </div>
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Giraffidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Giraffe, Okapi</div>
+              </div>
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Antilocapridae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Pronghorn Antelope</div>
+              </div>
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Tragulidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Mouse-deer (Chevrotains)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suborder 4: Whippomorpha -->
+          <div class="taxonomy-branch">
+            <div class="tree-node-title" onclick="toggleBranch(this)">
+              <span class="tree-icon">▶</span> 🦛 Suborder: Whippomorpha <span style="font-size:0.75rem; color:var(--text-muted)">(Hippos & Cetaceans)</span>
+            </div>
+            <div class="tree-children">
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-haram">Haram</span> Family: Hippopotamidae</div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Common Hippopotamus, Pygmy Hippopotamus (Cloven-hoofed but monogastric, non-ruminants)</div>
+              </div>
+              <div class="taxonomy-branch">
+                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Infraorder: Cetacea <span style="font-size:0.72rem; color:var(--text-muted)">(Marine creatures)</span></div>
+                <div class="leaf-node" style="margin-left:1.5rem">Representative: Whales, Dolphins, Porpoises (Evolved from land artiodactyls; permitted as marine game)</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-arabic" style="text-align:center;font-family:'Amiri',serif;font-size:1.5rem;color:var(--gold);margin-top:2rem">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
+  <p style="text-align:center;color:var(--text3);font-size:0.78rem;margin-top:0.5rem">AD-Deen ul-Qayyim · Ratnipora, Kashmir</p>
+</footer>
+
+<!-- App scripts -->
+<script src="js/app.js" defer></script>
+<script>
+  // Dynamic expandable tree
+  function toggleBranch(element) {
+    const parent = element.parentElement;
+    parent.classList.toggle('tree-branch-open');
+  }
+
+  // Auto-expand Ruminantia for demo
+  document.addEventListener('DOMContentLoaded', () => {
+    const rBranch = document.querySelectorAll('.tree-node-title');
+    // Open some by default
+    rBranch.forEach(title => {
+      if (title.textContent.includes('Ruminantia') || title.textContent.includes('Suina')) {
+        title.parentElement.classList.add('tree-branch-open');
+      }
+    });
+    initCharts();
+  });
+
+  // ChartJS implementation
+  function initCharts() {
+    // 1. Stomach Chart
+    new Chart(document.getElementById('stomachChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Cow (Bovidae)', 'Sheep (Bovidae)', 'Pig (Suidae)'],
+        datasets: [{
+          label: 'Capacity (Liters)',
+          data: [180, 22, 6],
+          backgroundColor: ['#c9a84c', '#e8c96a', '#e74c3c'],
+          borderColor: '#080e1a',
+          borderWidth: 1.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.raw} L` } }
+        },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a8b8cc' } },
+          x: { ticks: { color: '#a8b8cc' } }
+        }
+      }
+    });
+
+    // 2. Fat Composition Chart
+    new Chart(document.getElementById('fatChart'), {
+      type: 'pie',
+      data: {
+        labels: ['Beef (5x CLA)', 'Lamb (5x CLA)', 'Pork (1x CLA)'],
+        datasets: [{
+          data: [42, 48, 10],
+          backgroundColor: ['#c9a84c', '#e8c96a', '#e74c3c'],
+          borderColor: '#080e1a',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: '#a8b8cc', font: { size: 10 } } }
+        }
+      }
+    });
+
+    // 3. Zoonotic Parasite Prevalence
+    new Chart(document.getElementById('parasiteChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Free-Range Pork', 'Grass-Fed Ruminants'],
+        datasets: [{
+          label: 'Historical Trichinella Carriage (%)',
+          data: [25, 0.5],
+          backgroundColor: ['#e74c3c', '#27ae60'],
+          borderColor: '#080e1a',
+          borderWidth: 1.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { max: 30, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a8b8cc' } },
+          x: { ticks: { color: '#a8b8cc' } }
+        }
+      }
+    });
+
+    // 4. Heavy Metal Accumulation index
+    new Chart(document.getElementById('toxinChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Pig (Suidae)', 'Cow (Bovidae)', 'Sheep (Bovidae)'],
+        datasets: [{
+          label: 'Bio-Accumulation Index',
+          data: [4.2, 1.0, 0.9],
+          backgroundColor: ['#e74c3c', '#c9a84c', '#e8c96a'],
+          borderColor: '#080e1a',
+          borderWidth: 1.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a8b8cc' } },
+          x: { ticks: { color: '#a8b8cc' } }
+        }
+      }
+    });
+  }
+
+  // Cursor script
+  const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
+  const canvas = document.getElementById('sparkle-canvas');
+  const ctx = canvas.getContext('2d');
+  let mx=0,my=0,rx=0,ry=0;
+
+  function resizeSparkleCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeSparkleCanvas();
+  window.addEventListener('resize', resizeSparkleCanvas);
+
+  const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"];
+  let particles = [];
+
+  const spawnParticles = (x, y) => {
+    for (let i = 0; i < 3; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 0.5;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      particles.push({ x, y, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed, color });
+    }
+  };
+
+  let cursorInitialized = false;
+  document.addEventListener('mousemove', e => {
+    if (!cursorInitialized) {
+      dot.classList.add('visible');
+      ring.classList.add('visible');
+      cursorInitialized = true;
+    }
+    mx = e.clientX;
+    my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+    spawnParticles(mx, my);
+  });
+
+  (function animateSparkles() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => {
+      p.x += p.dx; p.y += p.dy;
+      p.dx *= 0.92; p.dy *= 0.92;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+      return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
+    });
+    requestAnimationFrame(animateSparkles);
+  })();
+
+  document.addEventListener('mousedown', () => {
+    dot.style.width = '6px'; dot.style.height = '6px';
+    ring.style.width = '40px'; ring.style.height = '40px';
+  });
+  document.addEventListener('mouseup', () => {
+    dot.style.width = '10px'; dot.style.height = '10px';
+    ring.style.width = '26px'; ring.style.height = '26px';
+  });
+
+  // NAV TOGGLE
+  document.getElementById('nav-toggle').addEventListener('click', () => {
+    document.getElementById('nav-links').classList.toggle('open');
+  });
+</script>
+</body>
+</html>
