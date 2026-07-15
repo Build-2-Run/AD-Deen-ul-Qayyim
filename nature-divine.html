@@ -16,38 +16,7 @@
   <link rel="stylesheet" href="css/main.css?v=compat" />
   <style>
     /* Custom style overrides for Nature & Divine */
-    #cursor-dot {
-      position:fixed; width:10px; height:10px;
-      background:var(--gold);
-      border-radius:50%;
-      pointer-events:none; z-index:999999;
-      transform:translate(-50%,-50%);
-      box-shadow:0 0 10px var(--gold);
-      transition:width 0.15s, height 0.15s, opacity 0.3s;
-      opacity:0;
-    }
-    #cursor-ring {
-      position:fixed; width:26px; height:26px;
-      border:1.5px solid rgba(201,168,76,0.6);
-      border-radius:50%;
-      pointer-events:none; z-index:999998;
-      transform:translate(-50%,-50%);
-      transition:width 0.2s, height 0.2s, opacity 0.3s;
-      opacity:0;
-    }
-    #cursor-dot.visible, #cursor-ring.visible { opacity:1; }
-    #sparkle-canvas {
-      position:fixed; inset:0; pointer-events:none; z-index:999995;
-    }
-    @media (max-width: 1024px) {
-      #cursor-dot, #cursor-ring, #sparkle-canvas {
-        display:none !important;
-      }
-      body {
-        cursor:auto !important;
-      }
-    }
-    body { cursor: none; }
+    
     .page-container {
       max-width: 1100px;
       margin: 0 auto;
@@ -295,21 +264,23 @@
       color: var(--text-secondary);
       padding: 3px 0;
     }
-  </style>
+  
+.nav-brand { flex-shrink:0; white-space:nowrap; }
+.nav-brand .brand-en { display:inline; }
+@media(max-width:480px){ .nav-brand .brand-en { display:none; } }
+</style>
 </head>
 <body>
 
 <!-- Cursor elements -->
-<div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
-<canvas id="sparkle-canvas"></canvas>
+
 
 <!-- Starfield background -->
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
 <!-- NAV -->
 <nav class="nav" role="navigation" aria-label="Main navigation">
-  <a href="index.html" class="nav-brand"><span class="brand-arabic">الدِّين</span> AD-Deen ul-Qayyim</a>
+  <a href="index.html" class="nav-brand"><span class="brand-arabic">الدِّين</span><span class="brand-en">AD-Deen ul-Qayyim</span></a>
   <ul class="nav-links" id="nav-links" role="list">
     <li><a href="index.html">🏠 Home</a></li>
     <li><a href="history.html">📜 History</a></li>
@@ -343,351 +314,146 @@
     <!-- SUBSECTION: PROHIBITION OF PORK -->
     <div class="card mb-3" style="padding: 2.5rem 2rem;">
       <div style="text-align: center; margin-bottom: 2.5rem;">
-        <span style="font-family: 'Amiri', serif; font-size: 1.3rem; color: var(--gold); display: block; margin-bottom: 0.5rem;">حُرِّمَتْ عَلَيْكُمُ الْمَيْتَةُ وَالدَّمُ وَلَحْمُ الْخِنزِيرِ</span>
+        <span style="font-family: 'Amiri', serif; font-size: 1.5rem; color: var(--gold); display: block; margin-bottom: 0.5rem;">حُرِّمَتْ عَلَيْكُمُ الْمَيْتَةُ وَالدَّمُ وَلَحْمُ الْخِنزِيرِ</span>
         <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--text-primary);">
-          The Divine Prohibition: Quranic Decree & Scientific Wisdom
+          The Prohibition of Pork: Biological & Taxonomic Reality
         </h3>
         <div class="divider" style="margin: 1rem auto; width: 80px; height: 3px; background: var(--gold); border-radius: 2px;"></div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 750px; margin: 0 auto; line-height: 1.6;">
-          An examination of the prohibition of swine flesh (pork) in Islam, contrasting the biological taxonomy, anatomy, digestive differences, and sanitary parameters of monogastric swine vs. grazing ruminants.
+      </div>
+
+      <div class="verse-card">
+        <p class="arabic-text" dir="rtl">
+          إِنَّمَا حَرَّمَ عَلَيْكُمُ ٱلْمَيْتَةَ وَٱلدَّمَ وَلَحْمَ ٱلْخِنزِيرِ وَمَآ أُهِلَّ بِهِۦ لِغَيْرِ ٱللَّهِ ۖ فَمَنِ ٱضْطُرَّ غَيْرَ بَاغٍۢ وَلَا عَادٍۢ فَلَآ إِثْمَ عَلَيْهِ ۚ إِنَّ ٱللَّهَ غَفُورٌۭ رَّحِيمٌ ١٧٣
+        </p>
+        <p class="english-translation">
+          "He has only forbidden to you dead animals, blood, the flesh of swine, and that which has been dedicated to other than Allah. But whoever is forced [by necessity], neither desiring [it] nor transgressing [its limit], there is no sin upon him. Indeed, Allah is Forgiving and Merciful." <br>— Surah Al-Baqarah (2:173)
         </p>
       </div>
 
-      <!-- SECTION 1: THE QURANIC FOUNDATION -->
-      <div class="mb-3">
-        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
-          1. The Quranic Decree
-        </h4>
-        <div class="verse-container" style="display:flex; flex-direction:column; gap:1.2rem;">
-          
-          <!-- Baqarah 2:173 -->
-          <div class="verse-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.82rem; color:var(--gold)">
-              <span>Surah Al-Baqarah (2:173)</span>
-              <span>The Prohibition</span>
-            </div>
-            <p class="arabic-text" dir="rtl">
-              إِنَّمَا حَرَّمَ عَلَيْكُمُ الْمَيْتَةَ وَالدَّمَ وَلَحْمَ الْخِنزِيرِ وَمَا أُهِلَّ بِهِ لِغَيْرِ اللَّهِ ۖ فَمَنِ اضْطُرَّ غَيْرَ بَاغٍ وَلَا عَادٍ فَلَا إِثْمَ عَلَيْهِ ۚ إِنَّ اللَّهَ غَفُورٌ رَّحِيمٌ
-            </p>
-            <p class="english-translation">
-              "He has only forbidden to you dead animals, blood, the flesh of swine, and that which has been dedicated to other than Allah. But whoever is forced [by necessity], neither desiring [it] nor transgressing [its limit], there is no sin upon him. Indeed, Allah is Forgiving and Merciful."
-            </p>
-          </div>
+      <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem; font-size: 1.05rem;">
+        The Quran explicitly prohibits the consumption of swine. Modern taxonomy and comparative biology offer a fascinating framework that distinguishes the biological group containing cows, sheep, and camels (all Halal) from the biological group of the pig (Haram). 
+      </p>
 
-          <!-- Al-An'am 6:145 -->
-          <div class="verse-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.82rem; color:var(--gold)">
-              <span>Surah Al-An'am (6:145)</span>
-              <span>Impurity (Rijs)</span>
-            </div>
-            <p class="arabic-text" dir="rtl">
-              قُل لَّآ أَجِدُ فِى مَآ أُوحِىَ إِلَىَّ مُحَرَّمًا عَلَىٰ طَاعِمٍۢ يَطْعَمُهُۥٓ إِلَّآ أَن يَكُونَ مَيْتَةً أَوْ دَمًۢا مَّسْفُوحًا أَوْ لَحْمَ خِنزِيرٍۢ فَإِنَّهُۥ رِجْسٌ أَوْ فِسْقًا أُهِلَّ لِغَيْرِ ٱللَّهِ بِهِ
-            </p>
-            <p class="english-translation">
-              "Say, 'I do not find in what has been revealed to me anything forbidden to an eater who would eat it unless it be a dead animal or spilled blood or the flesh of swine - for indeed, it is impure (rijs) - or it be disobedience, dedicated to other than Allah...'"
-            </p>
-          </div>
-
-          <!-- Al-A'raf 7:157 -->
-          <div class="verse-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; font-size:0.82rem; color:var(--gold)">
-              <span>Surah Al-A'raf (7:157)</span>
-              <span>Good vs. Evil Things</span>
-            </div>
-            <p class="arabic-text" dir="rtl">
-              وَيُحِلُّ لَهُمُ ٱلطَّيِّبَـٰتِ وَيُحَرِّمُ عَلَيْهِمُ ٱلْخَبَـٰٓئِثَ
-            </p>
-            <p class="english-translation">
-              "...and makes lawful for them the good things (tayyibat) and prohibits for them the evil and impure things (khaba'ith)..."
-            </p>
-          </div>
-
+      <h4 style="color: var(--gold); font-family: 'Outfit', sans-serif; font-size: 1.4rem; margin-top: 2rem; margin-bottom: 1rem;">
+        The Prohibition Filter: Cloven Hooves & Chewing Cud
+      </h4>
+      <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem;">
+        Islamic dietary jurisprudence, combined with modern biology, identifies permissible land animals primarily through two traits: <strong>cloven hooves</strong> and <strong>chewing the cud (rumination)</strong>. 
+      </p>
+      <div class="comparison-grid">
+        <div class="comp-card">
+          <h5 class="comp-title">🌿 The Cow (Bovidae) — HALAL</h5>
+          <ul style="text-align:left; color:var(--text-secondary); font-size:0.95rem; line-height:1.7; padding-left:1.2rem;">
+            <li><strong style="color:var(--text-primary)">Cloven Hooves:</strong> Yes (Order Artiodactyla).</li>
+            <li><strong style="color:var(--text-primary)">Chews Cud:</strong> Yes (Suborder Ruminantia).</li>
+            <li><strong style="color:var(--text-primary)">Digestive System:</strong> Complex 4-chambered stomach acting as an advanced biological filter.</li>
+          </ul>
+        </div>
+        <div class="comp-card" style="border-color: rgba(231, 76, 60, 0.3);">
+          <h5 class="comp-title" style="color: var(--red);">🚫 The Pig (Suidae) — HARAM</h5>
+          <ul style="text-align:left; color:var(--text-secondary); font-size:0.95rem; line-height:1.7; padding-left:1.2rem;">
+            <li><strong style="color:var(--text-primary)">Cloven Hooves:</strong> Yes (Order Artiodactyla).</li>
+            <li><strong style="color:var(--text-primary)">Chews Cud:</strong> <span style="color:var(--red); font-weight:600">NO</span> (Suborder Suina).</li>
+            <li><strong style="color:var(--text-primary)">Digestive System:</strong> Simple 1-chambered stomach, lacking the deep filtration of ruminants.</li>
+          </ul>
         </div>
       </div>
 
-      <!-- SECTION 2: THE "FAMILY" QUESTION & THE ISLAMIC CRITERION -->
-      <div class="mb-3">
-        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
-          2. The "Family" Question & The Islamic Criterion
-        </h4>
-        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1rem">
-          <strong>Taxonomic Clarification:</strong> While pigs and cows belong to the same taxonomic order (<em>Artiodactyla</em> - even-toed ungulates), they diverged over 50 million years ago and belong to completely separate biological families. 
-        </p>
+      <!-- Taxonomic Breakdown -->
+      <h4 style="color: var(--gold); font-family: 'Outfit', sans-serif; font-size: 1.4rem; margin-top: 3rem; margin-bottom: 1.5rem; text-align: center;">
+        Complete Taxonomic Breakdown of Order: Artiodactyla (Even-Toed)
+      </h4>
+      <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem; text-align: center; max-width: 800px; margin-inline: auto;">
+        Order Artiodactyla contains over 300 living species. Let's break down the 4 suborders to understand how the "Cow's Group" is distinct from the "Pig's Group".
+      </p>
 
-        <!-- Diagrams row -->
-        <div class="diagram-container">
-          <!-- Split Hoof SVG -->
-          <div class="svg-diagram">
-            <span style="font-size:0.8rem; font-weight:600; color:var(--gold-light); margin-bottom:0.5rem">Cloven Hoof (Bovidae)</span>
-            <svg viewBox="0 0 100 100" width="80" height="80">
-              <!-- Background Outer -->
-              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="1.5"/>
-              <!-- Symmetrical split toes -->
-              <path d="M35 15 C35 35, 48 55, 48 85 L25 85 C22 55, 18 35, 35 15 Z" fill="var(--gold-dark)" opacity="0.8"/>
-              <path d="M65 15 C65 35, 52 55, 52 85 L75 85 C78 55, 82 35, 65 15 Z" fill="var(--gold)" opacity="0.9"/>
-            </svg>
-            <div class="svg-caption">2 symmetrical, weight-bearing digits with hard outer keratin casings. Clean, dry structure.</div>
+      <div class="tree-wrap">
+        <!-- Suina -->
+        <div class="tree-branch tree-branch-open">
+          <div class="tree-node-title" onclick="this.parentElement.classList.toggle('tree-branch-open')">
+            <span class="tree-icon">▶</span>
+            Suborder: Suina (The Pig-like animals)
+            <span class="badge badge-haram" style="margin-left:auto">Haram</span>
           </div>
-
-          <!-- Pig Foot SVG -->
-          <div class="svg-diagram">
-            <span style="font-size:0.8rem; font-weight:600; color:var(--red); margin-bottom:0.5rem">Pig Foot (Suidae)</span>
-            <svg viewBox="0 0 100 100" width="80" height="80">
-              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(231,76,60,0.2)" stroke-width="1.5"/>
-              <!-- Four toes total: 2 main weight-bearing + 2 side dewclaws -->
-              <path d="M38 18 C38 35, 47 50, 47 80 L30 80 C27 50, 24 35, 38 18 Z" fill="#7a2a2a" opacity="0.8"/>
-              <path d="M62 18 C62 35, 53 50, 53 80 L70 80 C73 50, 76 35, 62 18 Z" fill="#a83c3c" opacity="0.9"/>
-              <!-- Dewclaws (side toes) -->
-              <path d="M18 45 C15 50, 15 58, 22 62 L22 52 Z" fill="#5c1f1f"/>
-              <path d="M82 45 C85 50, 85 58, 78 62 L78 52 Z" fill="#5c1f1f"/>
-            </svg>
-            <div class="svg-caption">4 toes total (2 main + 2 lateral dewclaws) which touch muddy ground. Anatomically distinct.</div>
-          </div>
-
-          <!-- 4-Chambered Stomach SVG -->
-          <div class="svg-diagram" style="width:340px">
-            <span style="font-size:0.8rem; font-weight:600; color:var(--gold-light); margin-bottom:0.5rem">Stomach Structure Comparison</span>
-            <div style="display:flex; justify-content:space-around; width:100%; align-items:center; margin-top:0.5rem">
-              <!-- Cow Stomach (4 Chamber) -->
-              <div style="text-align:center">
-                <svg viewBox="0 0 80 80" width="70" height="70">
-                  <path d="M10 40 C10 10, 70 10, 70 40 C70 70, 10 70, 10 40 Z" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
-                  <!-- Inner chambers partitions -->
-                  <path d="M25 22 C32 40, 48 40, 55 22" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
-                  <path d="M40 20 L40 60" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
-                  <circle cx="20" cy="40" r="4" fill="var(--gold-light)"/>
-                  <circle cx="35" cy="50" r="4" fill="var(--gold-light)"/>
-                  <circle cx="50" cy="35" r="4" fill="var(--gold-light)"/>
-                  <circle cx="62" cy="45" r="4" fill="var(--gold-light)"/>
-                </svg>
-                <div style="font-size:0.65rem; color:var(--gold); margin-top:0.3rem">Ruminant (4-Chambered)</div>
-              </div>
-              <div style="font-size:1.2rem; color:var(--text-muted)">vs</div>
-              <!-- Pig Stomach (1 Chamber) -->
-              <div style="text-align:center">
-                <svg viewBox="0 0 80 80" width="70" height="70">
-                  <path d="M15 35 C15 15, 65 15, 65 45 C65 60, 45 65, 15 35 Z" fill="none" stroke="var(--red)" stroke-width="1.5"/>
-                  <circle cx="40" cy="40" r="6" fill="#a83c3c"/>
-                </svg>
-                <div style="font-size:0.65rem; color:var(--red); margin-top:0.3rem">Monogastric (1-Chambered)</div>
-              </div>
+          <div class="tree-children">
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Suidae (True Pigs)</strong>
+              <div class="leaf-node">• Examples: Wild boar, Domestic pig, Warthog.</div>
             </div>
-            <div class="svg-caption">Ruminants ferment complex plant fibers inside 4 distinct compartments. Monogastric systems possess simple, fast-transit digestion.</div>
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Tayassuidae (Peccaries)</strong>
+              <div class="leaf-node">• Examples: Collared peccary. Single-chamber stomach, does not chew cud.</div>
+            </div>
           </div>
         </div>
 
-        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1rem">
-          <strong>The Islamic Jurisprudential Rule:</strong> In Islamic dietary law (Fiqh), grazing land mammals must meet two strict biological criteria to be permissible:
-        </p>
-
-        <!-- Verdict Table -->
-        <table class="verdict-table">
-          <thead>
-            <tr>
-              <th>Biological Feature</th>
-              <th>🐄 Cow / Sheep / Goat / Deer / Buffalo</th>
-              <th>🐖 Pig</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Taxonomic Family</strong></td>
-              <td><strong>Bovidae</strong> (or Cervidae for deer)</td>
-              <td><strong>Suidae</strong> (Swine family)</td>
-            </tr>
-            <tr>
-              <td><strong>Stomach Structure</strong></td>
-              <td>4-Chambered (Rumen, Reticulum, Omasum, Abomasum)</td>
-              <td>1-Chambered (Simple Stomach)</td>
-            </tr>
-            <tr>
-              <td><strong>Chews Cud? (Rumination)</strong></td>
-              <td><strong>Yes</strong> (Regurgitates and re-chews food to break down cellulose)</td>
-              <td><strong>No</strong> (Biologically incapable of rumination)</td>
-            </tr>
-            <tr>
-              <td><strong>Hoof Structure</strong></td>
-              <td>Cloven Hoof (Split hoof with 2 main toes)</td>
-              <td>Cloven (2 main toes + 2 lateral dewclaws)</td>
-            </tr>
-            <tr>
-              <td><strong>Islamic Verdict</strong></td>
-              <td><span class="badge badge-halal">Halal (Permitted)</span></td>
-              <td><span class="badge badge-haram">Haram (Forbidden)</span></td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <p style="color:var(--text-muted); font-size:0.78rem; font-style:italic; margin-top:0.8rem; line-height:1.5;">
-          * Note on the Camel: The camel is an exception in Islamic law. It has padded toes rather than hard hooves, but is explicitly permitted in the Quran. Biologically, camels possess a 3-chambered pseudo-ruminant digestive system which allows them to chew the cud, grouping them metabolically with clean grazing animals.
-        </p>
-      </div>
-
-      <!-- SECTION 3: SCIENTIFIC ANALYSIS & STATISTICS -->
-      <div class="mb-3" style="margin-top:2rem">
-        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
-          3. Comparative Scientific Analysis
-        </h4>
-        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1.5rem">
-          Modern comparative biology reveals stark metabolic and hygienic differences between ruminant systems and the simple digestive system of swine.
-        </p>
-
-        <!-- Charts grid -->
-        <div class="charts-grid">
-          <!-- Chart 1: Stomach Capacity -->
-          <div class="chart-card">
-            <div class="chart-title">🥛 Stomach Size & Fermentation Capacity (Liters)</div>
-            <div class="chart-box">
-              <canvas id="stomachChart"></canvas>
-            </div>
-            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
-              Ruminants ferment cellulose into nutritious short-chain fatty acids over a slow, safe multi-day cycle.
+        <!-- Tylopoda -->
+        <div class="tree-branch tree-branch-open" style="margin-top: 1rem;">
+          <div class="tree-node-title" onclick="this.parentElement.classList.toggle('tree-branch-open')">
+            <span class="tree-icon">▶</span>
+            Suborder: Tylopoda (The Pad-footed animals)
+            <span class="badge badge-halal" style="margin-left:auto">Halal</span>
+          </div>
+          <div class="tree-children">
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Camelidae (Camels)</strong>
+              <div class="leaf-node">• Examples: Dromedary (1 hump), Bactrian (2 humps), Llama. </div>
+              <div class="leaf-node" style="color: var(--gold-light); font-style: italic;">Quran explicitly permits the camel; chews cud (3-chambered stomach) despite lacking hooves.</div>
             </div>
           </div>
+        </div>
 
-          <!-- Chart 2: Fat Composition -->
-          <div class="chart-card">
-            <div class="chart-title">🥩 Conjugated Linoleic Acid (CLA) Content (Relative)</div>
-            <div class="chart-box">
-              <canvas id="fatChart"></canvas>
+        <!-- Ruminantia -->
+        <div class="tree-branch tree-branch-open" style="margin-top: 1rem;">
+          <div class="tree-node-title" onclick="this.parentElement.classList.toggle('tree-branch-open')">
+            <span class="tree-icon">▶</span>
+            Suborder: Ruminantia (The Cud-chewers)
+            <span class="badge badge-halal" style="margin-left:auto">Halal</span>
+          </div>
+          <div class="tree-children">
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Bovidae (The "Cow" Family — Largest group)</strong>
+              <div class="leaf-node">• Subfamily Bovinae: Domestic Cattle, Zebu, Water Buffalo, Bison.</div>
+              <div class="leaf-node">• Subfamily Caprinae: Domestic Sheep, Goats, Ibex.</div>
+              <div class="leaf-node">• Subfamily Antilopinae: Gazelles, Impalas.</div>
+              <div class="leaf-node" style="color: var(--gold-light); font-style: italic;">Every single animal in the Bovidae family is Halal.</div>
             </div>
-            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
-              Ruminant fat naturally contains up to 5x more beneficial CLA. simple stomachs cannot produce this compound.
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Cervidae (True Deer)</strong>
+              <div class="leaf-node">• Examples: White-tailed deer, Elk, Reindeer, Fallow deer.</div>
+            </div>
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Giraffidae & Antilocapridae</strong>
+              <div class="leaf-node">• Examples: Giraffes, Okapis, Pronghorns.</div>
             </div>
           </div>
+        </div>
 
-          <!-- Chart 3: Zoonotic Parasite Prevalence -->
-          <div class="chart-card">
-            <div class="chart-title">🐛 Historical Zoonotic Parasite Prevalence (Pre-Modern)</div>
-            <div class="chart-box">
-              <canvas id="parasiteChart"></canvas>
-            </div>
-            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
-              Swine diet (including carrion/decay) historically resulted in high carriage of <em>Trichinella spiralis</em>.
-            </div>
+        <!-- Whippomorpha -->
+        <div class="tree-branch" style="margin-top: 1rem;">
+          <div class="tree-node-title" onclick="this.parentElement.classList.toggle('tree-branch-open')">
+            <span class="tree-icon">▶</span>
+            Suborder: Whippomorpha (Hippo & Whale group)
+            <span class="badge" style="background: rgba(255,255,255,0.1); color: #ccc; margin-left:auto; border: 1px solid rgba(255,255,255,0.2);">Mixed</span>
           </div>
-
-          <!-- Chart 4: Toxin Accumulation Rate -->
-          <div class="chart-card">
-            <div class="chart-title">⚠️ Toxin & Heavy Metal Bio-Accumulation Index</div>
-            <div class="chart-box">
-              <canvas id="toxinChart"></canvas>
+          <div class="tree-children">
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Family: Hippopotamidae</strong>
+              <div class="leaf-node">• Examples: Hippos. Cloven hooves but do not chew cud. <span class="badge badge-haram" style="font-size:0.5rem">Haram</span></div>
             </div>
-            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:0.5rem">
-              Fast absorption and lack of complex foregut filtration causes pigs to accumulate toxins into fat tissues up to 4x faster.
+            <div class="taxonomy-branch">
+              <strong style="color: var(--text-primary);">Infraorder: Cetacea (Whales/Dolphins)</strong>
+              <div class="leaf-node">• Evolutionarily linked to Artiodactyls. Aquatic. <span class="badge badge-halal" style="font-size:0.5rem">Halal (Seafood)</span></div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- SECTION 4: THE PERMITTED GROUP (BOVIDAE) & ARTIODACTYLA TREE -->
-      <div>
-        <h4 style="font-family:'Outfit',sans-serif; color:var(--gold); font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
-          4. Taxonomic Tree of Order Artiodactyla (Even-Toed)
-        </h4>
-        <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.6; margin-bottom:1.2rem">
-          Click on branches of the taxonomic tree of Order <strong>Artiodactyla</strong> to expand and explore the families, their representative species, and their Islamic dietary status:
-        </p>
-
-        <!-- Interactive Taxonomy Tree -->
-        <div class="tree-wrap">
-          <!-- Root -->
-          <div style="font-family:'Outfit',sans-serif; font-size:1.1rem; font-weight:700; color:var(--gold-light)">
-            🌱 Order: Artiodactyla <span style="font-size:0.8rem; color:var(--text-muted); font-weight:normal">(~300 Species including Whales)</span>
-          </div>
-
-          <!-- Suborder 1: Suina -->
-          <div class="taxonomy-branch">
-            <div class="tree-node-title" onclick="toggleBranch(this)">
-              <span class="tree-icon">▶</span> 🐖 Suborder: Suina <span style="font-size:0.75rem; color:var(--text-muted)">(Pig-like, Monogastric)</span>
-            </div>
-            <div class="tree-children">
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-haram">Haram</span> Family: Suidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Wild Boar, Domestic Pig, Warthog</div>
-              </div>
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-haram">Haram</span> Family: Tayassuidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Collared Peccary, White-lipped Peccary</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Suborder 2: Tylopoda -->
-          <div class="taxonomy-branch">
-            <div class="tree-node-title" onclick="toggleBranch(this)">
-              <span class="tree-icon">▶</span> 🐫 Suborder: Tylopoda <span style="font-size:0.75rem; color:var(--text-muted)">(Pad-footed, Pseudo-ruminant)</span>
-            </div>
-            <div class="tree-children">
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Camelidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Dromedary Camel, Bactrian Camel, Llama, Alpaca</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Suborder 3: Ruminantia -->
-          <div class="taxonomy-branch">
-            <div class="tree-node-title" onclick="toggleBranch(this)">
-              <span class="tree-icon">▶</span> 🐄 Suborder: Ruminantia <span style="font-size:0.75rem; color:var(--text-muted)">(Cud-chewers, 4-Chambered Stomach)</span>
-            </div>
-            <div class="tree-children">
-              <div class="taxonomy-branch">
-                <div class="tree-node-title" onclick="toggleBranch(this)"><span class="tree-icon">▶</span> <span class="badge badge-halal">Halal</span> Family: Bovidae <span style="font-size:0.72rem; color:var(--gold)">(The Cattle Group)</span></div>
-                <div class="tree-children">
-                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Bovinae:</strong> Cattle (Cow), Water Buffalo, Cape Buffalo, Bison, Nilgai</div>
-                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Caprinae:</strong> Domestic Sheep, Domestic Goats, Markhor, Ibex</div>
-                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Antilopinae:</strong> Gazelles, Impalas, Springboks</div>
-                  <div class="leaf-node" style="margin-left:1.5rem"><strong>Alcelaphinae:</strong> Wildebeests, Hartebeests</div>
-                </div>
-              </div>
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Cervidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Red Deer, Moose, Elk, Reindeer, Fallow Deer</div>
-              </div>
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Giraffidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Giraffe, Okapi</div>
-              </div>
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Antilocapridae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Pronghorn Antelope</div>
-              </div>
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Family: Tragulidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Mouse-deer (Chevrotains)</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Suborder 4: Whippomorpha -->
-          <div class="taxonomy-branch">
-            <div class="tree-node-title" onclick="toggleBranch(this)">
-              <span class="tree-icon">▶</span> 🦛 Suborder: Whippomorpha <span style="font-size:0.75rem; color:var(--text-muted)">(Hippos & Cetaceans)</span>
-            </div>
-            <div class="tree-children">
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-haram">Haram</span> Family: Hippopotamidae</div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Common Hippopotamus, Pygmy Hippopotamus (Cloven-hoofed but monogastric, non-ruminants)</div>
-              </div>
-              <div class="taxonomy-branch">
-                <div class="tree-node-title"><span class="badge badge-halal">Halal</span> Infraorder: Cetacea <span style="font-size:0.72rem; color:var(--text-muted)">(Marine creatures)</span></div>
-                <div class="leaf-node" style="margin-left:1.5rem">Representative: Whales, Dolphins, Porpoises (Evolved from land artiodactyls; permitted as marine game)</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
   </section>
 </main>
 
-<footer>
-  <div class="footer-arabic" style="text-align:center;font-family:'Amiri',serif;font-size:1.5rem;color:var(--gold);margin-top:2rem">الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ</div>
-  <p style="text-align:center;color:var(--text3);font-size:0.78rem;margin-top:0.5rem">AD-Deen ul-Qayyim · Ratnipora, Kashmir</p>
-</footer>
+
+
 
 <!-- App scripts -->
 <script src="js/app.js?v=compat" defer></script>
@@ -813,74 +579,23 @@
     });
   }
 
-  // Cursor script
-  const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
-  const canvas = document.getElementById('sparkle-canvas');
-  const ctx = canvas.getContext('2d');
-  let mx=0,my=0,rx=0,ry=0;
-
-  function resizeSparkleCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeSparkleCanvas();
-  window.addEventListener('resize', resizeSparkleCanvas);
-
-  const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"];
-  let particles = [];
-
-  const spawnParticles = (x, y) => {
-    for (let i = 0; i < 3; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 3 + 0.5;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      particles.push({ x, y, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed, color });
-    }
-  };
-
-  let cursorInitialized = false;
-  document.addEventListener('mousemove', e => {
-    if (!cursorInitialized) {
-      dot.classList.add('visible');
-      ring.classList.add('visible');
-      cursorInitialized = true;
-    }
-    mx = e.clientX;
-    my = e.clientY;
-    dot.style.left = mx + 'px';
-    dot.style.top = my + 'px';
-    spawnParticles(mx, my);
-  });
-
-  (function animateSparkles() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles = particles.filter(p => {
-      p.x += p.dx; p.y += p.dy;
-      p.dx *= 0.92; p.dy *= 0.92;
-      ctx.fillStyle = p.color;
-      ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
-      return Math.abs(p.dx) >= 0.05 || Math.abs(p.dy) >= 0.05;
-    });
-    requestAnimationFrame(animateSparkles);
-  })();
-
-  document.addEventListener('mousedown', () => {
-    dot.style.width = '6px'; dot.style.height = '6px';
-    ring.style.width = '40px'; ring.style.height = '40px';
-  });
-  document.addEventListener('mouseup', () => {
-    dot.style.width = '10px'; dot.style.height = '10px';
-    ring.style.width = '26px'; ring.style.height = '26px';
-  });
-
   // NAV TOGGLE
   document.getElementById('nav-toggle').addEventListener('click', () => {
     document.getElementById('nav-links').classList.toggle('open');
   });
+
+// 3D tilt for cards
+document.querySelectorAll('.card').forEach(card => {
+card.addEventListener('mousemove', e => {
+const rect = card.getBoundingClientRect();
+const x = e.clientX - rect.left, y = e.clientY - rect.top;
+const ax = -(y - rect.height/2) / (rect.height/2) * 6;
+const ay = (x - rect.width/2) / (rect.width/2) * 6;
+card.style.transform = `perspective(1000px) rotateX(${ax}deg) rotateY(${ay}deg) translateY(-2px)`;
+});
+card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)'; });
+});
+
 </script>
 </body>
 </html>
