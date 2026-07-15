@@ -325,12 +325,16 @@ display:flex; align-items:center; gap:0.6rem;
 .nafl-pill { border-color:rgba(39,174,96,0.35) !important; }
 .nafl-pill .pname { color:var(--text3); }
 .nafl-pill .ptime { font-size:0.78rem !important; }
+.solar-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0.6rem; max-width:520px; margin:0 auto; }
+@media(max-width:500px){ .solar-stats-row { grid-template-columns:1fr; } }
 .zawal-stat {
 text-align:center; background:rgba(255,255,255,0.03); border:1px solid var(--border);
-border-radius:14px; padding:0.8rem 1rem; max-width:280px; margin:0 auto;
+border-radius:14px; padding:0.8rem 0.7rem;
 }
-.zawal-stat .zs-time { font-family:'Orbitron',sans-serif; font-size:1.3rem; font-weight:700; color:var(--gold-l); text-shadow:0 0 14px rgba(201,168,76,0.4); }
-.zawal-stat .zs-note { font-size:0.68rem; color:var(--text3); margin-top:3px; }
+.zawal-stat .zs-icon { font-size:1.1rem; margin-bottom:2px; }
+.zawal-stat .zs-label { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); margin-bottom:2px; }
+.zawal-stat .zs-time { font-family:'Orbitron',sans-serif; font-size:1.15rem; font-weight:700; color:var(--gold-l); text-shadow:0 0 14px rgba(201,168,76,0.4); }
+.zawal-stat .zs-note { font-size:0.62rem; color:rgba(231,76,60,0.85); margin-top:4px; line-height:1.4; }
 .prayer-countdown strong { color:var(--gold); font-family:'Outfit',sans-serif; font-size:0.95rem; }
 /* ── CITY CLOCKS ── */
 .clocks-row {
@@ -540,11 +544,27 @@ padding:2rem 1.5rem; text-align:center; position:relative; z-index:1;
 <div class="prayer-pill nafl-pill"><span class="pname">🌞 Chaasht</span><span class="ptime" id="chaasht-time">—</span></div>
 </div>
 
-<!-- Zawal -->
-<div class="tracker-subhead">Zawal (Solar Noon)</div>
+<!-- Sunrise · Zawal · Sunset -->
+<div class="tracker-subhead">Sunrise · Zawal · Sunset</div>
+<div class="solar-stats-row">
 <div class="zawal-stat">
+<div class="zs-icon">🌄</div>
+<div class="zs-label">Sunrise</div>
+<div class="zs-time" id="stat-sunrise-time">—</div>
+<div class="zs-note">⚠️ Makruh 20 min after</div>
+</div>
+<div class="zawal-stat">
+<div class="zs-icon">☀️</div>
+<div class="zs-label">Zawal</div>
 <div class="zs-time" id="zawal-time">—</div>
-<div class="zs-note">Dhuhr begins shortly after Zawal</div>
+<div class="zs-note">⚠️ Makruh · Dhuhr follows</div>
+</div>
+<div class="zawal-stat">
+<div class="zs-icon">🌇</div>
+<div class="zs-label">Sunset</div>
+<div class="zs-time" id="stat-sunset-time">—</div>
+<div class="zs-note">⚠️ Makruh 20 min before</div>
+</div>
 </div>
 
 <!-- Sun Arc Graph -->
@@ -788,10 +808,14 @@ const chaashtEl=document.getElementById('chaasht-time');
 if(ishraqEl) ishraqEl.textContent=`${minsTo12(ishraqStart)} – ${minsTo12(ishraqEnd)}`;
 if(chaashtEl) chaashtEl.textContent=`${minsTo12(chaashtStart)} – ${minsTo12(chaashtEnd)}`;
 
-// ── Zawal (Solar Noon) ──
+// ── Sunrise · Zawal · Sunset ──
 const zawalM=Math.round((srM+ssM)/2);
 const zawalEl=document.getElementById('zawal-time');
 if(zawalEl) zawalEl.textContent=minsTo12(zawalM);
+const statSunriseEl=document.getElementById('stat-sunrise-time');
+const statSunsetEl=document.getElementById('stat-sunset-time');
+if(statSunriseEl) statSunriseEl.textContent=fmt12(t.Sunrise);
+if(statSunsetEl) statSunsetEl.textContent=fmt12(t.Sunset||t.Maghrib);
 
 renderPrayerPills(t);
 drawSunArc(t);
