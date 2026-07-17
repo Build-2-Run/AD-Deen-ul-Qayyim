@@ -44,8 +44,8 @@ export function Sidebar() {
                   <Typography variant="body" className="text-sm">
                     {mod.title}
                   </Typography>
-                  {mod.status !== 'Complete' && (
-                    <span className="ml-auto w-2 h-2 rounded-full bg-border" title="In Development"></span>
+                  {mod.status !== 'Production Ready' && mod.status !== 'Foundation Complete' && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary/50 flex-shrink-0" title="Coming Soon" />
                   )}
                 </NavLink>
               ))}

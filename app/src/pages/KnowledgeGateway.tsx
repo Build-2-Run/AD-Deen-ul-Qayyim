@@ -49,7 +49,7 @@ export function KnowledgeGateway() {
         
         <div>
           <KnowledgeSurface className="h-full">
-            <Typography variant="h4" className="text-tx-primary mb-4 border-b border-border pb-2">Recent Activity</Typography>
+            <Typography variant="body" className="text-tx-primary mb-4 font-bold border-b border-border pb-2">Recent Activity</Typography>
             {activity.length > 0 ? (
               <ul className="space-y-4">
                 {activity.slice(0, 4).map((item, idx) => (

@@ -103,7 +103,7 @@ export function QuranHome() {
                 <Typography variant="h3" className="font-arabic text-2xl text-tx-primary">{surah.arabic}</Typography>
               </div>
               <div>
-                <Typography variant="h4" className="text-tx-primary mb-1">{surah.english}</Typography>
+                <Typography variant="body" className="text-tx-primary mb-1 font-bold">{surah.english}</Typography>
                 <div className="flex items-center gap-4 text-tx-secondary text-sm">
                   <span>{surah.revelation}</span>
                   <span>•</span>
