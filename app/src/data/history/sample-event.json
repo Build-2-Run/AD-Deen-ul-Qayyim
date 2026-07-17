@@ -1,0 +1,19 @@
+{
+  "id": "history-badr",
+  "slug": "battle-of-badr",
+  "title": "The Battle of Badr",
+  "category": "History",
+  "status": "Verified",
+  "description": "The first major military engagement between the Muslims and the Quraysh.",
+  "keyFigures": ["Prophet Muhammad (ﷺ)", "Abu Jahl"],
+  "location": {
+    "id": "loc-badr",
+    "name": "Badr, Hejaz",
+    "coordinates": { "lat": 23.7333, "lng": 38.7833 }
+  },
+  "eventTimeline": {
+    "id": "time-badr",
+    "name": "Battle of Badr",
+    "date": "17 Ramadan 2 AH"
+  }
+}

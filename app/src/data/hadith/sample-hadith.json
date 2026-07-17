@@ -1,0 +1,18 @@
+{
+  "id": "hadith-bukhari-1",
+  "slug": "actions-are-by-intentions",
+  "title": "Actions are by Intentions",
+  "category": "Hadith",
+  "status": "Verified",
+  "narrator": "Umar bin Al-Khattab",
+  "arabicText": "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",
+  "grading": "Sahih",
+  "collection": "Sahih al-Bukhari",
+  "hadithNumber": 1,
+  "translations": [
+    {
+      "languageCode": "en",
+      "text": "The reward of deeds depends upon the intentions."
+    }
+  ]
+}

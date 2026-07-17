@@ -1,0 +1,18 @@
+{
+  "id": "quran-1-1",
+  "slug": "al-fatihah-1",
+  "title": "Al-Fatihah, Ayah 1",
+  "category": "Quran",
+  "status": "Verified",
+  "description": "The opening verse of the Quran.",
+  "surahNumber": 1,
+  "ayahNumber": 1,
+  "arabicText": "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+  "revelationType": "Meccan",
+  "translations": [
+    {
+      "languageCode": "en",
+      "text": "In the name of Allah, the Entirely Merciful, the Especially Merciful."
+    }
+  ]
+}
