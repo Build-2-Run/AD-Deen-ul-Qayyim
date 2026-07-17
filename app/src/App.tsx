@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { AppShell } from './components/layout/AppShell';
+import { ShellLayout as AppShell } from './components/layout/ShellLayout';
 import { ModuleRegistry } from './features/modules/ModuleRegistry';
 import { ModuleProvider } from './features/modules/ModuleProvider';
 import { Typography } from './components/ui/Typography';

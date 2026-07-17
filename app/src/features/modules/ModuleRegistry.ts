@@ -1,6 +1,6 @@
 import { AppModule } from './types';
 import { 
-  BookOpen, Book, Scroll, Sun, Moon, Map, Calendar, 
+  BookOpen, Book, Scroll, Sun, Moon, Calendar, 
   Calculator, History, Users, User, TreePine, FlaskConical,
   Star, Settings, Search, LayoutDashboard
 } from 'lucide-react';
