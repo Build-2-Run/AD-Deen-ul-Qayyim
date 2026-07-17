@@ -1,12 +1,23 @@
-import { SurahMeta } from '../types/quran-ui';
+import { ValidatorService } from '../../../services/validator';
+import { QuranNodeSchema } from '../../../schemas/quran.schema';
+import type { QuranNode } from '../../../types/quran';
+
+// We import the static JSON file directly for the frontend architecture.
+// In a real full-stack app, this would be fetched from an API.
+import sampleSurah from '../../../data/quran/sample-surah.json';
 
 export class QuranService {
-  static getSurahs(): SurahMeta[] {
-    return [
-      { id: 1, nameArabic: 'الفاتحة', nameTransliterated: 'Al-Fatihah', nameEnglish: 'The Opening', revelationType: 'Meccan', totalAyahs: 7 },
-      { id: 2, nameArabic: 'البقرة', nameTransliterated: 'Al-Baqarah', nameEnglish: 'The Cow', revelationType: 'Medinan', totalAyahs: 286 },
-      { id: 3, nameArabic: 'آل عمران', nameTransliterated: 'Ali \'Imran', nameEnglish: 'Family of Imran', revelationType: 'Medinan', totalAyahs: 200 },
-      { id: 114, nameArabic: 'الناس', nameTransliterated: 'An-Nas', nameEnglish: 'Mankind', revelationType: 'Meccan', totalAyahs: 6 }
-    ];
+  static async getQuranNodes(): Promise<QuranNode[]> {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    try {
+      // Validate the imported JSON using Zod
+      const node = ValidatorService.validate(QuranNodeSchema, sampleSurah);
+      return [node];
+    } catch (error) {
+      console.error('Failed to validate Quran data:', error);
+      throw new Error('Data validation failed gracefully.');
+    }
   }
 }

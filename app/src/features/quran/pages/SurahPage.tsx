@@ -2,17 +2,11 @@ import { Typography } from '../../../components/ui/Typography';
 import { Section } from '../../../components/layout/Section';
 import { Bismillah } from '../components/Bismillah';
 import { AyahViewer } from '../components/AyahViewer';
+import { KnowledgeSurface } from '../../../components/common/KnowledgeSurface';
 
 export function SurahPage() {
-  // Mock data for Al-Fatihah demonstration
   const ayahs = [
     { number: 1, arabic: "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ", translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful." },
-    { number: 2, arabic: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", translation: "[All] praise is [due] to Allah, Lord of the worlds -" },
-    { number: 3, arabic: "الرَّحْمَنِ الرَّحِيمِ", translation: "The Entirely Merciful, the Especially Merciful," },
-    { number: 4, arabic: "مَالِكِ يَوْمِ الدِّينِ", translation: "Sovereign of the Day of Recompense." },
-    { number: 5, arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", translation: "It is You we worship and You we ask for help." },
-    { number: 6, arabic: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", translation: "Guide us to the straight path -" },
-    { number: 7, arabic: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ", translation: "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray." }
   ];
 
   return (
@@ -24,8 +18,36 @@ export function SurahPage() {
 
       <Bismillah />
       
+      <div className="mt-8 mb-12">
+        <KnowledgeSurface className="bg-surface-elevated/50 border-dashed text-center py-6">
+          <Typography variant="h3" className="text-tx-primary mb-1">Surah Information</Typography>
+          <Typography variant="caption" className="text-tx-secondary">Metadata and contextual details will appear here.</Typography>
+        </KnowledgeSurface>
+      </div>
+
       <div className="mt-10">
         <AyahViewer ayahs={ayahs} />
+      </div>
+
+      <div className="mt-16 space-y-6">
+        <KnowledgeSurface className="border-dashed text-center py-6">
+          <Typography variant="h3" className="text-tx-primary mb-1">Knowledge Connections</Typography>
+          <Typography variant="caption" className="text-tx-secondary">(Placeholder) Links to Hadith and Tafsir.</Typography>
+        </KnowledgeSurface>
+
+        <KnowledgeSurface className="border-dashed text-center py-6">
+          <Typography variant="h3" className="text-tx-primary mb-1">References</Typography>
+          <Typography variant="caption" className="text-tx-secondary">(Placeholder) Source citations and evidence levels.</Typography>
+        </KnowledgeSurface>
+
+        <KnowledgeSurface className="border-dashed text-center py-6">
+          <Typography variant="h3" className="text-tx-primary mb-1">Related Topics</Typography>
+          <Typography variant="caption" className="text-tx-secondary">(Placeholder) Tags and historical categories.</Typography>
+        </KnowledgeSurface>
+
+        <div className="text-center py-8">
+          <Typography variant="caption" className="text-tx-secondary">Revision Information (Placeholder) - Verified Status: Draft</Typography>
+        </div>
       </div>
     </Section>
   );
