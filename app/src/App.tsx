@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import { ShellLayout as AppShell } from './components/layout/ShellLayout';
 import { ModuleRegistry } from './features/modules/ModuleRegistry';
 import { ModuleProvider } from './features/modules/ModuleProvider';
@@ -20,7 +20,7 @@ export function App() {
   return (
     <ModuleProvider>
       <Routes>
-        <Route path="/" element={<AppShell />}>
+        <Route path="/" element={<AppShell><Outlet /></AppShell>}>
           {modules.map(mod => {
             const Component = mod.component || (() => <ComingSoon title={mod.title} />);
             return (
