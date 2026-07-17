@@ -1,1 +1,53 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: var(--gold);
+  --color-secondary: var(--bg-secondary);
+  --color-accent: var(--gold-light);
+  --color-background: var(--bg-primary);
+  --color-surface: var(--bg-card);
+  --color-surface-elevated: var(--bg-card-hover);
+  --color-border: var(--border);
+
+  --color-tx-primary: var(--text-primary);
+  --color-tx-secondary: var(--text-secondary);
+
+  --font-display: 'Outfit', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-arabic: 'Amiri', serif;
+
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-glass: 0 0 35px rgba(224, 169, 34, 0.18);
+}
+
+@layer base {
+  :root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --bg-card-hover: rgba(255, 255, 255, 1);
+    --gold: #c98a1a;
+    --gold-light: #dfa032;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border: rgba(0, 0, 0, 0.1);
+  }
+
+  .dark {
+    --bg-primary: #0c101b;
+    --bg-secondary: #101625;
+    --bg-card: rgba(20, 27, 46, 0.45);
+    --bg-card-hover: rgba(26, 36, 61, 0.55);
+    --gold: #e0a922;
+    --gold-light: #f5c75d;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.65);
+    --border: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
