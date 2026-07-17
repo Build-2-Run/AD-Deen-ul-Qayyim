@@ -1,26 +1,58 @@
+import { NavLink } from 'react-router-dom';
 import { Typography } from '../ui/Typography';
+import { useModules } from '../../features/modules/ModuleProvider';
 
 export function Sidebar() {
+  const { modules } = useModules();
+  const byCategory = modules.reduce((acc, mod) => {
+    if (!acc[mod.category]) acc[mod.category] = [];
+    acc[mod.category].push(mod);
+    return acc;
+  }, {} as Record<string, typeof modules>);
+
+  const categoryOrder = ['Core', 'Revelation', 'Fiqh', 'Theology', 'History', 'Science', 'Tools'];
+  const categories = Object.keys(byCategory).sort((a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b));
+
   return (
-    <aside className="hidden w-64 flex-col border-r border-border bg-surface/30 lg:flex transition-colors overflow-y-auto">
-      <div className="flex flex-col gap-8 p-6">
-        <div>
-          <Typography variant="small" className="font-semibold text-tx-secondary mb-3 uppercase tracking-widest text-xs">Features</Typography>
-          <nav className="flex flex-col gap-1">
-            <a href="#" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium bg-primary/10 text-primary transition-colors">Dashboard</a>
-            <a href="#" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-tx-secondary hover:bg-surface-elevated hover:text-tx-primary transition-colors">Qur'an</a>
-            <a href="#" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-tx-secondary hover:bg-surface-elevated hover:text-tx-primary transition-colors">Hadith</a>
-            <a href="#" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-tx-secondary hover:bg-surface-elevated hover:text-tx-primary transition-colors">Prayer Times</a>
-          </nav>
-        </div>
-        <div>
-          <Typography variant="small" className="font-semibold text-tx-secondary mb-3 uppercase tracking-widest text-xs">Recent Modules</Typography>
-          <nav className="flex flex-col gap-1">
-            <a href="#" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-tx-secondary hover:bg-surface-elevated hover:text-tx-primary transition-colors">99 Names</a>
-            <a href="#" className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-tx-secondary hover:bg-surface-elevated hover:text-tx-primary transition-colors">Inheritance Calculator</a>
-          </nav>
-        </div>
+    <aside className="w-64 bg-surface border-r border-border h-screen flex flex-col fixed left-0 top-0 overflow-y-auto">
+      <div className="p-6">
+        <Typography variant="h3" className="text-primary font-bold tracking-wide">
+          AD-DEEN
+        </Typography>
       </div>
+
+      <nav className="flex-1 px-4 pb-6 space-y-6">
+        {categories.map(category => (
+          <div key={category} className="space-y-2">
+            <Typography variant="caption" className="px-2 text-tx-secondary font-bold uppercase tracking-wider text-[10px]">
+              {category}
+            </Typography>
+            <div className="space-y-1">
+              {byCategory[category].map(mod => (
+                <NavLink
+                  key={mod.id}
+                  to={mod.route}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                      isActive && mod.route !== '/'
+                        ? 'bg-primary/10 text-primary font-medium' 
+                        : 'text-tx-secondary hover:bg-surface-elevated hover:text-tx-primary'
+                    }`
+                  }
+                >
+                  <mod.icon className="w-4 h-4" />
+                  <Typography variant="body" className="text-sm">
+                    {mod.title}
+                  </Typography>
+                  {mod.status !== 'Complete' && (
+                    <span className="ml-auto w-2 h-2 rounded-full bg-border" title="In Development"></span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
     </aside>
   );
 }
