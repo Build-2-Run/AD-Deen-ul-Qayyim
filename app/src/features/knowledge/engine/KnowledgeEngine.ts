@@ -9,8 +9,8 @@ export class KnowledgeEngine {
   public recommendations: RecommendationEngine;
   
   // Future extension points
-  private graphDb?: GraphAdapter;
-  private aiSearch?: AISearchAdapter;
+  private _graphDb?: GraphAdapter;
+  private _aiSearch?: AISearchAdapter;
 
   constructor() {
     this.registry = new NodeRegistry();
@@ -19,11 +19,11 @@ export class KnowledgeEngine {
   }
 
   setGraphAdapter(adapter: GraphAdapter) {
-    this.graphDb = adapter;
+    this._graphDb = adapter;
   }
 
   setAISearchAdapter(adapter: AISearchAdapter) {
-    this.aiSearch = adapter;
+    this._aiSearch = adapter;
   }
 }
 

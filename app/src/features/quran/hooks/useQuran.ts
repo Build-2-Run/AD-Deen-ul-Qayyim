@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { ValidatorService } from '../../../services/validator';
 import { QuranNodeSchema } from '../../../schemas/quran.schema';
 import sampleSurah from '../../../data/quran/sample-surah.json';

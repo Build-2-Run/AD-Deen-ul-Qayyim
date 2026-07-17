@@ -13,16 +13,16 @@ export class GraphTraversal {
       .filter((n): n is KnowledgeNode => n !== undefined);
   }
 
-  getConnections(id: string): KnowledgeConnection[] {
+  getConnections(_id: string): KnowledgeConnection[] {
     // Placeholder for future edge graph resolution
     return [];
   }
 
-  getParents(id: string): KnowledgeNode[] {
+  getParents(_id: string): KnowledgeNode[] {
     return [];
   }
 
-  getChildren(id: string): KnowledgeNode[] {
+  getChildren(_id: string): KnowledgeNode[] {
     return [];
   }
 }
