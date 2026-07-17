@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { QuranService } from '../services/quran-service';
+import { ValidatorService } from '../../../services/validator';
+import { QuranNodeSchema } from '../../../schemas/quran.schema';
+import sampleSurah from '../../../data/quran/sample-surah.json';
+import { KnowledgeService } from '../../knowledge/services/knowledge-service';
 import type { QuranNode } from '../../../types/quran';
-import { SearchIndex } from '../../../lib/search-index';
 
-const searchIndex = new SearchIndex();
+let initialized = false;
 
 export function useQuran() {
   const [nodes, setNodes] = useState<QuranNode[]>([]);
@@ -17,12 +19,15 @@ export function useQuran() {
       setLoading(true);
       setError(null);
       try {
-        const data = await QuranService.getQuranNodes();
+        if (!initialized) {
+          // Hydrate the universal Knowledge Engine
+          const node = ValidatorService.validate(QuranNodeSchema, sampleSurah);
+          await KnowledgeService.initialize([node]);
+          initialized = true;
+        }
+        
         if (mounted) {
-          setNodes(data);
-          // Populate search index
-          searchIndex.clear();
-          data.forEach(node => searchIndex.index(node));
+          setNodes(KnowledgeService.searchNodes(searchQuery) as QuranNode[]);
         }
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err : new Error('Unknown error'));
@@ -32,15 +37,10 @@ export function useQuran() {
     };
     fetchNodes();
     return () => { mounted = false; };
-  }, []);
-
-  const filteredNodes = useMemo(() => {
-    if (!searchQuery.trim()) return nodes;
-    return searchIndex.search(searchQuery) as QuranNode[];
-  }, [nodes, searchQuery]);
+  }, [searchQuery]);
 
   return { 
-    nodes: filteredNodes, 
+    nodes, 
     loading, 
     error,
     searchQuery,

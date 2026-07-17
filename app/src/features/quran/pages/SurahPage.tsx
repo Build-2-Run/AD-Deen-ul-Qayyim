@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Bismillah } from '../components/Bismillah';
 import { AyahViewer } from '../components/AyahViewer';
 import { ReadingWorkspace } from '../../reader/components/ReadingWorkspace';
-import { QuranService } from '../services/quran-service';
+import { KnowledgeService } from '../../knowledge/services/knowledge-service';
 import type { QuranNode } from '../../../types/quran';
 import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorBoundary } from '../../../components/ui/ErrorBoundary';
@@ -13,17 +13,15 @@ function SurahPageContent() {
 
   useEffect(() => {
     let mounted = true;
-    const fetchNode = async () => {
-      try {
-        const nodes = await QuranService.getQuranNodes();
-        if (mounted && nodes.length > 0) {
-          setNode(nodes[0]); // Using the sample node
-        }
-      } catch (err) {
-        if (mounted) setError(err instanceof Error ? err : new Error('Unknown error'));
+    try {
+      // Fetch data via the unified Knowledge Engine Runtime rather than isolated QuranService
+      const found = KnowledgeService.findNode('quran-1-1');
+      if (mounted && found) {
+        setNode(found as QuranNode);
       }
-    };
-    fetchNode();
+    } catch (err) {
+      if (mounted) setError(err instanceof Error ? err : new Error('Unknown error'));
+    }
     return () => { mounted = false; };
   }, []);
 
@@ -40,18 +38,12 @@ function SurahPageContent() {
     { label: `Ayah ${node.ayahNumber}` }
   ];
 
-  // The sample data currently represents an Ayah, so we map it to an array for AyahViewer
   const ayahs = [
     { number: node.ayahNumber, arabic: node.arabicText, translation: node.translations?.[0]?.text || '' }
   ];
 
   return (
-    <ReadingWorkspace 
-      node={node}
-      breadcrumbs={breadcrumbs}
-      // Note: NodeHeader takes arabic/translation. We can omit it if AyahViewer renders it,
-      // but to satisfy the layout request, we let ReadingWorkspace render the Title.
-    >
+    <ReadingWorkspace node={node} breadcrumbs={breadcrumbs}>
       <Bismillah />
       <AyahViewer ayahs={ayahs} />
     </ReadingWorkspace>
