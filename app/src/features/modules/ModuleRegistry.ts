@@ -9,8 +9,8 @@ import { QuranHome } from '../quran/pages/QuranHome';
 import { KnowledgeGateway } from '../../pages/KnowledgeGateway';
 
 const modules: AppModule[] = [
-  { id: 'dashboard', title: 'Dashboard', description: 'Knowledge Gateway', icon: LayoutDashboard, route: '/', status: 'Complete', category: 'Core', order: 0, enabled: true, component: KnowledgeGateway },
-  { id: 'quran', title: 'Quran', description: 'The Divine Revelation', icon: BookOpen, route: '/quran', status: 'Complete', category: 'Revelation', order: 1, enabled: true, component: QuranHome },
+  { id: 'dashboard', title: 'Dashboard', description: 'Knowledge Gateway', icon: LayoutDashboard, route: '/', status: 'Production Ready', category: 'Core', order: 0, enabled: true, component: KnowledgeGateway },
+  { id: 'quran', title: 'Quran', description: 'The Divine Revelation', icon: BookOpen, route: '/quran', status: 'Foundation Complete', category: 'Revelation', order: 1, enabled: true, component: QuranHome },
   { id: 'hadith', title: 'Hadith', description: 'Prophetic Traditions', icon: Scroll, route: '/hadith', status: 'Planned', category: 'Revelation', order: 2, enabled: true },
   { id: 'tafsir', title: 'Tafsir', description: 'Exegesis & Interpretation', icon: Book, route: '/tafsir', status: 'Planned', category: 'Revelation', order: 3, enabled: true },
   { id: 'asma-ul-husna', title: 'Asma-ul-Husna', description: 'The Beautiful Names of Allah', icon: Sun, route: '/asma-ul-husna', status: 'Planned', category: 'Theology', order: 4, enabled: true },

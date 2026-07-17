@@ -1,6 +1,6 @@
 import { ComponentType } from 'react';
 
-export type ModuleStatus = 'Planned' | 'In Development' | 'Complete';
+export type ModuleStatus = 'Planned' | 'In Development' | 'Foundation Complete' | 'Production Ready';
 
 export interface AppModule {
   id: string;
