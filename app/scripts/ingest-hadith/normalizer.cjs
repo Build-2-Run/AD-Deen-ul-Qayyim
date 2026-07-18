@@ -6,13 +6,15 @@ function normalize(rawData) {
       id: `hadith:${rawData.metadata.id}:${book.number}:${h.number}`,
       collection: rawData.metadata.id,
       book: book.number,
-      chapter: null,
+      chapter: h.chapter || null,
       number: h.number,
       grade: h.grade,
+      narrator: h.narrator || null,
       arabic: h.arabic,
       translations: h.translations,
       topics: h.topics,
       relations: h.relations,
+      references: h.references || {},
       tags: []
     }))
   }));

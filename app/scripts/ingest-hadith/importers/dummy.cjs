@@ -21,22 +21,42 @@ async function importData() {
           {
             number: "1",
             grade: "Sahih",
+            chapter: {
+              number: "1",
+              arabic: "بَابُ كَيْفَ كَانَ بَدْءُ الْوَحْيِ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم",
+              english: "How the Divine Revelation started to be revealed to Allah's Messenger"
+            },
+            narrator: "‘Umar bin Al-Khattab",
             arabic: "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
             translations: {
               en: "The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended."
             },
             topics: ["Intentions", "Sincerity"],
-            relations: ["quran-98-5"]
+            relations: ["quran-98-5"],
+            references: {
+              book: 1,
+              hadith: 1
+            }
           },
           {
             number: "2",
             grade: "Sahih",
+            chapter: {
+              number: "1",
+              arabic: "بَابُ كَيْفَ كَانَ بَدْءُ الْوَحْيِ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم",
+              english: "How the Divine Revelation started to be revealed to Allah's Messenger"
+            },
+            narrator: "‘Aisha",
             arabic: "أَحْيَانًا يَأْتِينِي مِثْلَ صَلْصَلَةِ الْجَرَسِ",
             translations: {
               en: "Sometimes it is (revealed) like the ringing of a bell."
             },
             topics: ["Revelation"],
-            relations: ["quran-42-51"]
+            relations: ["quran-42-51"],
+            references: {
+              book: 1,
+              hadith: 2
+            }
           }
         ]
       }

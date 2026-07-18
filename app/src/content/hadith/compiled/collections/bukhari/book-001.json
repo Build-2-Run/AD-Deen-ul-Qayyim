@@ -8,9 +8,14 @@
       "id": "hadith:bukhari:1:1",
       "collection": "bukhari",
       "book": 1,
-      "chapter": null,
+      "chapter": {
+        "number": "1",
+        "arabic": "بَابُ كَيْفَ كَانَ بَدْءُ الْوَحْيِ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم",
+        "english": "How the Divine Revelation started to be revealed to Allah's Messenger"
+      },
       "number": "1",
       "grade": "Sahih",
+      "narrator": "‘Umar bin Al-Khattab",
       "arabic": "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
       "translations": {
         "en": "The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended."
@@ -22,15 +27,24 @@
       "relations": [
         "quran-98-5"
       ],
+      "references": {
+        "book": 1,
+        "hadith": 1
+      },
       "tags": []
     },
     {
       "id": "hadith:bukhari:1:2",
       "collection": "bukhari",
       "book": 1,
-      "chapter": null,
+      "chapter": {
+        "number": "1",
+        "arabic": "بَابُ كَيْفَ كَانَ بَدْءُ الْوَحْيِ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم",
+        "english": "How the Divine Revelation started to be revealed to Allah's Messenger"
+      },
       "number": "2",
       "grade": "Sahih",
+      "narrator": "‘Aisha",
       "arabic": "أَحْيَانًا يَأْتِينِي مِثْلَ صَلْصَلَةِ الْجَرَسِ",
       "translations": {
         "en": "Sometimes it is (revealed) like the ringing of a bell."
@@ -41,6 +55,10 @@
       "relations": [
         "quran-42-51"
       ],
+      "references": {
+        "book": 1,
+        "hadith": 2
+      },
       "tags": []
     }
   ]

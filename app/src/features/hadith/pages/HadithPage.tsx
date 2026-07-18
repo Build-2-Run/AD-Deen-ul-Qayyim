@@ -21,6 +21,12 @@ export const HadithPage: React.FC = () => {
       rightSidebar={<HadithSidebar hadithNode={node} />}
     >
       <div className="max-w-3xl mx-auto p-8 space-y-8">
+        {node.chapter && (
+          <div className="text-center border-b pb-4 mb-8">
+            <h2 className="text-xl font-bold font-arabic mb-1">{node.chapter.arabic}</h2>
+            <h3 className="text-sm text-gray-500">{node.chapter.english}</h3>
+          </div>
+        )}
         <div className="text-3xl text-right leading-loose font-arabic" dir="rtl">
           {node.arabic}
         </div>

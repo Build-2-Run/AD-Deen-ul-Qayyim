@@ -12,6 +12,20 @@ export const HadithSidebar: React.FC<{ hadithNode: any }> = ({ hadithNode }) => 
           {hadithNode.grade}
         </span>
       </div>
+      {hadithNode.narrator && (
+        <div className="mb-4">
+          <span className="text-sm text-gray-500 block">Narrator</span>
+          <span className="text-sm font-semibold">{hadithNode.narrator}</span>
+        </div>
+      )}
+      {hadithNode.references && (
+        <div className="mb-4">
+          <span className="text-sm text-gray-500 block mb-1">References</span>
+          <div className="text-xs text-gray-600">
+            Book {hadithNode.references.book}, Hadith {hadithNode.references.hadith}
+          </div>
+        </div>
+      )}
       {hadithNode.topics && hadithNode.topics.length > 0 && (
         <div className="mb-4">
           <span className="text-sm text-gray-500 block mb-1">Topics</span>
