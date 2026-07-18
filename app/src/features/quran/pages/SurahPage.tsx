@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Bookmark, Copy, Share2, BookOpen, Settings, Maximize } from 'lucide-react';
+import { Copy, Share2, Settings, Maximize } from 'lucide-react';
 
 import { Bismillah } from '../components/Bismillah';
 import { AyahViewer } from '../components/AyahViewer';
@@ -10,14 +10,18 @@ import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorBoundary } from '../../../components/ui/ErrorBoundary';
 import { useQuranExperience } from '../hooks/useQuranExperience';
 
-// Platform Reader
+// Platform Reader & Study UI
 import { ReaderLayout } from '../../../platform/reader/ReaderLayout';
 import { ReaderToolbar, ReaderToolbarItem } from '../../../platform/reader/components/ReaderToolbar';
+import { BookmarkButton } from '../../../platform/study/components/BookmarkButton';
+import { NoteButton } from '../../../platform/study/components/NoteButton';
+import { NotesPanel } from '../../../platform/study/components/NotesPanel';
 
 function SurahPageContent() {
   const { id } = useParams<{ id: string }>();
   const [node, setNode] = useState<QuranNode | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const [showNotes, setShowNotes] = useState(false);
   
   const { updateProgress, logActivity } = useQuranExperience();
 
@@ -66,15 +70,20 @@ function SurahPageContent() {
   const ayahs = [
     { number: node.ayahNumber, arabic: node.arabicText, translation: node.translations?.[0]?.text || '' }
   ];
+  
+  const nodeId = `quran-${node.surahNumber}`;
 
-  // Configure Reader Toolbar specifically for Quran
   const toolbarItems: ReaderToolbarItem[] = [
-    { id: 'bookmark', icon: <Bookmark className="w-5 h-5" />, label: 'Bookmark', enabled: true, visible: true, onClick: () => console.log('Bookmark') },
     { id: 'copy', icon: <Copy className="w-5 h-5" />, label: 'Copy Ayah', enabled: true, visible: true, onClick: () => console.log('Copy') },
     { id: 'share', icon: <Share2 className="w-5 h-5" />, label: 'Share', enabled: true, visible: true, onClick: () => console.log('Share') },
-    { id: 'knowledge', icon: <BookOpen className="w-5 h-5" />, label: 'Knowledge Connections', enabled: true, visible: true, onClick: () => console.log('Knowledge') },
     { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Reader Settings', enabled: true, visible: true, onClick: () => console.log('Settings') },
-    { id: 'fullscreen', icon: <Maximize className="w-5 h-5" />, label: 'Fullscreen', enabled: true, visible: true, onClick: () => console.log('Fullscreen') },
+    { id: 'fullscreen', icon: <Maximize className="w-5 h-5" />, label: 'Fullscreen', enabled: true, visible: true, onClick: () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.error(err));
+      } else {
+        document.exitFullscreen();
+      }
+    } },
   ];
 
   const header = (
@@ -107,12 +116,25 @@ function SurahPageContent() {
       </div>
     </div>
   );
+  
+  const rightSidebar = showNotes ? (
+    <NotesPanel nodeId={nodeId} onClose={() => setShowNotes(false)} />
+  ) : undefined;
 
   return (
     <ReaderLayout 
       header={header}
-      toolbar={<ReaderToolbar items={toolbarItems} />}
+      toolbar={
+        <ReaderToolbar items={toolbarItems}>
+          <div className="h-6 w-px bg-gray-200 dark:bg-gray-800 mx-2" />
+          <BookmarkButton nodeId={nodeId} title={node.title} />
+          <div onClick={() => setShowNotes(!showNotes)}>
+            <NoteButton />
+          </div>
+        </ReaderToolbar>
+      }
       leftSidebar={leftSidebar}
+      rightSidebar={rightSidebar}
     >
       <Bismillah />
       <AyahViewer ayahs={ayahs} />
