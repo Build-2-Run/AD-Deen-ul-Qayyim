@@ -23,9 +23,6 @@ async function fetchJson(url) {
   });
 }
 
-function generateChecksum(str) {
-  return crypto.createHash('sha256').update(str).digest('hex');
-}
 
 async function run() {
   console.log('Starting Quran Ingestion Pipeline...');
