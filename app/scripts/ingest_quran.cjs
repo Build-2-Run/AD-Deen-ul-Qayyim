@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const crypto = require('crypto');
+
 
 const RAW_DIR = path.join(__dirname, '../datasets/quran/raw');
 const COMPILED_DIR = path.join(__dirname, '../src/content/quran/compiled');
