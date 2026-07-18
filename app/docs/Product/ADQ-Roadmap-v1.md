@@ -34,12 +34,13 @@ The platform is organized into seven interconnected product pillars:
 - Granular mapping of chapters, books, and references using Canonical IDs.
 **Dependencies:** `DatasetRegistry`, `RelationService`.
 
-## 5. Knowledge & Understanding
+## 5. Knowledge & Research
 **Objectives:** Address contemporary questions and provide thematic knowledge exploration to resolve doubts and increase certainty (Yaqeen).
 **Scope:**
 - Curated responses to common misconceptions with direct citations to Primary Sources.
-- Thematic grouping of verses and Hadiths concerning Science, Ethics, and Society.
-- FAQ knowledge bases for new Muslims or researchers.
+- Islam & Science, Comparative studies, and Historical analysis.
+- FAQ knowledge bases, Research notes, and Scholarly references.
+- Knowledge graph exploration.
 **Dependencies:** `RelationService` to map thematic nodes (`concept:`) to source texts.
 
 ## 6. Astronomy & Time

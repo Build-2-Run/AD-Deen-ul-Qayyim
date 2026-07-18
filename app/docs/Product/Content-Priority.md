@@ -17,8 +17,8 @@ ADQ prioritizes future work based on immediate problem-solving value for the eve
 ## 5. Hadith
 **Reasoning:** Provides the prophetic explanation and context for the Quran and rulings. Completing the remaining Hadith collections establishes the bedrock for pulling exact Adhkar sources, proving Fiqh rulings for calculators, and sourcing timeline events.
 
-## 6. Knowledge & Understanding (Misconceptions, FAQs)
-**Reasoning:** Solves the problem of theological doubts and knowledge gaps. Essential for outreach and deep study, providing curated answers linked strictly to the primary texts (Quran and Hadith).
+## 6. Knowledge & Research (Misconceptions, FAQs, History)
+**Reasoning:** Solves the problem of theological doubts and knowledge gaps. Essential for outreach and deep study, providing curated answers linked strictly to the primary texts (Quran and Hadith). As the platform scales, this serves as the hub for comparative studies, historical analysis, and scholarly research.
 
 ## 7. Visual Learning (Timelines & Maps)
 **Reasoning:** Solves the problem of comprehension barriers in complex subjects like Seerah or Isnad. Visualizing timelines and geographical maps provides contextual depth to the texts.
