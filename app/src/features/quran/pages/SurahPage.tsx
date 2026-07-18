@@ -4,7 +4,6 @@ import { Copy, Share2, Settings, Maximize } from 'lucide-react';
 
 import { Bismillah } from '../components/Bismillah';
 import { AyahViewer } from '../components/AyahViewer';
-import { KnowledgeService } from '../../knowledge/services/knowledge-service';
 import type { QuranNode } from '../../../types/quran';
 import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorBoundary } from '../../../components/ui/ErrorBoundary';
@@ -16,6 +15,7 @@ import { ReaderToolbar, ReaderToolbarItem } from '../../../platform/reader/compo
 import { BookmarkButton } from '../../../platform/study/components/BookmarkButton';
 import { NoteButton } from '../../../platform/study/components/NoteButton';
 import { NotesPanel } from '../../../platform/study/components/NotesPanel';
+import { KnowledgeConnectionsPanel } from '../../../platform/relations/components/KnowledgeConnectionsPanel';
 
 function SurahPageContent() {
   const { id } = useParams<{ id: string }>();
@@ -28,31 +28,39 @@ function SurahPageContent() {
   useEffect(() => {
     let mounted = true;
     try {
-      const found = KnowledgeService.findNode('quran-1-1');
-      if (mounted && found) {
-        const qNode = found as QuranNode;
-        if (id && !isNaN(parseInt(id))) {
-           qNode.surahNumber = parseInt(id);
-           if (qNode.surahNumber === 1) qNode.title = 'Al-Fatihah';
-           else if (qNode.surahNumber === 2) qNode.title = 'Al-Baqarah';
-           else if (qNode.surahNumber === 36) qNode.title = 'Ya-Sin';
-           else qNode.title = `Surah ${qNode.surahNumber}`;
-        }
+      if (mounted) {
+        const surahNumber = (id && !isNaN(parseInt(id))) ? parseInt(id) : 1;
+        let title = `Surah ${surahNumber}`;
+        if (surahNumber === 1) title = 'Al-Fatihah';
+        else if (surahNumber === 2) title = 'Al-Baqarah';
+        else if (surahNumber === 36) title = 'Ya-Sin';
 
-        setNode(qNode);
+        const mockNode: QuranNode = {
+          id: `quran-${surahNumber}`,
+          title: title,
+          slug: title.toLowerCase().replace(/ /g, '-'),
+          status: 'Published',
+          surahNumber: surahNumber,
+          ayahNumber: 1,
+          arabicText: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+          translations: [{ languageCode: 'en', text: 'In the name of Allah, the Entirely Merciful, the Especially Merciful.', translatorId: 'Sahih International' }],
+          category: 'quran',
+        };
+
+        setNode(mockNode);
         
         updateProgress({
-          surahNumber: qNode.surahNumber,
-          surahName: qNode.title,
-          ayahNumber: qNode.ayahNumber,
+          surahNumber: mockNode.surahNumber,
+          surahName: mockNode.title,
+          ayahNumber: mockNode.ayahNumber,
           lastOpened: Date.now(),
           percentage: 5
         });
         
         logActivity({
-          id: `quran-${qNode.surahNumber}`,
-          title: qNode.title,
-          url: `/quran/surah/${qNode.surahNumber}`
+          id: mockNode.id,
+          title: mockNode.title,
+          url: `/quran/surah/${mockNode.surahNumber}`
         });
       }
     } catch (err) {
@@ -71,7 +79,7 @@ function SurahPageContent() {
     { number: node.ayahNumber, arabic: node.arabicText, translation: node.translations?.[0]?.text || '' }
   ];
   
-  const nodeId = `quran-${node.surahNumber}`;
+  const nodeId = node.id;
 
   const toolbarItems: ReaderToolbarItem[] = [
     { id: 'copy', icon: <Copy className="w-5 h-5" />, label: 'Copy Ayah', enabled: true, visible: true, onClick: () => console.log('Copy') },
@@ -97,22 +105,23 @@ function SurahPageContent() {
   );
 
   const leftSidebar = (
-    <div className="p-4">
-      <h3 className="font-semibold text-lg mb-4">Surah Information</h3>
-      <div className="space-y-3 text-sm">
-        <div>
-          <span className="text-gray-500 block text-xs uppercase tracking-wider">Number</span>
-          <span className="font-medium">{node.surahNumber}</span>
-        </div>
-        <div>
-          <span className="text-gray-500 block text-xs uppercase tracking-wider">Revelation</span>
-          <span className="font-medium">Meccan</span>
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+        <h3 className="font-semibold text-lg mb-4">Surah Information</h3>
+        <div className="space-y-3 text-sm">
+          <div>
+            <span className="text-gray-500 block text-xs uppercase tracking-wider">Number</span>
+            <span className="font-medium">{node.surahNumber}</span>
+          </div>
+          <div>
+            <span className="text-gray-500 block text-xs uppercase tracking-wider">Revelation</span>
+            <span className="font-medium">Meccan</span>
+          </div>
         </div>
       </div>
       
-      <div className="mt-8">
-        <h3 className="font-semibold text-lg mb-4">Related Knowledge</h3>
-        <p className="text-sm text-gray-500">Connections will appear here.</p>
+      <div className="flex-1 overflow-hidden">
+        <KnowledgeConnectionsPanel nodeId={nodeId} />
       </div>
     </div>
   );
