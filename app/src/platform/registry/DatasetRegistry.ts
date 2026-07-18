@@ -61,16 +61,26 @@ export class DatasetRegistry {
   static async loadNode(nodeId: string): Promise<any> {
     if (this.nodeCache.has(nodeId)) return this.nodeCache.get(nodeId);
 
-    // hadith:bukhari:1:1
+    // Canonical IDs: quran:surah:X:ayah:Y or hadith:bukhari:book:X:hadith:Y
     const parts = nodeId.split(':');
     if (parts[0] === 'hadith') {
       const collection = parts[1];
-      const book = parts[2];
+      const book = parts[3];
       const bookStr = book.padStart(3, '0');
       const bookData = (await import(`../../content/hadith/compiled/collections/${collection}/book-${bookStr}.json`)).default;
       
       const node = bookData.hadiths.find((h: any) => h.id === nodeId);
       if (node) {
+        this.nodeCache.set(nodeId, node);
+        return node;
+      }
+    } else if (parts[0] === 'quran') {
+      const surahNumber = parseInt(parts[2], 10);
+      const ayahNumber = parseInt(parts[4], 10);
+      const surahData = await this.loadSurah(surahNumber);
+      const ayah = surahData.ayahs.find((a: any) => a.number === ayahNumber);
+      if (ayah) {
+        const node = { ...ayah, id: nodeId, surah: surahNumber };
         this.nodeCache.set(nodeId, node);
         return node;
       }

@@ -6,6 +6,7 @@ export interface ReaderPreferences {
   translationSize: number;
   translationLanguage: string; // 'none', 'en-sahih', 'ur-jalandhry'
   theme: 'light' | 'dark';
+  developerMode: boolean;
 }
 
 const DEFAULT_PREFS: ReaderPreferences = {
@@ -13,7 +14,8 @@ const DEFAULT_PREFS: ReaderPreferences = {
   arabicSize: 32,
   translationSize: 18,
   translationLanguage: 'en-sahih',
-  theme: 'light'
+  theme: 'light',
+  developerMode: false
 };
 
 interface ReaderContextType {

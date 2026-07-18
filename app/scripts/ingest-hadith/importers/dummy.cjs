@@ -9,7 +9,11 @@ async function importData() {
       totalHadith: 7563,
       description: "The most authentic book of Hadith in Sunni Islam.",
       source: "sunnah.com (Sample)",
-      version: "1.0.0"
+      version: "1.0.0",
+      compilerVersion: "3.1.0",
+      schemaVersion: "2.0",
+      language: "ar",
+      checksum: "dummy-hash-123"
     },
     books: [
       {
@@ -32,7 +36,7 @@ async function importData() {
               en: "The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended."
             },
             topics: ["Intentions", "Sincerity"],
-            relations: ["quran-98-5"],
+            relations: ["quran:surah:98:ayah:5"],
             references: {
               book: 1,
               hadith: 1
@@ -52,7 +56,7 @@ async function importData() {
               en: "Sometimes it is (revealed) like the ringing of a bell."
             },
             topics: ["Revelation"],
-            relations: ["quran-42-51"],
+            relations: ["quran:surah:42:ayah:51"],
             references: {
               book: 1,
               hadith: 2

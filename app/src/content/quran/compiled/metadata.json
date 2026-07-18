@@ -1,4 +1,14 @@
 {
+  "id": "quran-hafs",
+  "name": "Quran (Hafs)",
+  "totalSurahs": 114,
+  "totalAyahs": 6236,
+  "version": "1.0.0",
+  "compilerVersion": "3.1.0",
+  "schemaVersion": "2.0",
+  "language": "ar",
+  "checksum": "quran-hash-456",
+  "source": "Tanzil",
   "surahs": [
     {
       "id": 1,

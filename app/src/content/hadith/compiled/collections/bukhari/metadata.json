@@ -6,5 +6,9 @@
   "totalHadith": 7563,
   "description": "The most authentic book of Hadith in Sunni Islam.",
   "source": "sunnah.com (Sample)",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "compilerVersion": "3.1.0",
+  "schemaVersion": "2.0",
+  "language": "ar",
+  "checksum": "dummy-hash-123"
 }

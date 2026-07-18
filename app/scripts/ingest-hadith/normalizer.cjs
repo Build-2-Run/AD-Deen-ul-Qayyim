@@ -3,7 +3,7 @@ function normalize(rawData) {
   const normalizedBooks = rawData.books.map(book => ({
     ...book,
     hadiths: book.hadiths.map(h => ({
-      id: `hadith:${rawData.metadata.id}:${book.number}:${h.number}`,
+      id: `hadith:${rawData.metadata.id}:book:${book.number}:hadith:${h.number}`,
       collection: rawData.metadata.id,
       book: book.number,
       chapter: h.chapter || null,

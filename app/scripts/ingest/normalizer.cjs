@@ -2,6 +2,19 @@ function normalize(rawData) {
   console.log('Normalizing data...');
   const { meta, arabic, english, urdu } = rawData;
   
+  const metadata = {
+    id: "quran-hafs",
+    name: "Quran (Hafs)",
+    totalSurahs: 114,
+    totalAyahs: 6236,
+    version: "1.0.0",
+    compilerVersion: "3.1.0",
+    schemaVersion: "2.0",
+    language: "ar",
+    checksum: "quran-hash-456",
+    source: "Tanzil"
+  };
+
   const surahs = meta.surahs.references.map(s => ({
     id: s.number,
     name: s.name,
@@ -31,6 +44,6 @@ function normalize(rawData) {
     });
   }
 
-  return { metadata: { surahs }, normalizedSurahs };
+  return { metadata: { ...metadata, surahs }, normalizedSurahs };
 }
 module.exports = { normalize };

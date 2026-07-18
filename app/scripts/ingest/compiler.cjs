@@ -49,7 +49,7 @@ function compile(normalizedData, outputDir) {
     // Search Index
     surah.ayahs.forEach(a => {
       searchIndex.push({
-        nodeId: `quran-${sNum}-${a.number}`,
+        nodeId: `quran:surah:${sNum}:ayah:${a.number}`,
         surah: sNum,
         ayah: a.number,
         arabic: a.arabic,

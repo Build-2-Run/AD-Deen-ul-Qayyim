@@ -67,6 +67,19 @@ export const ReaderSettingsPanel: React.FC<{ onClose: () => void }> = ({ onClose
             <option value="dark">Dark</option>
           </select>
         </div>
+
+        {/* Developer Mode */}
+        <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="checkbox" 
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              checked={preferences.developerMode}
+              onChange={(e) => updatePreferences({ developerMode: e.target.checked })}
+            />
+            <span className="text-xs text-gray-500 font-semibold uppercase">Developer Mode</span>
+          </label>
+        </div>
       </div>
     </div>
   );

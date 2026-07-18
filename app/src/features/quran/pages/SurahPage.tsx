@@ -161,11 +161,16 @@ function SurahPageContent() {
           {ayahs.map((ayah: any) => (
             <div key={ayah.number} className="flex flex-col gap-6" id={`ayah-${ayah.number}`}>
               <div 
-                className="text-right font-arabic leading-loose text-gray-900 dark:text-gray-100" 
+                className="text-right font-arabic leading-loose text-gray-900 dark:text-gray-100 relative" 
                 style={{ fontSize: `${preferences.arabicSize}px` }}
                 dir="rtl"
               >
                 {ayah.arabic} <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 text-sm ml-2">{ayah.number}</span>
+                {preferences.developerMode && (
+                  <div className="absolute top-0 right-0 -mt-6 text-[10px] font-mono bg-gray-100 dark:bg-gray-800 text-gray-500 px-1 py-0.5 rounded" dir="ltr">
+                    quran:surah:{surahNumber}:ayah:{ayah.number}
+                  </div>
+                )}
               </div>
               {ayah.translation && (
                 <div 
