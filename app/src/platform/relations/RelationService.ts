@@ -33,13 +33,13 @@ export class RelationService {
   static initializeSeedData() {
     const now = Date.now();
     const seeds: Omit<KnowledgeRelation, 'id'>[] = [
-      { sourceNodeId: 'quran-1', targetNodeId: 'topic-prayer', relationType: 'supports', priority: 1, confidence: 1, createdAt: now, updatedAt: now },
-      { sourceNodeId: 'quran-1', targetNodeId: 'topic-opening-supplication', relationType: 'explains', priority: 2, confidence: 1, createdAt: now, updatedAt: now },
-      { sourceNodeId: 'quran-1', targetNodeId: 'place-mecca', relationType: 'location', priority: 1, confidence: 1, createdAt: now, updatedAt: now },
-      { sourceNodeId: 'quran-1', targetNodeId: 'hadith-sahih-bukhari-756', relationType: 'related', priority: 1, confidence: 0.9, createdAt: now, updatedAt: now },
-      { sourceNodeId: 'quran-1', targetNodeId: 'theme-guidance', relationType: 'mentions', priority: 3, confidence: 1, createdAt: now, updatedAt: now },
-      { sourceNodeId: 'quran-1', targetNodeId: 'theme-worship', relationType: 'mentions', priority: 3, confidence: 1, createdAt: now, updatedAt: now },
-      { sourceNodeId: 'topic-prayer', targetNodeId: 'topic-opening-supplication', relationType: 'related', priority: 1, confidence: 0.9, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'quran:surah:1', targetNodeId: 'topic:prayer', relationType: 'supports', priority: 1, confidence: 1, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'quran:surah:1', targetNodeId: 'topic:opening-supplication', relationType: 'explains', priority: 2, confidence: 1, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'quran:surah:1', targetNodeId: 'place:makkah', relationType: 'location', priority: 1, confidence: 1, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'quran:surah:1', targetNodeId: 'hadith:bukhari:book:1:hadith:1', relationType: 'related', priority: 1, confidence: 0.9, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'quran:surah:1', targetNodeId: 'concept:guidance', relationType: 'mentions', priority: 3, confidence: 1, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'quran:surah:1', targetNodeId: 'concept:worship', relationType: 'mentions', priority: 3, confidence: 1, createdAt: now, updatedAt: now },
+      { sourceNodeId: 'topic:prayer', targetNodeId: 'topic:opening-supplication', relationType: 'related', priority: 1, confidence: 0.9, createdAt: now, updatedAt: now },
     ];
     seeds.forEach((s, i) => this.registerRelation({ ...s, id: `rel-${i}` }));
   }

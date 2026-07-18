@@ -52,7 +52,7 @@ function SurahPageContent() {
             percentage: 5
           });
           logActivity({
-            id: `quran-${surahNumber}`,
+            id: `quran:surah:${surahNumber}`,
             title: data.englishName || data.name,
             url: `/quran/surah/${surahNumber}`
           });
@@ -89,7 +89,7 @@ function SurahPageContent() {
   if (error) throw error;
   if (!baseSurah || !meta) return <div className="flex justify-center py-24"><Spinner /></div>;
 
-  const nodeId = `quran-${surahNumber}`;
+  const nodeId = `quran:surah:${surahNumber}`;
   
   // Combine Arabic and Translation
   const ayahs = baseSurah.ayahs.map((a: any, idx: number) => ({
