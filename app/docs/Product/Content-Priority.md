@@ -1,27 +1,27 @@
 # Content Priority
 
-ADQ prioritizes future work based on immediate user value, daily utility, and foundational academic importance. Below is the recommended implementation order for future modules under the Product-First strategy.
+ADQ prioritizes future work based on immediate problem-solving value for the everyday Muslim. Rather than a purely academic content-first approach, we focus on building tools and references that answer real questions and assist in daily practice. Below is the recommended implementation order under the Problem-First strategy.
 
-## 1. Primary Sources (Quran & Remaining Hadith)
-**Reasoning:** The absolute foundation of the platform. Completing the remaining Hadith collections establishes the bedrock for every other feature (e.g., pulling exact Adhkar sources, proving Fiqh rulings for calculators, or sourcing timeline events).
+## 1. Daily Worship (Prayer Tools & Adhkar)
+**Reasoning:** High-frequency daily utility. Users face the problem of consistency in worship multiple times a day. Building this creates immediate, repeating value and habituates the user to relying on ADQ.
 
-## 2. Daily Practice (Prayer Tools & Adhkar)
-**Reasoning:** High-frequency daily utility. Users interact with prayer tools and Adhkar multiple times a day. Building this creates immediate, repeating value and habituates the user to relying on ADQ for their daily spiritual life.
+## 2. Islamic Decision Tools (Zakat & Mirath Calculators)
+**Reasoning:** Solves high-complexity pain points. Inheritance (Mirath) and Zakat calculations are famously difficult for laymen to compute manually, often leading to real-world financial and legal confusion. Automating these provides immense, tangible problem-solving value.
 
 ## 3. Astronomy & Time (Hijri, Qibla, Prayer Times)
-**Reasoning:** Closely tied to Daily Practice. Providing accurate offline prayer times and a Qibla compass removes the need for users to rely on multiple third-party apps, centralizing their Islamic utility toolset.
+**Reasoning:** Solves the immediate problem of knowing when and where to pray accurately, removing the need for users to rely on multiple third-party apps and centralizing their Islamic utility toolset.
 
-## 4. Islamic Calculators (Zakat & Mirath)
-**Reasoning:** Solves high-complexity pain points. Inheritance (Mirath) and Zakat calculations are famously difficult for laymen to compute manually. Automating these provides immense, tangible value that sets ADQ apart from standard reader applications.
+## 4. Quran
+**Reasoning:** The absolute foundation of the platform. Required as the primary reference node for all daily worship tools, decision calculators, and FAQs. 
 
-## 5. Visual Learning (Timelines & Maps)
-**Reasoning:** Transforms the platform from a "book reader" into an interactive educational suite. Visualizing the Seerah timeline and geographical maps provides contextual depth to the Primary Sources already ingested in Phase 1.
+## 5. Hadith
+**Reasoning:** Provides the prophetic explanation and context for the Quran and rulings. Completing the remaining Hadith collections establishes the bedrock for pulling exact Adhkar sources, proving Fiqh rulings for calculators, and sourcing timeline events.
 
 ## 6. Knowledge & Understanding (Misconceptions, FAQs)
-**Reasoning:** Essential for outreach and deep study, providing curated answers linked to the primary texts.
+**Reasoning:** Solves the problem of theological doubts and knowledge gaps. Essential for outreach and deep study, providing curated answers linked strictly to the primary texts (Quran and Hadith).
 
-## 7. Tafsir (Exegesis)
-**Reasoning:** Intentionally deprioritized for the immediate term. While incredibly valuable, classical Tafsir requires a fully mature Hadith and Concept graph to be correctly linked. Immediate product value is higher in daily utilities and calculators before committing to the massive undertaking of indexing multi-volume Tafsir works.
+## 7. Visual Learning (Timelines & Maps)
+**Reasoning:** Solves the problem of comprehension barriers in complex subjects like Seerah or Isnad. Visualizing timelines and geographical maps provides contextual depth to the texts.
 
-## 8. Fiqh & Scientific Topics
-**Reasoning:** Highly derived and interpretive. These should only be tackled once the Primary Sources, Calculators, and Visual Learning modules are robust enough to accurately represent complex, multi-layered scholarly debates and modern analysis.
+## 8. Tafsir (Exegesis)
+**Reasoning:** Intentionally deprioritized in the immediate term. While incredibly valuable academically, classical Tafsir requires a fully mature Hadith and Concept graph to be correctly linked. Immediate problem-solving value is higher in daily utilities and calculators.
