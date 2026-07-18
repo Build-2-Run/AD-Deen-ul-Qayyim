@@ -32,7 +32,7 @@ export class PlatformSearch {
     nodes.slice(0, 50).forEach((node: any) => { // limit to 50 results
       results.push({
         id: node.nodeId,
-        title: `Surah ${node.surah} Ayah ${node.ayah}`,
+        title: node.collection ? `${node.collection} ${node.book}:${node.number}` : `Surah ${node.surah} Ayah ${node.ayah}`,
         type: 'node',
         preview: node.english || node.arabic
       });

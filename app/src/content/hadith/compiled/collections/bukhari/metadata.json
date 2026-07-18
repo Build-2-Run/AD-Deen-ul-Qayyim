@@ -1,0 +1,10 @@
+{
+  "id": "bukhari",
+  "name": "Sahih al-Bukhari",
+  "arabicName": "صحيح البخاري",
+  "author": "Imam Muhammad al-Bukhari",
+  "totalHadith": 7563,
+  "description": "The most authentic book of Hadith in Sunni Islam.",
+  "source": "sunnah.com (Sample)",
+  "version": "1.0.0"
+}
