@@ -1,8 +1,10 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Typography } from './Typography';
+import { Retry } from './Retry';
 
 interface Props {
   children?: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
@@ -11,10 +13,7 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
+  public state: State = { hasError: false, error: null };
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -26,20 +25,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      if (this.props.fallback) return this.props.fallback;
       return (
-        <div className="p-8 border border-red-500/30 bg-red-500/10 rounded-xl text-center">
-          <Typography variant="h3" className="text-red-500 mb-2">Unable to load Quran data.</Typography>
-          <Typography variant="body" className="text-tx-secondary mb-4">{this.state.error?.message}</Typography>
-          <button 
-            onClick={() => this.setState({ hasError: false, error: null })}
-            className="px-4 py-2 bg-surface text-tx-primary rounded-lg border border-border hover:bg-surface-elevated transition-colors"
-          >
-            Retry
-          </button>
+        <div className="p-8 border border-red-500/30 bg-red-500/5 rounded-xl text-center mx-auto max-w-lg mt-8" role="alert">
+          <Typography variant="h3" className="text-red-600 dark:text-red-400 mb-2">Something went wrong.</Typography>
+          <Typography variant="body" className="text-gray-600 dark:text-gray-400 mb-6">{this.state.error?.message}</Typography>
+          <Retry onRetry={() => this.setState({ hasError: false, error: null })} />
         </div>
       );
     }
-
     return this.props.children;
   }
 }
