@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { ReaderContext } from './ReaderContext';
 import { ReaderPreferences, defaultPreferences } from '../settings/ReaderSettings';
+import { CacheProvider } from '../cache/CacheProvider';
 
 export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [preferences, setPreferences] = useState<ReaderPreferences>(() => {
     try {
-      const saved = localStorage.getItem('reader_preferences');
-      return saved ? { ...defaultPreferences, ...JSON.parse(saved) } : defaultPreferences;
+      const cache = CacheProvider.getInstance();
+      if (cache.getSync) {
+        const saved = cache.getSync<ReaderPreferences>('reader_preferences');
+        return saved ? { ...defaultPreferences, ...saved } : defaultPreferences;
+      }
+      return defaultPreferences;
     } catch {
       return defaultPreferences;
     }
@@ -18,7 +23,10 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const updatePreferences = (updates: Partial<ReaderPreferences>) => {
     setPreferences(prev => {
       const next = { ...prev, ...updates };
-      localStorage.setItem('reader_preferences', JSON.stringify(next));
+      const cache = CacheProvider.getInstance();
+      if (cache.setSync) {
+        cache.setSync('reader_preferences', next);
+      }
       return next;
     });
   };

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { CacheProvider } from '../../../platform/cache/CacheProvider';
 
 export interface ReadingProgress {
   surahNumber: number;
@@ -31,21 +32,22 @@ export function useQuranExperience() {
   const [activity, setActivity] = useState<RecentActivity[]>([]);
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      try {
-        const data = JSON.parse(raw);
+    const cache = CacheProvider.getInstance();
+    if (cache.getSync) {
+      const data = cache.getSync<any>(STORAGE_KEY);
+      if (data) {
         setProgress(data.progress || null);
         setBookmarks(data.bookmarks || []);
         setActivity(data.activity || []);
-      } catch (e) {
-        console.error('Failed to parse local storage', e);
       }
     }
   }, []);
 
   const saveState = useCallback((p: ReadingProgress | null, b: Bookmark[], a: RecentActivity[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ progress: p, bookmarks: b, activity: a }));
+    const cache = CacheProvider.getInstance();
+    if (cache.setSync) {
+      cache.setSync(STORAGE_KEY, { progress: p, bookmarks: b, activity: a });
+    }
     setProgress(p);
     setBookmarks(b);
     setActivity(a);

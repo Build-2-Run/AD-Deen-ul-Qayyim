@@ -1,9 +1,9 @@
 export interface DatasetMetadata {
-  id: string;
-  version: string;
-  source: string;
-  compiledAt: string;
-  language: string;
+  id?: string;
+  version?: string;
+  source?: string;
+  compiledAt?: string;
+  language?: string;
   surahs?: any[];
 }
 
@@ -16,7 +16,7 @@ export class DatasetRegistry {
   static async loadMetadata(): Promise<DatasetMetadata> {
     if (this.metadataCache) return this.metadataCache;
     // @ts-ignore
-    const meta = (await import('../../../content/quran/compiled/metadata.json')).default;
+    const meta = (await import('../../content/quran/compiled/metadata.json')).default;
     this.metadataCache = meta;
     return meta;
   }
@@ -26,7 +26,7 @@ export class DatasetRegistry {
     if (this.surahCache.has(sNumStr)) return this.surahCache.get(sNumStr);
     
     // Dynamic import allows Vite to chunk each JSON file
-    const surah = (await import(`../../../content/quran/compiled/surahs/${sNumStr}.json`)).default;
+    const surah = (await import(`../../content/quran/compiled/surahs/${sNumStr}.json`)).default;
     this.surahCache.set(sNumStr, surah);
     return surah;
   }
@@ -36,7 +36,7 @@ export class DatasetRegistry {
     const key = `${lang}-${author}-${sNumStr}`;
     if (this.translationCache.has(key)) return this.translationCache.get(key);
     
-    const trans = (await import(`../../../content/quran/compiled/translations/${lang}/${author}/${sNumStr}.json`)).default;
+    const trans = (await import(`../../content/quran/compiled/translations/${lang}/${author}/${sNumStr}.json`)).default;
     this.translationCache.set(key, trans);
     return trans;
   }
@@ -44,7 +44,7 @@ export class DatasetRegistry {
   static async search(query: string): Promise<any[]> {
     if (!this.searchIndexCache) {
       // @ts-ignore
-      this.searchIndexCache = (await import('../../../content/quran/compiled/search-index.json')).default;
+      this.searchIndexCache = (await import('../../content/quran/compiled/search-index.json')).default;
     }
     const q = query.toLowerCase();
     return this.searchIndexCache!.filter((item: any) => 
