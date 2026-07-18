@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '../../../services/validator';
 import { QuranNodeSchema } from '../../../schemas/quran.schema';
-import sampleSurah from '../../../data/quran/sample-surah.json';
+import sampleSurah from '../../../content/quran/sample-surah.json';
 import { KnowledgeService } from '../../knowledge/services/knowledge-service';
 import type { QuranNode } from '../../../types/quran';
 
