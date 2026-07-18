@@ -1,141 +1,54 @@
 # ADQ Product Roadmap v1
 
-This document outlines the long-term product strategy for AD-Deen-ul-Qayyim, organized into five parallel workstreams. The platform has officially transitioned from architecture-driven development to product-driven development.
+This document outlines the long-term product strategy for AD-Deen-ul-Qayyim, shifting from architecture-driven development to a **Product-First Strategy**. The platform is organized into six interconnected product pillars designed to serve the practical, intellectual, and daily needs of Muslims.
 
-## 1. Platform Maintenance
+## 1. Primary Sources (Quran, Hadith)
+**Objectives:** Build the most authentic, cryptographically verifiable, and accessible dataset of core Islamic texts.
+**Scope:** 
+- Complete Quranic text with translations and recitations.
+- Full indexing of the remaining Hadith collections (Kutub al-Sittah and beyond).
+- Granular mapping of chapters, books, and references using Canonical IDs.
+**Dependencies:** `DatasetRegistry`, `RelationService`, and strict `Knowledge-Quality-Standards`.
+**Items Intentionally Postponed:** Tafsir is deprioritized in the immediate term to ensure the foundational Arabic texts and translations of Hadith are perfectly mapped first.
 
-**Objectives:**
-- Guarantee the long-term stability, performance, and scaling of the frozen Platform API.
-- Ensure cross-platform reliability for web, progressive web app (PWA), and mobile environments.
-
+## 2. Daily Practice (Salah, Adhkar, Ramadan, Prayer Tools)
+**Objectives:** Provide frictionless tools for daily worship and remembrance.
 **Scope:**
-- Performance optimization (lazy loading, worker-based search, IndexedDB index scaling).
-- Bug fixes and technical debt resolution for the reader layout and offline caching.
-- Security and dependency updates.
+- Contextual Adhkar (Morning/Evening supplications) linked to their source Hadiths.
+- Ramadan tracking and fasting guidelines.
+- Dynamic Salah trackers and daily worship checklists.
+**Dependencies:** Local device storage (IndexedDB) for privacy-preserving user data.
+**Items Intentionally Postponed:** Social accountability or public leaderboards; worship tracking remains strictly private.
 
-**Dependencies:**
-- Immutable Platform APIs (DatasetRegistry, RelationService, CacheProvider).
-- Zero feature-to-feature dependencies.
-
-**Quality Standards:**
-- Strict TypeScript compilation with zero errors.
-- Automated architectural dependency tests passing.
-
-**Success Metrics:**
-- Zero regression bugs on core Platform APIs.
-- Sub-50ms node load times regardless of corpus size.
-- 100% offline availability of cached datasets.
-
-**Items Intentionally Postponed:**
-- User accounts and cloud syncing (focus remains on local-first PWA for now).
-- Collaborative study features.
-
----
-
-## 2. Content Acquisition & Verification
-
-**Objectives:**
-- Systematically acquire, normalize, and validate core textual knowledge (Hadith, Tafsir, Seerah).
-- Build the most authentic and cryptographically verifiable Islamic dataset in the world.
-
+## 3. Islamic Calculators (Zakat, Mirath, Fidya, Kaffarah)
+**Objectives:** Automate complex Islamic financial and legal calculations with precision and transparency.
 **Scope:**
-- Importers and Normalizers for primary texts.
-- Translation pipelines for English, Urdu, and other regional languages.
-- Generation of detailed metadata registries for version control.
+- **Zakat:** Multi-asset calculators (gold, silver, fiat, stocks, agriculture).
+- **Mirath (Inheritance):** Advanced family tree calculation engine resolving exact fractional shares according to Fiqh.
+- **Fidya & Kaffarah:** Dynamic calculators for missed fasts or broken oaths based on local fiat values.
+**Dependencies:** Real-time (or cached) gold/silver pricing APIs; standalone deterministic Fiqh logic engines.
 
-**Dependencies:**
-- Requires strict adherence to `Knowledge-Quality-Standards.md` and `Content-Priority.md`.
-
-**Quality Standards:**
-- 100% accurate Canonical IDs.
-- Zero orphaned relations (Target node must exist).
-- Zero duplicated entries.
-
-**Success Metrics:**
-- Ingestion pipelines run flawlessly without manual data wrangling.
-- Number of nodes available in the dataset registry (scaling to millions).
-- 100% of imported data passes the ContentValidator script.
-
-**Items Intentionally Postponed:**
-- Unverified, community-sourced content. All datasets must be heavily vetted first-party datasets.
-- Weak/Da'if hadith variants unless explicitly required for academic Tafsir relationships.
-
----
-
-## 3. Knowledge Graph Expansion
-
-**Objectives:**
-- Map the intricate, multifaceted relationships between texts to form a unified graph.
-- Create an ontology of concepts, themes, places, and people.
-
+## 4. Knowledge & Understanding (Islam and Science, Misconceptions, FAQs)
+**Objectives:** Address contemporary questions and provide thematic knowledge exploration.
 **Scope:**
-- Linking Ayahs to Hadiths (Tafsir bil-Mathur).
-- Linking texts to taxonomy domains (`topic:`, `place:`, `person:`, `concept:`).
-- Generating visual knowledge exploration paths.
+- Curated responses to common misconceptions with direct citations to Primary Sources.
+- Thematic grouping of verses and Hadiths concerning Science, Ethics, and Society.
+- FAQ knowledge bases for new Muslims or researchers.
+**Dependencies:** `RelationService` to map thematic nodes (`concept:`) to source texts.
 
-**Dependencies:**
-- Depends directly on the `RelationService` and normalized content from Workstream 2.
-
-**Quality Standards:**
-- Graph connections must be historically or academically verifiable.
-- Relations must carry priority, relationType, and confidence metadata.
-
-**Success Metrics:**
-- Ratio of connected nodes vs isolated nodes.
-- High average "depth" of graph traversal paths available to a user.
-
-**Items Intentionally Postponed:**
-- Automated relation generation without human review.
-
----
-
-## 4. Learning Experience
-
-**Objectives:**
-- Deliver a deeply immersive, highly customizable, distraction-free reading and study experience.
-
+## 5. Astronomy & Time (Hijri Calendar, Moon Phases, Prayer Time Calculations, Qibla, Eclipses)
+**Objectives:** Provide hyper-accurate astronomical tools deeply integrated with Islamic jurisprudence.
 **Scope:**
-- Reader typography, layout, and localization (RTL).
-- Personal study tools: Highlighting, note-taking, and bookmark collections.
-- Interactive sidebars for relation exploration (Knowledge Explorer).
+- Advanced algorithmic prayer time calculation supporting major global conventions (MWL, ISNA, Umm al-Qura, etc.).
+- Offline-capable Qibla compass using device geolocation and magnetometer.
+- Hijri calendar conversion and moon phase tracking.
+**Dependencies:** Device sensor APIs (Geolocation, DeviceOrientation); astronomical calculation libraries.
 
-**Dependencies:**
-- `StudyService` and `ReaderLayout` platforms.
-
-**Quality Standards:**
-- Fully accessible (ARIA) and WCAG compliant.
-- Mobile-first responsiveness.
-- Frictionless translation switching without page reloads.
-
-**Success Metrics:**
-- User session duration (time spent reading/exploring).
-- Number of notes/bookmarks saved locally.
-
-**Items Intentionally Postponed:**
-- Gamification (badges, streaks, leaderboards) which detract from sincere study.
-
----
-
-## 5. Research & AI
-
-**Objectives:**
-- Augment the student's capability to search and synthesize knowledge without hallucination risks.
-
+## 6. Visual Learning (Illustrations, Timelines, Maps, Diagrams, Interactive Explorers)
+**Objectives:** Make complex historical and legal knowledge visually intuitive.
 **Scope:**
-- Deterministic full-text and semantic search.
-- "AI Tutor" tools that strictly operate on the ADQ canonical dataset using Retrieval-Augmented Generation (RAG).
-
-**Dependencies:**
-- `PlatformSearch` adapters (LocalIndex, Worker, SQLite).
-- High-quality ontology and Knowledge Graph metadata for context ingestion.
-
-**Quality Standards:**
-- AI responses must provide exact citations to Canonical IDs.
-- Zero generative hallucination of primary texts (Arabic must always be deterministic).
-
-**Success Metrics:**
-- Search query success rate (latency and relevance).
-- AI citation accuracy percentage.
-
-**Items Intentionally Postponed:**
-- Unconstrained conversational AI. All AI must be strictly bounded by the curated ADQ dataset.
+- **Timelines:** Interactive Seerah timelines showing Revelation (Asbab al-Nuzul) against historical events.
+- **Maps:** Geographical plotting of Hijrah, battles, and historical sites (`place:`).
+- **Diagrams:** Visual family trees for Mirath, or chain of transmission (Isnad) graphs for Hadith.
+- **Interactive Explorers:** The "Knowledge Explorer" UI for browsing the Relation Engine graph visually.
+**Dependencies:** Specialized Canvas/SVG rendering libraries; `RelationService` for feeding graph data.
