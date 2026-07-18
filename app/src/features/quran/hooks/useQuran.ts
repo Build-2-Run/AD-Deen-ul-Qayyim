@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ValidatorService } from '../../../services/validator';
-import { QuranNodeSchema } from '../../../schemas/quran.schema';
-import sampleSurah from '../../../content/quran/sample-surah.json';
-import { KnowledgeService } from '../../knowledge/services/knowledge-service';
-import type { QuranNode } from '../../../types/quran';
-
-let initialized = false;
+import { DatasetRegistry } from '../../../platform/registry/DatasetRegistry';
 
 export function useQuran() {
-  const [nodes, setNodes] = useState<QuranNode[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [nodes, setNodes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -19,15 +13,13 @@ export function useQuran() {
       setLoading(true);
       setError(null);
       try {
-        if (!initialized) {
-          // Hydrate the universal Knowledge Engine
-          const node = ValidatorService.validate(QuranNodeSchema, sampleSurah);
-          await KnowledgeService.initialize([node]);
-          initialized = true;
-        }
-        
-        if (mounted) {
-          setNodes(KnowledgeService.searchNodes(searchQuery) as QuranNode[]);
+        if (searchQuery.length >= 3) {
+          const results = await DatasetRegistry.search(searchQuery);
+          if (mounted) {
+            setNodes(results);
+          }
+        } else {
+          if (mounted) setNodes([]);
         }
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err : new Error('Unknown error'));

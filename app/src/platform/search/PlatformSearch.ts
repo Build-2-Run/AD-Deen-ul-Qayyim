@@ -18,33 +18,23 @@ export class PlatformSearch {
     // Search Notes
     const notes = await StudyService.searchNotes(lowerQuery);
     notes.forEach(note => {
-      results.push({
-        id: note.id,
-        title: note.title || 'Untitled Note',
-        type: 'note',
-        preview: note.content.substring(0, 100) + '...'
-      });
+      results.push({ id: note.id, title: note.title || 'Untitled Note', type: 'note', preview: note.content.substring(0, 100) + '...' });
     });
 
     // Search Bookmarks
     const bookmarks = await StudyService.searchBookmarks(lowerQuery);
     bookmarks.forEach(bm => {
-      results.push({
-        id: bm.id,
-        title: bm.title,
-        type: 'bookmark'
-      });
+      results.push({ id: bm.id, title: bm.title, type: 'bookmark' });
     });
 
-    // Search Dataset Registry (Nodes)
-    // NOTE: This assumes DatasetRegistry has a synchronous or fast search.
+    // Search Quran Index
     const nodes = await DatasetRegistry.search(lowerQuery);
-    nodes.forEach(node => {
+    nodes.slice(0, 50).forEach((node: any) => { // limit to 50 results
       results.push({
-        id: node.id,
-        title: node.title,
+        id: node.nodeId,
+        title: `Surah ${node.surah} Ayah ${node.ayah}`,
         type: 'node',
-        preview: node.preview
+        preview: node.english || node.arabic
       });
     });
 
