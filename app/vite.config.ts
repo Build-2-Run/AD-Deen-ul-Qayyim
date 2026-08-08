@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
+  base: '/AD-Deen-ul-Qayyim/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
