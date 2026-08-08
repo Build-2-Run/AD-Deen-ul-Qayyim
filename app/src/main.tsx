@@ -19,7 +19,7 @@ import './styles/index.css'
 bootstrap().then(() => {
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
-      <BrowserRouter>
+      <BrowserRouter basename="/AD-Deen-ul-Qayyim/">
         <App />
       </BrowserRouter>
     </React.StrictMode>,
