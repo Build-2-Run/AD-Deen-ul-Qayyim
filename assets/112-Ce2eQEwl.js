@@ -1,0 +1,1 @@
+var e=112,t=`ur`,n=`jalandhry`,r=[{number:1,text:`کہو کہ وہ (ذات پاک جس کا نام) الله (ہے) ایک ہے`},{number:2,text:`معبود برحق جو بےنیاز ہے`},{number:3,text:`نہ کسی کا باپ ہے اور نہ کسی کا بیٹا`},{number:4,text:`اور کوئی اس کا ہمسر نہیں`}],i={surah:112,translation:`ur`,author:n,ayahs:r};export{n as author,r as ayahs,i as default,e as surah,t as translation};

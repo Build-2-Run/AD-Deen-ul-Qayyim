@@ -1,0 +1,1 @@
+var e=108,t=`ur`,n=`jalandhry`,r=[{number:1,text:`(اے محمدﷺ) ہم نے تم کو کوثر عطا فرمائی ہے`},{number:2,text:`تو اپنے پروردگار کے لیے نماز پڑھا کرو اور قربانی دیا کرو`},{number:3,text:`کچھ شک نہیں کہ تمہارا دشمن ہی بےاولاد رہے گا`}],i={surah:108,translation:`ur`,author:n,ayahs:r};export{n as author,r as ayahs,i as default,e as surah,t as translation};

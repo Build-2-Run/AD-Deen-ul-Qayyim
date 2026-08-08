@@ -1,0 +1,1 @@
+var e=103,t=`en`,n=`sahih`,r=[{number:1,text:`By time,`},{number:2,text:`Indeed, mankind is in loss,`},{number:3,text:`Except for those who have believed and done righteous deeds and advised each other to truth and advised each other to patience.`}],i={surah:103,translation:`en`,author:n,ayahs:r};export{n as author,r as ayahs,i as default,e as surah,t as translation};

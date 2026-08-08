@@ -1,0 +1,1 @@
+var e=108,t=`en`,n=`sahih`,r=[{number:1,text:`Indeed, We have granted you, [O Muhammad], al-Kawthar.`},{number:2,text:`So pray to your Lord and sacrifice [to Him alone].`},{number:3,text:`Indeed, your enemy is the one cut off.`}],i={surah:108,translation:`en`,author:n,ayahs:r};export{n as author,r as ayahs,i as default,e as surah,t as translation};

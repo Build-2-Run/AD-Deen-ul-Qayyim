@@ -1,0 +1,1 @@
+var e=103,t=`ur`,n=`jalandhry`,r=[{number:1,text:`عصر کی قسم`},{number:2,text:`کہ انسان نقصان میں ہے`},{number:3,text:`مگر وہ لوگ جو ایمان لائے اور نیک عمل کرتے رہے اور آپس میں حق (بات) کی تلقین اور صبر کی تاکید کرتے رہے`}],i={surah:103,translation:`ur`,author:n,ayahs:r};export{n as author,r as ayahs,i as default,e as surah,t as translation};

@@ -1,0 +1,1 @@
+var e=112,t=`en`,n=`sahih`,r=[{number:1,text:`Say, "He is Allah, [who is] One,`},{number:2,text:`Allah, the Eternal Refuge.`},{number:3,text:`He neither begets nor is born,`},{number:4,text:`Nor is there to Him any equivalent."`}],i={surah:112,translation:`en`,author:n,ayahs:r};export{n as author,r as ayahs,i as default,e as surah,t as translation};
