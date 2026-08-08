@@ -138,7 +138,7 @@ export function SurahReader() {
                   </ReaderHeader>
                   <ReaderContent>
                     {node.nodeNumber && (
-                      <WordByWordBlock surahNumber={surah.number} ayahNumber={node.nodeNumber} />
+                      <WordByWordBlock surahNumber={surah.number} ayahNumber={Number(node.nodeNumber)} />
                     )}
                   </ReaderContent>
                   <ActionBar node={node} />
@@ -149,9 +149,10 @@ export function SurahReader() {
                         <button
                           onClick={() => {
                             const next = expandedAyah === node.nodeNumber ? null : node.nodeNumber;
-                            setExpandedAyah(next);
-                            if (next) {
-                              saveLastRead({ surahNumber: surah.number, surahName: surah.name.transliteration, ayahNumber: next });
+                            const nextAyah = next == null ? null : Number(next);
+                            setExpandedAyah(nextAyah);
+                            if (nextAyah) {
+                              saveLastRead({ surahNumber: surah.number, surahName: surah.name.transliteration, ayahNumber: nextAyah });
                             }
                           }}
                           className="flex items-center gap-2 text-sm text-[#f5c75d] hover:text-white transition-colors font-medium"
@@ -164,8 +165,8 @@ export function SurahReader() {
                         <BookmarkButton
                           surahNumber={surah.number}
                           surahName={surah.name.transliteration}
-                          ayahNumber={node.nodeNumber}
-                          arabicPreview={node.arabicText}
+                          ayahNumber={Number(node.nodeNumber)}
+                          arabicPreview={node.arabicText ?? ''}
                         />
                       </div>
 

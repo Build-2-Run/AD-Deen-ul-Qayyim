@@ -10,7 +10,6 @@ import { QuranSearchProvider } from './services/QuranSearchProvider';
 
 // Lazy load components
 const QuranCollectionView = lazy(() => import('./components/QuranCollectionView').then(m => ({ default: m.QuranCollectionView })));
-const SurahOverview = lazy(() => import('./pages/SurahOverview').then(m => ({ default: m.SurahOverview })));
 const SurahReader = lazy(() => import('./pages/SurahReader').then(m => ({ default: m.SurahReader })));
 
 export const QuranModuleManifest: ModuleManifest = {

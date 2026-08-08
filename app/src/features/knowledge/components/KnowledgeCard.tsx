@@ -9,7 +9,6 @@ import { MarkdownBody } from './MarkdownBody';
 import { Stack } from '../../../design/primitives/Stack';
 import { ArabicText } from '../../../design/typography/ArabicText';
 import { Body } from '../../../design/typography/BasicText';
-import { Flex } from '../../../design/primitives/Flex';
 
 interface KnowledgeCardProps {
   node: KnowledgeNode;

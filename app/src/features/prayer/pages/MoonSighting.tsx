@@ -130,7 +130,6 @@ function MoonScene({
   illum,
   ageDays,
   solarAngleDeg,
-  phaseLabel,
   waxing,
   activeFraction,
   isPreviewing,
@@ -140,7 +139,6 @@ function MoonScene({
   illum: number;
   ageDays: number;
   solarAngleDeg: number | null;
-  phaseLabel: string;
   waxing: boolean;
   activeFraction: number;
   isPreviewing: boolean;
@@ -316,7 +314,6 @@ export function MoonSighting() {
           illum={activeIllum}
           ageDays={activeAgeDays}
           solarAngleDeg={isPreviewing ? null : solarAngleDeg}
-          phaseLabel={activeName}
           waxing={activeWaxing}
           activeFraction={activeFraction}
           isPreviewing={isPreviewing}

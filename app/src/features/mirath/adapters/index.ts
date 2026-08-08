@@ -1,4 +1,4 @@
-import { AnyMirathRule, HeirRule, FixedShareRule, BlockingRule, ResiduaryRule, WorkedExample, MirathFAQ, SpecialCaseRule, MirathGlossaryTerm, RuleRequirement } from '../models';
+import { AnyMirathRule, HeirRule, FixedShareRule, BlockingRule, ResiduaryRule, WorkedExample, MirathFAQ, MirathGlossaryTerm, RuleRequirement } from '../models';
 import { KnowledgeNode, BreadcrumbItem, KnowledgeMetadata } from '../../knowledge/types';
 import { heirRules } from '../mock/rules/heirs';
 

@@ -82,9 +82,19 @@ check('130 → needsVerification', camelZakat(130)?.needsVerification, true);
 check('150 → 3 ḥiqqah (flagged)', camelZakat(150)?.inKind, '3 ḥiqqah');
 
 console.log('\n=== Agriculture ===');
-check('652 kg → below nisab', agricultureZakat([{ cropName: 'Wheat', quantityKg: 652, irrigatedByEffort: false }]).length, 0);
-check('653 kg rain-fed → 65.3 kg', agricultureZakat([{ cropName: 'Wheat', quantityKg: 653, irrigatedByEffort: false }])[0]?.inKind, '65.3 kg');
-check('1000 kg irrigated → 50 kg', agricultureZakat([{ cropName: 'Dates', quantityKg: 1000, irrigatedByEffort: true }])[0]?.inKind, '50 kg');
+const grainHarvest = (cropName: string, quantity: number, irrigatedByEffort: boolean) => ({
+  cropName,
+  category: 'grain' as const,
+  fiqhSchool: 'jumhur' as const,
+  unit: 'kg' as const,
+  quantity,
+  bagWeightKg: 0,
+  pricePerUnit: 0,
+  irrigatedByEffort,
+});
+check('652 kg → below nisab', agricultureZakat([grainHarvest('Wheat', 652, false)]).length, 0);
+check('653 kg rain-fed → 65.3 kg', agricultureZakat([grainHarvest('Wheat', 653, false)])[0]?.inKind, '65.3 kg');
+check('1000 kg irrigated → 50 kg', agricultureZakat([grainHarvest('Dates', 1000, true)])[0]?.inKind, '50 kg');
 
 console.log(`\n=== Summary: ${passed} Passed, ${failed} Failed ===`);
 if (failed > 0) {

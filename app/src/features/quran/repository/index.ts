@@ -51,7 +51,7 @@ class QuranRepositoryImpl implements IQuranRepository {
           english: `Surah ${number}`,
           transliteration: `Surah ${number}`
         },
-        revelation: { type: 'Meccan' },
+        revelation: { type: 'Meccan', order: 1 },
         ayahCount: 7,
         ayahs: []
       };

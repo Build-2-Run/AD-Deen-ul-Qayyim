@@ -89,8 +89,7 @@ const landFeature = feature(
   landTopology as unknown as Topology<{ land: GeometryCollection }>,
   (landTopology as unknown as Topology<{ land: GeometryCollection }>).objects.land,
 );
-const landGeometries =
-  landFeature.type === 'FeatureCollection' ? landFeature.features.map((f) => f.geometry) : [landFeature.geometry];
+const landGeometries = landFeature.features.map((f) => f.geometry);
 
 /** SVG path `d` for every polygon ring in the real coastline data, projected via projectLatLon. */
 const WORLD_LAND_PATH = landGeometries
@@ -111,7 +110,7 @@ const WORLD_LAND_PATH = landGeometries
   .join(' ');
 
 /** 240×240 3D gold compass dial: tick ring, degree numbers, cardinal labels, and a live Qibla needle. */
-function CompassDial({ azimuth, heading, facing }: { azimuth: number; heading: number | null; facing: boolean }) {
+function CompassDial({ azimuth, heading }: { azimuth: number; heading: number | null }) {
   const cx = 120, cy = 120, outerR = 108, innerR = 88;
   const roseRotation = heading == null ? 0 : -heading;
 
@@ -225,7 +224,7 @@ function CompassDial({ azimuth, heading, facing }: { azimuth: number; heading: n
 }
 
 /** Equirectangular world map with landmass vector outlines and glowing Great Circle arc. */
-function WorldArcMap({ locationName, lat, lon, azimuth }: { locationName: string; lat: number; lon: number; azimuth: number }) {
+function WorldArcMap({ locationName, lat, lon }: { locationName: string; lat: number; lon: number }) {
   const userPt = projectLatLon(lat, lon);
   const kaabaPt = projectLatLon(KAABA.latitude, KAABA.longitude);
 
@@ -486,12 +485,11 @@ export function QiblaDirection() {
 
         {/* Dual panel: compass dial + world map arc */}
         <div className="flex flex-col md:flex-row gap-5 items-center" style={GLASS_CARD_STYLE}>
-          <CompassDial azimuth={azimuth} heading={heading} facing={facing} />
+          <CompassDial azimuth={azimuth} heading={heading} />
           <WorldArcMap
             locationName={currentLoc.name}
             lat={currentLoc.coordinates.latitude}
             lon={currentLoc.coordinates.longitude}
-            azimuth={azimuth}
           />
         </div>
 

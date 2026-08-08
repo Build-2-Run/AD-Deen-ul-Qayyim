@@ -1,12 +1,8 @@
 import { useState, useMemo } from 'react';
 import { PageContainer, ContentContainer } from '../../../design/layout/Containers';
-import { Heading } from '../../../design/typography/Heading';
-import { Body } from '../../../design/typography/BasicText';
 import { KnowledgeCollection } from '../../knowledge/components/KnowledgeCollection';
 import { useQuranList } from '../hooks/useQuran';
-import { QuranAdapter } from '../adapters';
 import { Icon } from '../../../design/icons/Icon';
-import { KnowledgeNode } from '../../knowledge/types';
 import { ContinueReadingBanner } from './ContinueReadingBanner';
 import { useJuzList } from '../hooks/useJuzList';
 
