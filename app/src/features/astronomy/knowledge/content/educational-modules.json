@@ -1,0 +1,50 @@
+[
+  {
+    "id": "module-prayer-sun",
+    "title": {
+      "en": "Prayer & Solar Motion",
+      "ur": "نماز اور شمسی گردش"
+    },
+    "description": {
+      "en": "Explore how the five daily prayer times correspond to solar elevation and atmospheric depression angles."
+    },
+    "category": "PrayerTimes",
+    "levels": {
+      "Beginner": {
+        "en": "Learn that Fajr starts at dawn, Dhuhr at solar noon, Asr in late afternoon, Maghrib at sunset, and Isha at nightfall."
+      },
+      "Intermediate": {
+        "en": "Understand solar depression angles: Fajr (-18° or -15°), Isha (-17° or -18°), and Shadow length ratio for Asr (1x or 2x)."
+      },
+      "Advanced": {
+        "en": "Study high-latitude approximations (Nearest Latitude, Middle of Night, Seventh of Night) when twilight persists all night."
+      }
+    },
+    "relatedCitations": ["quran-36-38", "hadith-bukhari-521"],
+    "relatedAstronomers": ["ibn-al-shatir", "al-battani"]
+  },
+  {
+    "id": "module-moon-hijri",
+    "title": {
+      "en": "Moon Phases & The Hijri Calendar",
+      "ur": "قمر اور ہجری تقویم"
+    },
+    "description": {
+      "en": "Understand synodic lunation cycles, conjunctions, Danjon limits, and crescent visibility criteria."
+    },
+    "category": "HijriCalendar",
+    "levels": {
+      "Beginner": {
+        "en": "Learn how the moon changes shape every 29.5 days and why the Hijri year is 11 days shorter than the solar year."
+      },
+      "Intermediate": {
+        "en": "Understand astronomical new moon (conjunction) vs hilal crescent visibility."
+      },
+      "Advanced": {
+        "en": "Study Yallop ($q$-parameter), Odeh ($V$-parameter), and Bruin visibility contrast equations."
+      }
+    },
+    "relatedCitations": ["quran-36-39", "quran-2-189", "hadith-bukhari-1907"],
+    "relatedAstronomers": ["al-biruni", "ibn-yunus", "ulugh-beg"]
+  }
+]

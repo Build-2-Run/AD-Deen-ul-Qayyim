@@ -1,0 +1,21 @@
+{
+  "authorityId": "UmmAlQura",
+  "authorityName": "Umm al-Qura Calendar",
+  "country": "Saudi Arabia",
+  "website": "https://www.ummulqura.org.sa/",
+  "officialReference": "Royal Decree No. 202 (1419 AH revision)",
+  "version": "1447.1",
+  "effectiveFrom": "1420-01-01",
+  "effectiveTo": "2099-12-31",
+  "sourceDocument": "Official Umm al-Qura Astronomical Criteria Specification",
+  "referenceLocation": {
+    "name": "Makkah Al-Mukarramah",
+    "latitude": 21.422487,
+    "longitude": 39.826206,
+    "timezone": "Asia/Riyadh"
+  },
+  "rules": {
+    "conjunctionBeforeSunsetInMakkah": true,
+    "moonsetAfterSunsetInMakkah": true
+  }
+}

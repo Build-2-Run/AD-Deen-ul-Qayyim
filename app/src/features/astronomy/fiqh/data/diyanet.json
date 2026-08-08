@@ -1,0 +1,16 @@
+{
+  "authorityId": "Diyanet",
+  "authorityName": "Turkish Diyanet (Presidency of Religious Affairs)",
+  "country": "Türkiye",
+  "website": "https://diyanet.gov.tr/",
+  "officialReference": "International Hijri Calendar Unity Congress (Istanbul 2016)",
+  "version": "2026.1",
+  "effectiveFrom": "2016-05-30",
+  "effectiveTo": "2050-12-31",
+  "sourceDocument": "Unified International Hijri Calendar Criteria (Istanbul Resolution)",
+  "rules": {
+    "globalVisibilityRequired": true,
+    "minElongationDegrees": 8.0,
+    "minAltitudeDegrees": 5.0
+  }
+}

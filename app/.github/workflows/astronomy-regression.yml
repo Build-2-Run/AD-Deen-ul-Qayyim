@@ -1,0 +1,41 @@
+name: Astronomy Engine Scientific Validation & Regression
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/features/astronomy/**'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/features/astronomy/**'
+
+jobs:
+  scientific-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'app/package-lock.json'
+
+      - name: Install Dependencies
+        run: |
+          cd app
+          npm ci
+
+      - name: Run Astronomy Engine Unit & Validation Tests
+        run: |
+          cd app
+          npx vitest run src/features/astronomy/engine/__tests__
+
+      - name: Run Application Build
+        run: |
+          cd app
+          npm run build

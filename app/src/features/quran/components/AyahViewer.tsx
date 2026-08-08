@@ -1,5 +1,5 @@
 import { AyahCard } from './AyahCard';
-import { Stack } from '../../../components/layout/Stack';
+import { Stack } from '../../../design/primitives/Stack';
 
 interface AyahViewerProps {
   surahNumber: number;
@@ -8,7 +8,7 @@ interface AyahViewerProps {
 
 export function AyahViewer({ surahNumber, ayahs }: AyahViewerProps) {
   return (
-    <Stack spacing={4}>
+    <Stack space={4} className="h-full">
       {ayahs.map((ayah) => (
         <AyahCard key={ayah.number} surahNumber={surahNumber} ayahNumber={ayah.number} arabic={ayah.arabic} translation={ayah.translation} />
       ))}

@@ -1,41 +1,44 @@
 import { useState, useEffect } from 'react';
-import { DatasetRegistry } from '../../../platform/registry/DatasetRegistry';
+import { QuranRepository } from '../repository';
+import { Surah } from '../models';
 
-export function useQuran() {
-  const [nodes, setNodes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+export function useQuranList() {
+  const [surahs, setSurahs] = useState<Omit<Surah, 'ayahs'>[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    QuranRepository.getSurahs().then(data => {
+      setSurahs(data);
+      setLoading(false);
+    });
+  }, []);
+
+  return { surahs, loading };
+}
+
+export function useSurah(surahNumber: number) {
+  const [surah, setSurah] = useState<Surah | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     let mounted = true;
-    const fetchNodes = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        if (searchQuery.length >= 3) {
-          const results = await DatasetRegistry.search(searchQuery);
-          if (mounted) {
-            setNodes(results);
-          }
-        } else {
-          if (mounted) setNodes([]);
+    setLoading(true);
+    QuranRepository.getSurah(surahNumber)
+      .then(data => {
+        if (mounted) {
+          setSurah(data);
+          setLoading(false);
         }
-      } catch (err) {
-        if (mounted) setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    fetchNodes();
+      })
+      .catch(err => {
+        if (mounted) {
+          setError(err);
+          setLoading(false);
+        }
+      });
     return () => { mounted = false; };
-  }, [searchQuery]);
+  }, [surahNumber]);
 
-  return { 
-    nodes, 
-    loading, 
-    error,
-    searchQuery,
-    setSearchQuery
-  };
+  return { surah, loading, error };
 }

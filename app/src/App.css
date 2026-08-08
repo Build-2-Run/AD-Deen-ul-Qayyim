@@ -1,3 +1,12 @@
+/* ── Hide native scrollbar globally (premium dark UI) ── */
+* {
+  -ms-overflow-style: none;   /* IE / Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+*::-webkit-scrollbar {
+  display: none;              /* Chrome / Safari / Opera */
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

@@ -1,0 +1,15 @@
+{
+  "authorityId": "MoonsightingCommittee",
+  "authorityName": "Moonsighting Committee Worldwide",
+  "country": "Global",
+  "website": "http://www.moonsighting.com/",
+  "officialReference": "Global Naked-Eye / Telescope Sighting Verification Policy",
+  "version": "2026.1",
+  "effectiveFrom": "2000-01-01",
+  "effectiveTo": "2050-12-31",
+  "sourceDocument": "Crescent Sighting Verification Matrix & Yallop/Odeh Criteria Integration",
+  "rules": {
+    "nakedEyeOrOpticalSightingRequired": true,
+    "yallopCategoriesAllowed": ["A", "B", "C"]
+  }
+}

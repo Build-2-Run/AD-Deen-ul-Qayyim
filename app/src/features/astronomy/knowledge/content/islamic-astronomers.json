@@ -1,0 +1,121 @@
+[
+  {
+    "id": "al-battani",
+    "name": "Al-Battani (Albatenius)",
+    "arabicName": "محمد بن جابر بن سنان البتاني",
+    "eraYears": "858–929 CE",
+    "location": "Raqqa, Syria",
+    "biography": {
+      "en": "Al-Battani was a premier Islamic astronomer and mathematician who refined solar and lunar measurements and discovered the movement of the Sun's apogee."
+    },
+    "contributions": [
+      { "en": "Determined the solar year to be 365 days, 5 hours, 46 minutes, and 24 seconds (accurate to within 2 minutes)." }
+    ],
+    "discoveries": [
+      { "en": "Discovered the secular variation of the eccentricity of the Earth's orbit and precession of equinoxes." }
+    ],
+    "majorWorks": ["Kitāb az-Zīj as-Ṣābī"]
+  },
+  {
+    "id": "al-biruni",
+    "name": "Al-Biruni",
+    "arabicName": "أبو الريحان البيروني",
+    "eraYears": "973–1048 CE",
+    "location": "Khwarazm / Ghazni",
+    "biography": {
+      "en": "Polymath and astronomer who calculated Earth's radius using trigonometric geodesy at Fort Nandana with unprecedented precision."
+    },
+    "contributions": [
+      { "en": "Calculated Earth's radius as 6,339.6 km (within 1% of modern WGS84 radius of 6,371 km)." }
+    ],
+    "discoveries": [
+      { "en": "First to hypothesize that Earth rotates around its axis and proposed heliocentric planetary models." }
+    ],
+    "majorWorks": ["Al-Qanun al-Mas'udi", "Tahdid Nihayat al-Amakin"]
+  },
+  {
+    "id": "ibn-al-shatir",
+    "name": "Ibn al-Shatir",
+    "arabicName": "ابن الشاطر الدمشقي",
+    "eraYears": "1304–1375 CE",
+    "location": "Damascus, Syria",
+    "biography": {
+      "en": "Chief timekeeper (Muwaqqit) of the Umayyad Mosque in Damascus whose non-Ptolemaic lunar and planetary models directly influenced Copernicus."
+    },
+    "contributions": [
+      { "en": "Eliminated the Ptolemaic equant by introducing epicyclic epicycles." }
+    ],
+    "discoveries": [
+      { "en": "Formulated the mathematical planetary models later used identical in Copernicus's De revolutionibus." }
+    ],
+    "majorWorks": ["Nihayat al-Sul fi Tashih al-Usul"]
+  },
+  {
+    "id": "ibn-yunus",
+    "name": "Ibn Yunus",
+    "arabicName": "ابن يونس المصري",
+    "eraYears": "950–1009 CE",
+    "location": "Cairo, Egypt",
+    "biography": {
+      "en": "Fatimid astronomer and mathematician known for his massive astronomical handbook Al-Zij al-Kabir al-Hakimi."
+    },
+    "contributions": [
+      { "en": "Recorded forty solar and lunar eclipses with high precision used centuries later by Simon Newcomb." }
+    ],
+    "discoveries": [
+      { "en": "Discovered prosthetic trigonometric formulas before logarithms were invented." }
+    ],
+    "majorWorks": ["Al-Zij al-Kabir al-Hakimi"]
+  },
+  {
+    "id": "al-tusi",
+    "name": "Nasir al-Din al-Tusi",
+    "arabicName": "نصير الدين الطوسي",
+    "eraYears": "1201–1274 CE",
+    "location": "Maragheh Observatory, Iran",
+    "biography": {
+      "en": "Director of the Maragheh Observatory who invented the Tusi Couple mechanism."
+    },
+    "contributions": [
+      { "en": "Invented the Tusi couple to resolve linear motion from circular motion." }
+    ],
+    "discoveries": [
+      { "en": "Created the first non-Ptolemaic planetary model system." }
+    ],
+    "majorWorks": ["Al-Tadhkirah fi 'Ilm al-Hay'ah"]
+  },
+  {
+    "id": "al-farghani",
+    "name": "Al-Farghani (Alfraganus)",
+    "arabicName": "أبو العباس أحمد بن محمد بن كثير الفرغاني",
+    "eraYears": "800–870 CE",
+    "location": "Baghdad, Iraq",
+    "biography": {
+      "en": "Abbasid astronomer involved in measuring the length of a terrestrial degree along the Tigris plain."
+    },
+    "contributions": [
+      { "en": "Wrote Elements of Astronomy which was the standard European textbook for 500 years." }
+    ],
+    "discoveries": [
+      { "en": "Calculated axial tilt as 23° 33'." }
+    ],
+    "majorWorks": ["Jawami' 'Ilm al-Nujum"]
+  },
+  {
+    "id": "ulugh-beg",
+    "name": "Ulugh Beg",
+    "arabicName": "ألوغ بك",
+    "eraYears": "1394–1449 CE",
+    "location": "Samarkand, Uzbekistan",
+    "biography": {
+      "en": "Sultan and astronomer who built the massive Samarkand Observatory and compiled the Zij-i Sultani star catalogue."
+    },
+    "contributions": [
+      { "en": "Catalogued 1,018 stars with minimal error using his 36-meter meridian arc." }
+    ],
+    "discoveries": [
+      { "en": "Determined tropical year length as 365d 5h 49m 15s (error +25s)." }
+    ],
+    "majorWorks": ["Zij-i Sultani"]
+  }
+]

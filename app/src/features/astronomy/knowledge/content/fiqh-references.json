@@ -1,0 +1,20 @@
+[
+  {
+    "scholarName": "Imam Al-Nawawi",
+    "era": "631–676 AH (1233–1277 CE)",
+    "bookTitle": "Al-Majmu' Sharh al-Muhadhdhab",
+    "quote": {
+      "en": "The beginning of Dhuhr prayer by consensus of scholars is when the Sun passes the zenith toward the west.",
+      "ur": "علماء کے اجماع کے مطابق ظہر کا وقت سورج کے زوال (نصف النہار سے مغرب کی طرف ڈھلنے) سے شروع ہوتا ہے۔"
+    }
+  },
+  {
+    "scholarName": "Ibn Taymiyyah",
+    "era": "661–728 AH (1263–1328 CE)",
+    "bookTitle": "Majmu' al-Fatawa",
+    "quote": {
+      "en": "Astronomical calculations indicate when the crescent moon is physically formed, while visibility determines the legal month start.",
+      "ur": "فلکیاتی حساب سے چاند کی پیدائش کا وقت معلوم ہوتا ہے، جبکہ چاند کا شرعی دخول رؤیت پر موقوف ہے۔"
+    }
+  }
+]

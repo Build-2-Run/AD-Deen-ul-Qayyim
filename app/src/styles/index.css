@@ -1,53 +1,600 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: var(--gold);
-  --color-secondary: var(--bg-secondary);
-  --color-accent: var(--gold-light);
-  --color-background: var(--bg-primary);
-  --color-surface: var(--bg-card);
-  --color-surface-elevated: var(--bg-card-hover);
+  /* Semantic Colors */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-surface: var(--surface);
+  --color-background: var(--background);
   --color-border: var(--border);
-
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  
   --color-tx-primary: var(--text-primary);
   --color-tx-secondary: var(--text-secondary);
 
-  --font-display: 'Outfit', sans-serif;
-  --font-heading: 'Outfit', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-arabic: 'Amiri', serif;
+  /* Typography Font Tokens */
+  --font-display: var(--font-display-family);
+  --font-heading: var(--font-heading-family);
+  --font-body: var(--font-body-family);
+  --font-arabic: var(--font-arabic-family);
 
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-glass: 0 0 35px rgba(224, 169, 34, 0.18);
+  /* Elevation/Shadows — soft & diffused (calm principle; no glow) */
+  --shadow-low: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-high: 0 12px 32px rgba(0, 0, 0, 0.12);
+  /* deprecated: 'glass' was a gold glow (contradicts "calm, never distracting"); now a calm high shadow */
+  --shadow-glass: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+  /* Motion Tokens (Tailwind v4 allows custom transition timings if configured in plugins, 
+     but we can just use variables for generic CSS usage or custom utilities) */
 }
 
 @layer base {
   :root {
-    --bg-primary: #f8fafc;
-    --bg-secondary: #ffffff;
-    --bg-card: rgba(255, 255, 255, 0.8);
-    --bg-card-hover: rgba(255, 255, 255, 1);
-    --gold: #c98a1a;
-    --gold-light: #dfa032;
+    --primary: #047857;            /* Emerald 700 — brand & primary actions (white text passes AA) */
+    --primary-foreground: #ffffff; /* text/icon color on --primary */
+    --surface: #ffffff;
+    --background: #f8fafc;
+    --border: rgba(0, 0, 0, 0.1);
+    --accent: #dfa032;             /* Gold/brass — accent & emphasis (large text/icons/borders only) */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+
     --text-primary: #0f172a;
     --text-secondary: #475569;
-    --border: rgba(0, 0, 0, 0.1);
+
+    --font-display-family: 'Outfit', sans-serif;
+    --font-heading-family: 'Outfit', sans-serif;
+    --font-body-family: 'Inter', sans-serif;
+    --font-arabic-family: 'Amiri', serif;
+    
+    --transition-essential: 150ms ease-out;
+    --transition-helpful: 250ms ease-in-out;
+  }
+
+  /* Allow every page to scroll naturally (no clipped viewport-height traps). */
+  html, body, #root {
+    min-height: 100vh;
+    height: auto !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+  }
+
+  /* ── Hide native scrollbar globally, but keep scrolling functional ── */
+  * {
+    scrollbar-width: none !important;   /* Firefox */
+    -ms-overflow-style: none !important; /* IE / Edge */
+  }
+  *::-webkit-scrollbar {
+    display: none !important;   /* Chrome / Safari / Opera */
+    width: 0 !important;
+    height: 0 !important;
   }
 
   .dark {
-    --bg-primary: #0c101b;
-    --bg-secondary: #101625;
-    --bg-card: rgba(20, 27, 46, 0.45);
-    --bg-card-hover: rgba(26, 36, 61, 0.55);
-    --gold: #e0a922;
-    --gold-light: #f5c75d;
+    --primary: #34d399;            /* Emerald 400 — brighter on dark backgrounds */
+    --primary-foreground: #0c101b; /* dark text on the bright emerald (passes AA) */
+    --surface: #101625;
+    --background: #0c101b;
+    --border: rgba(255, 255, 255, 0.08);
+    --accent: #f5c75d;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --error: #f87171;
+    --info: #60a5fa;
+
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.65);
-    --border: rgba(255, 255, 255, 0.08);
   }
 
   body {
-    background-color: var(--bg-primary);
+    background-color: var(--background);
     color: var(--text-primary);
+    font-family: var(--font-body-family);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
+
+/* ---------------------------------------------------------------------------
+   ADQ premium surface utilities (additive; safe to use anywhere).
+   Soft layered surfaces, depth shadows, subtle gradients, selective blur,
+   and gentle micro-interactions. Introduced with the Zakat premium pass.
+--------------------------------------------------------------------------- */
+@layer components {
+  /* Subtle page tint so elevated white cards read with depth. */
+  .adq-page-bg {
+    background:
+      radial-gradient(80% 60% at 85% -5%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 60%),
+      radial-gradient(70% 55% at 0% 5%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%);
+  }
+  .adq-card {
+    position: relative;
+    background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--surface) 92%, var(--background)));
+    border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+    border-radius: 22px;
+    /* Layered depth: hairline top highlight (light source) + edge definition + lift + ambient. */
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 8px 18px -10px rgba(15, 23, 42, 0.14),
+      0 26px 48px -22px rgba(15, 23, 42, 0.24);
+    transition:
+      transform var(--transition-helpful),
+      box-shadow var(--transition-helpful),
+      border-color var(--transition-helpful);
+  }
+  /* The top highlight line — a light source hitting the card's leading edge. */
+  .adq-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    border-radius: 22px 22px 0 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+    pointer-events: none;
+  }
+  .adq-elevated {
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+      0 4px 10px rgba(15, 23, 42, 0.08),
+      0 34px 70px -24px rgba(15, 23, 42, 0.36);
+  }
+  .adq-hover-lift {
+    transition:
+      transform var(--transition-helpful),
+      box-shadow var(--transition-helpful),
+      filter var(--transition-helpful);
+    will-change: transform;
+  }
+  .adq-hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 6px 14px rgba(15, 23, 42, 0.10),
+      0 28px 56px -16px rgba(15, 23, 42, 0.30);
+  }
+  .adq-hero {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
+    border-radius: 26px;
+    background:
+      radial-gradient(135% 130% at 100% 0%, color-mix(in srgb, var(--primary) 26%, transparent), transparent 56%),
+      radial-gradient(125% 135% at 0% 100%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 52%),
+      var(--surface);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.5) inset,
+      0 4px 12px rgba(15, 23, 42, 0.07),
+      0 34px 74px -26px rgba(15, 23, 42, 0.34);
+  }
+  .adq-glass {
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+  }
+  .adq-btn-primary {
+    background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 58%, var(--accent))) !important;
+    color: var(--primary-foreground) !important;
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.25) inset,
+      0 10px 24px -8px color-mix(in srgb, var(--primary) 55%, transparent);
+  }
+  .adq-btn-primary:hover { filter: brightness(1.06); }
+  .adq-rise {
+    animation: adq-rise 340ms var(--transition-helpful) both;
+  }
+  @keyframes adq-rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  .adq-focus-ring:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+}
+
+.dark .adq-card {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 100%, #ffffff 4%), var(--surface));
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 18px 40px -16px rgba(0, 0, 0, 0.7);
+}
+.dark .adq-card::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+}
+.dark .adq-elevated {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 4px 10px rgba(0, 0, 0, 0.55),
+    0 34px 70px -22px rgba(0, 0, 0, 0.85);
+}
+.dark .adq-hover-lift:hover {
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.55),
+    0 30px 60px -18px rgba(0, 0, 0, 0.9);
+}
+.dark .adq-hero {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 38px 80px -26px rgba(0, 0, 0, 0.85);
+}
+
+/* ---------------------------------------------------------------------------
+   ADQ visual identity — signature hero band, gold accents, geometric motif.
+--------------------------------------------------------------------------- */
+.adq-identity-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background:
+    radial-gradient(120% 100% at 12% 8%, rgba(255, 255, 255, 0.14), transparent 46%),
+    linear-gradient(135deg, #053e2f 0%, #065f46 42%, #047857 74%, #0f766e 100%);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.16) inset,
+    0 30px 70px -28px rgba(4, 120, 87, 0.55),
+    0 10px 24px -10px rgba(0, 0, 0, 0.28);
+}
+/* Leading-edge light line, same trick as the cards but brighter for the dark band. */
+.adq-identity-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  pointer-events: none;
+}
+.adq-kicker { color: #f5c75d; letter-spacing: 0.22em; }
+.adq-arabic-display {
+  font-family: var(--font-arabic-family);
+  color: #f7d081;
+  line-height: 1;
+  /* Double glow: tight warm halo + large diffuse ambient — makes it emit light. */
+  text-shadow:
+    0 0 1px rgba(255, 240, 200, 0.5),
+    0 2px 18px rgba(245, 199, 93, 0.45),
+    0 6px 60px rgba(245, 199, 93, 0.28);
+}
+/* Readable Arabic for reading/reference surfaces (light cards): solid, high-contrast,
+   generous line-height so Qurʾānic diacritics never collide. No glow. */
+.adq-arabic-read {
+  font-family: var(--font-arabic-family);
+  color: var(--text-primary);
+  line-height: 2.2;
+  font-weight: 400;
+  text-shadow: none;
+}
+.adq-btn-gold {
+  background: linear-gradient(135deg, #f5c75d, #dfa032) !important;
+  color: #3a2a06 !important;
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.35) inset,
+    0 12px 26px -8px rgba(223, 160, 50, 0.6);
+  transition: transform var(--transition-helpful), filter var(--transition-helpful), box-shadow var(--transition-helpful);
+}
+.adq-btn-gold:hover { transform: translateY(-2px); filter: brightness(1.04); }
+.adq-eyebrow {
+  color: var(--primary);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------
+   ADQ calculator refinements — step badges, certificate "due" box, evidence
+   document, press states. Theme-aware.
+--------------------------------------------------------------------------- */
+
+/* Step badge — gradient + inner highlight so it reads as a physical button. */
+.adq-step-badge {
+  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 76%, #000000));
+  color: var(--primary-foreground);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+/* Certificate-style "Zakat due" box — the emotional payoff of the flow. */
+.adq-due-box {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 11%, var(--surface)), color-mix(in srgb, var(--primary) 5%, var(--surface)));
+  border: 1px solid color-mix(in srgb, var(--primary) 34%, transparent);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 3px color-mix(in srgb, var(--primary) 8%, transparent),
+    0 10px 26px -8px color-mix(in srgb, var(--primary) 24%, transparent);
+}
+.dark .adq-due-box {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 12px 28px -8px rgba(0, 0, 0, 0.6);
+}
+.adq-due-label {
+  letter-spacing: 0.12em;
+  color: var(--primary);
+}
+.adq-due-amount {
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+/* Upcoming (not-yet-reached) progress steps — visible, not ghostly. */
+.adq-step-upcoming {
+  border: 1.5px solid color-mix(in srgb, var(--text-secondary) 42%, transparent);
+  color: color-mix(in srgb, var(--text-secondary) 90%, transparent);
+}
+.dark .adq-step-upcoming {
+  border-color: rgba(255, 255, 255, 0.24);
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* Hide scrollbars on the progress rail (still scrollable on tiny screens). */
+.adq-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.adq-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   ADQ Astronomy — time-of-day sky hero + prayer timeline.
+--------------------------------------------------------------------------- */
+.adq-sky {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.14) inset,
+    0 30px 70px -28px rgba(0, 0, 0, 0.5),
+    0 10px 24px -10px rgba(0, 0, 0, 0.28);
+}
+.adq-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.30), transparent);
+  pointer-events: none;
+}
+/* Adaptive gradients — the sky shifts with the time of day. */
+.adq-sky-night { background: radial-gradient(120% 120% at 86% -12%, rgba(245, 199, 93, 0.16), transparent 54%), linear-gradient(135deg, #041f1a 0%, #064e3b 55%, #0f172a 100%); }
+.adq-sky-dawn  { background: radial-gradient(120% 120% at 86% -12%, rgba(255, 214, 153, 0.36), transparent 56%), linear-gradient(135deg, #7c2d12 0%, #b45309 42%, #3b3663 100%); }
+.adq-sky-day   { background: radial-gradient(120% 120% at 86% -12%, rgba(255, 255, 255, 0.22), transparent 55%), linear-gradient(135deg, #065f46 0%, #0e7490 55%, #0369a1 100%); }
+.adq-sky-dusk  { background: radial-gradient(120% 120% at 86% -12%, rgba(255, 186, 120, 0.34), transparent 56%), linear-gradient(135deg, #7c2d12 0%, #9a3412 38%, #3b0764 100%); }
+
+.adq-sky-arabic {
+  font-family: var(--font-arabic-family);
+  color: #f7d081;
+  line-height: 1;
+  text-shadow: 0 2px 18px rgba(245, 199, 93, 0.42), 0 6px 48px rgba(245, 199, 93, 0.24);
+}
+
+/* Pulsing "live now" indicators. */
+@keyframes adq-pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.82); } }
+.adq-pulse-dot { animation: adq-pulse-dot 2s ease-in-out infinite; }
+@keyframes adq-ring { 0% { box-shadow: 0 0 0 0 rgba(245, 199, 93, 0.5); } 70% { box-shadow: 0 0 0 9px rgba(245, 199, 93, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 199, 93, 0); } }
+.adq-ring-pulse { animation: adq-ring 2.6s ease-out infinite; }
+
+/* Prayer timeline rows. */
+.adq-prayer-row {
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: 16px;
+  background: var(--surface);
+  transition: transform var(--transition-helpful), box-shadow var(--transition-helpful), border-color var(--transition-helpful);
+}
+.adq-prayer-past { opacity: 0.5; }
+.adq-prayer-current {
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 11%, var(--surface)), var(--surface));
+  box-shadow: 0 8px 22px -12px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+.adq-prayer-next {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 13%, var(--surface)), var(--surface));
+}
+/* Moon-phase card — celestial dark panel between hero and timeline. */
+.adq-moon-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background:
+    radial-gradient(120% 140% at 82% -10%, rgba(245, 199, 93, 0.12), transparent 55%),
+    linear-gradient(160deg, #071a2b 0%, #0b1327 60%, #0a0f1f 100%);
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.6);
+}
+/* The moon disc: lit face + a same-size shadow circle translated across it
+   (classic two-circle terminator). Shift/direction come from real engine data. */
+.adq-moon {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 36% 34%, #f4f7ff 0%, #ccd6ec 68%, #aab6d2 100%);
+  box-shadow: 0 0 26px rgba(214, 226, 255, 0.30), inset 0 0 16px rgba(0, 0, 0, 0.28);
+}
+.adq-moon-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #070c1a;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+  filter: blur(1px);
+  will-change: transform;
+}
+
+/* Range slider — emerald track fill, white thumb (used in method settings). */
+.adq-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+.adq-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #059669;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+.adq-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #059669;
+  cursor: pointer;
+}
+
+/* Brief highlight when jumping to a prayer card from the sun-path diagram. */
+.adq-flash { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 45%, transparent) !important; transition: box-shadow 0.3s ease; }
+
+/* ---- "Tonight's Moon" 3D solar-system scene (pure CSS, self-contained) ---- */
+.adq-space {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: radial-gradient(120% 90% at 50% 120%, #12263f 0%, #0a1424 45%, #05080f 100%);
+}
+@keyframes adq-twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.adq-star { position: absolute; border-radius: 50%; background: #ffffff; animation: adq-twinkle 3.5s ease-in-out infinite; }
+@keyframes adq-sun-pulse {
+  0%, 100% { box-shadow: 0 0 60px rgba(245, 158, 11, 0.8), inset -12px -12px 24px rgba(180, 83, 9, 0.9); }
+  50% { box-shadow: 0 0 84px rgba(245, 158, 11, 0.95), inset -12px -12px 24px rgba(180, 83, 9, 0.9); }
+}
+.adq-sun-3d { border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fffbeb 0%, #fde047 25%, #f59e0b 60%, #b45309 85%, #451a03 100%); animation: adq-sun-pulse 4.5s ease-in-out infinite; }
+.adq-earth-3d { border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 35% 35%, #bfdbfe 0%, #3b82f6 35%, #1d4ed8 70%, #030712 100%); box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), inset -18px -18px 35px rgba(0, 0, 0, 0.9); }
+.adq-orbit-3d { position: absolute; border: 1px dashed rgba(255, 255, 255, 0.18); border-radius: 50%; pointer-events: none; }
+.adq-moon-3d { position: absolute; border-radius: 50%; overflow: hidden; box-shadow: 0 0 14px rgba(226, 232, 255, 0.4); }
+.adq-ray { position: absolute; height: 2px; background: linear-gradient(90deg, rgba(245, 199, 93, 0.6), rgba(245, 199, 93, 0)); }
+
+/* Panoramic orbital canvas container (page-local: MoonSighting only) + floating stats + Earth badge. */
+.adq-orbit-canvas {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #050a14;
+}
+.adq-orbit-stats { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 2; }
+.adq-orbit-stat {
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+}
+.adq-orbit-stat b { color: #ffffff; font-weight: 700; margin-left: 4px; }
+.adq-earth-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(5, 10, 20, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+/* High-res moon centerpiece card (page-local: MoonSighting only). */
+.adq-moon-centerpiece-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  border-radius: 24px;
+  padding: 32px;
+  margin-top: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(12, 18, 32, 0.9);
+}
+.adq-moon-centerpiece-row { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.adq-moon-stat-col { display: flex; flex-direction: column; gap: 12px; flex: 0 0 140px; }
+.adq-moon-stat-box {
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.adq-moon-stat-box .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.5); }
+.adq-moon-stat-box .value { font-size: 16px; font-weight: 700; color: #ffffff; margin-top: 3px; }
+.adq-moon-stat-box .value.gold { color: #f5c75d; }
+.adq-moon-hero {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 auto;
+  background: radial-gradient(circle at 30% 30%, #f8fafc 0%, #cbd5e1 40%, #64748b 70%, #090d16 100%);
+  box-shadow: 0 0 35px rgba(203, 213, 225, 0.4), inset -20px -20px 40px rgba(0, 0, 0, 0.95);
+}
+.adq-range-gold::-webkit-slider-thumb { border-color: #f5c75d; }
+.adq-range-gold::-moz-range-thumb { border-color: #f5c75d; }
+
+/* Asr madhhab toggle pills. */
+.adq-asr-pill {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all var(--transition-essential);
+  cursor: pointer;
+}
+.adq-asr-pill-on { background: color-mix(in srgb, var(--primary) 15%, var(--surface)); color: var(--primary); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 40%, transparent); }
+.adq-asr-pill-off { background: transparent; color: var(--text-secondary); }
+
+/* Evidence panel — mint tint + emerald spine, reads like a document. */
+.adq-evidence {
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  border-left: 3px solid var(--primary);
+  border-radius: 12px;
+}
+
+/* Tactile press states on the primary CTAs. */
+.adq-btn-primary { transition: transform var(--transition-helpful), filter var(--transition-helpful), box-shadow var(--transition-helpful); }
+.adq-btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.adq-btn-gold:active:not(:disabled) { transform: translateY(0) scale(0.98); }

@@ -1,0 +1,14 @@
+{
+  "authorityId": "ISNA",
+  "authorityName": "Islamic Society of North America / Fiqh Council of North America",
+  "country": "USA / Canada",
+  "website": "https://fiqhcouncil.org/",
+  "officialReference": "FCNA Calendar Criterion (2006 Revision)",
+  "version": "2026.1",
+  "effectiveFrom": "2006-01-01",
+  "effectiveTo": "2050-12-31",
+  "sourceDocument": "FCNA Decision on Astronomical Calculation Basis for Islamic Calendar",
+  "rules": {
+    "conjunctionBeforeSunsetInMakkah": true
+  }
+}

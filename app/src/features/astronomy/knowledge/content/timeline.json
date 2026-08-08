@@ -1,0 +1,32 @@
+[
+  {
+    "year": "830 CE",
+    "event": "Caliph Al-Ma'mun builds the Shammasiyya Observatory in Baghdad.",
+    "astronomer": "Al-Farghani & Al-Khwarizmi"
+  },
+  {
+    "year": "900 CE",
+    "event": "Al-Battani compiles Kitab az-Zij as-Sabi refining equinox precession.",
+    "astronomer": "Al-Battani"
+  },
+  {
+    "year": "1020 CE",
+    "event": "Al-Biruni measures Earth radius with 99.7% accuracy at Fort Nandana.",
+    "astronomer": "Al-Biruni"
+  },
+  {
+    "year": "1259 CE",
+    "event": "Maragheh Observatory constructed under Nasir al-Din al-Tusi.",
+    "astronomer": "Al-Tusi"
+  },
+  {
+    "year": "1375 CE",
+    "event": "Ibn al-Shatir completes non-Ptolemaic Damascus planetary model.",
+    "astronomer": "Ibn al-Shatir"
+  },
+  {
+    "year": "1420 CE",
+    "event": "Ulugh Beg constructs Samarkand Observatory 36-meter meridian quadrant.",
+    "astronomer": "Ulugh Beg"
+  }
+]

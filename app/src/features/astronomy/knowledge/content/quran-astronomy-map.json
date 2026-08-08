@@ -1,0 +1,44 @@
+[
+  {
+    "id": "quran-36-38",
+    "source": "Quran",
+    "reference": "Surah Ya-Sin [36:38]",
+    "arabicText": "وَالشَّمْسُ تَجْرِي لِمُسْتَقَرٍّ لَّهَا ۚ ذَٰلِكَ تَقْدِيرُ الْعَزِيزِ الْعَلِيمِ",
+    "translations": {
+      "en": "And the sun runs [on course] toward its stopping point. That is the determination of the Exalted in Might, the Knowing.",
+      "ur": "اور سورج اپنے ٹھکانے کی طرف چلا جا رہا ہے، یہ زبردست دانا کا مقرر کیا ہوا اندازہ ہے۔",
+      "id": "Dan matahari berjalan di tempat peredarannya. Demikianlah ketetapan Yang Mahaperkasa lagi Maha Mengetahui.",
+      "fr": "Et le soleil court vers un gîte qui lui est assigné; telle est la détermination du Tout Puissant, de l'Omniscient."
+    },
+    "authenticity": "Mutawatir",
+    "keywords": ["Sun", "Solar Motion", "Orbit", "Creation"]
+  },
+  {
+    "id": "quran-36-39",
+    "source": "Quran",
+    "reference": "Surah Ya-Sin [36:39]",
+    "arabicText": "وَالْقَمَرَ قَدَّرْنَاهُ مَنَازِلَ حَتَّىٰ عَادَ كَالْعُرْجُونِ الْقَدِيمِ",
+    "translations": {
+      "en": "And the moon - We have determined for it phases, until it returns [appearing] like the old date stalk.",
+      "ur": "اور چاند کے لیے ہم نے منزلیں مقرر کر دی ہیں یہاں تک کہ وہ لوٹ کر پرانی شاخ کی طرح ہو جاتا ہے۔",
+      "id": "Dan telah Kami tetapkan bagi bulan manzilah-manzilah, sehingga (setelah dia sampai ke manzilah yang terakhir) kembalilah dia sebagai bentuk tandan yang tua.",
+      "fr": "Et la lune, Nous lui avons déterminé des phases jusqu'à ce qu'elle devienne comme la palme desséchée."
+    },
+    "authenticity": "Mutawatir",
+    "keywords": ["Moon", "Phases", "Crescent", "Manazil"]
+  },
+  {
+    "id": "quran-2-189",
+    "source": "Quran",
+    "reference": "Surah Al-Baqarah [2:189]",
+    "arabicText": "يَسْأَلُونَكَ عَنِ الْأَهِلَّةِ ۖ قُلْ هِيَ مَوَاقِيتُ لِلنَّاسِ وَالْحَجِّ",
+    "translations": {
+      "en": "They ask you about the new moons. Say, 'They are measurements of time for the people and for Hajj.'",
+      "ur": "لوگ آپ سے نئے چاندوں کے بارے میں پوچھتے ہیں، کہہ دیجیے کہ یہ لوگوں اور حج کے لیے وقت کی علامتیں ہیں۔",
+      "id": "Mereka bertanya kepadamu tentang bulan sabit. Katakanlah: 'Bulan sabit itu adalah tanda-tanda waktu bagi manusia dan (bagi ibadat) haji.'",
+      "fr": "Ils t'interrogent sur les nouvelles lunes. Dis: 'Elles servent aux hommes à meurer le temps, et aussi pour le Hajj.'"
+    },
+    "authenticity": "Mutawatir",
+    "keywords": ["Crescent", "Ahillah", "Calendar", "Hajj", "Timekeeping"]
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "hadith-bukhari-1907",
+    "source": "Hadith",
+    "reference": "Sahih Al-Bukhari 1907",
+    "arabicText": "صُومُوا لِرُؤْيَتِهِ وَأَفْطِرُوا لِرُؤْيَتِهِ، فَإِنْ غُبِّيَ عَلَيْكُمْ فَأَكْمِلُوا عِدَّةَ شَعْبَانَ ثَلَاثِينَ",
+    "translations": {
+      "en": "Fast when you see the crescent moon and break your fast when you see it; and if it be obscured from you, complete thirty days of Sha'ban.",
+      "ur": "چاند دیکھ کر روزے رکھو اور چاند دیکھ کر ہی افطار کرو، اور اگر تم پر بادل چھا جائیں تو شعبان کے تیس دن پورے کرو۔",
+      "id": "Berpuasalah kamu karena melihat hilal dan berbukalah kamu karena melihatnya. Jika hilal tertutup awan atasmu, maka genapkanlah bulan Sya'ban menjadi 30 hari.",
+      "fr": "Jeûnez à la vision du croissant et rompez le jeûne à sa vision; et si le ciel est nuageux, complétez trente jours pour Sha'ban."
+    },
+    "authenticity": "Sahih",
+    "keywords": ["Hilal", "Moonsighting", "Ramadan", "Sha'ban"]
+  },
+  {
+    "id": "hadith-bukhari-521",
+    "source": "Hadith",
+    "reference": "Sahih Al-Bukhari 521",
+    "arabicText": "إِذَا زَالَتِ الشَّمْسُ فَصَلُّوا الظُّهْرَ",
+    "translations": {
+      "en": "When the sun passes its meridian, offer the Dhuhr prayer.",
+      "ur": "جب سورج ڈھل جائے تو ظہر کی نماز پڑھو۔",
+      "id": "Apabila matahari telah tergelincir, maka laksanakanlah shalat Dhuhr.",
+      "fr": "Lorsque le soleil décline du méridien, accomplissez la prière de Dhuhr."
+    },
+    "authenticity": "Sahih",
+    "keywords": ["Dhuhr", "Solar Meridian", "Prayer Times"]
+  }
+]

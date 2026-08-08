@@ -1,0 +1,47 @@
+[
+  {
+    "id": "hilal",
+    "termArabic": "الهلال",
+    "termEnglish": "Crescent Moon (Hilal)",
+    "termUrdu": "ہلال",
+    "termIndonesian": "Hilal",
+    "termFrench": "Croissant de lune",
+    "category": "Astronomy",
+    "scientificDefinition": {
+      "en": "The thin visible illuminated arc of the Moon immediately following conjunction (New Moon) when solar elongation exceeds the Danjon limit."
+    },
+    "islamicContext": {
+      "en": "Marks the official Islamic legal start of a new lunar month (e.g. Ramadan, Shawwal, Dhul Hijjah)."
+    }
+  },
+  {
+    "id": "zawal",
+    "termArabic": "الزوال",
+    "termEnglish": "Solar Meridian Transit (Zawal)",
+    "termUrdu": "زوال",
+    "termIndonesian": "Zawal",
+    "termFrench": "Méridien solaire",
+    "category": "Astronomy",
+    "scientificDefinition": {
+      "en": "The precise instant when the Sun crosses the local observer's celestial meridian at maximum daily altitude."
+    },
+    "islamicContext": {
+      "en": "Marks the end of the prohibition period and the exact beginning of Dhuhr prayer."
+    }
+  },
+  {
+    "id": "shafaq",
+    "termArabic": "الشفق الأحمر والأبيض",
+    "termEnglish": "Twilight (Shafaq)",
+    "termUrdu": "شفق",
+    "termIndonesian": "Syafaq",
+    "termFrench": "Crépuscule",
+    "category": "Astronomy",
+    "scientificDefinition": {
+      "en": "Atmospheric scattering of sunlight after sunset or before sunrise when the Sun is below the horizon."
+    },
+    "islamicContext": {
+      "en": "Red twilight (Shafaq al-Ahmar) marks Maghrib duration; white twilight (Shafaq al-Abyad) marks Isha entry according to Hanafi fiqh."
+    }
+  }
+]
