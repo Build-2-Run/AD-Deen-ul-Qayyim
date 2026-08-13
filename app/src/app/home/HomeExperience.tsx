@@ -170,29 +170,38 @@ export function HomeExperience() {
   return (
     <div style={{ background: '#03070d' }}>
       <style>{`
+        @keyframes borderGlow {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+        @keyframes subtlePulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+        }
         .adq-home-card {
           position: relative;
           overflow: hidden;
           display: block;
-          border-radius: 16px;
-          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 20px;
+          border: 1px solid rgba(212,160,23,0.15);
           text-decoration: none;
-          transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .adq-home-card:hover {
-          transform: translateY(-6px);
-          border-color: rgba(212,160,23,0.3);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212,160,23,0.06);
+          transform: translateY(-8px);
+          border-color: rgba(212,160,23,0.35);
+          box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 48px rgba(212,160,23,0.08);
         }
         .adq-home-card .adq-home-geo {
           opacity: 0;
           transition: opacity 0.22s;
         }
         .adq-home-card:hover .adq-home-geo {
-          opacity: var(--geo-hover-opacity, 0.2);
+          opacity: var(--geo-hover-opacity, 0.25);
         }
         .adq-home-card-quran:hover {
           border-color: rgba(184,134,11,0.3) !important;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.3), 0 0 40px rgba(184,134,11,0.08) !important;
         }
         .adq-home-btn-primary:hover { filter: brightness(1.08); }
         .adq-home-btn-ghost:hover {
@@ -241,18 +250,18 @@ export function HomeExperience() {
           style={{
             position: 'relative',
             zIndex: 4,
-            maxWidth: 680,
+            maxWidth: 780,
             margin: '0 auto',
-            padding: '100px 20px 80px',
+            padding: '120px 48px 100px',
             textAlign: 'center',
           }}
         >
           <p
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 16,
-              color: 'rgba(212,160,23,0.7)',
-              letterSpacing: '0.15em',
+              fontSize: 17,
+              color: 'rgba(212,160,23,0.75)',
+              letterSpacing: '0.18em',
               marginBottom: 16,
             }}
           >
@@ -263,10 +272,10 @@ export function HomeExperience() {
             dir="rtl"
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 56,
+              fontSize: 62,
               fontWeight: 700,
               color: '#d4a017',
-              textShadow: '0 4px 100px rgba(212,160,23,0.5), 0 0 200px rgba(212,160,23,0.15)',
+              textShadow: '0 4px 120px rgba(212,160,23,0.5), 0 0 300px rgba(212,160,23,0.2)',
               marginBottom: 6,
             }}
           >
@@ -277,10 +286,10 @@ export function HomeExperience() {
             dir="rtl"
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 20,
-              color: 'rgba(212,160,23,0.65)',
+              fontSize: 22,
+              color: 'rgba(212,160,23,0.7)',
               textAlign: 'center',
-              lineHeight: 2.2,
+              lineHeight: 2.4,
               maxWidth: 700,
               margin: '0 auto',
             }}
@@ -293,9 +302,9 @@ export function HomeExperience() {
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 15,
+              fontSize: 16,
               fontStyle: 'italic',
-              color: 'rgba(212,160,23,0.45)',
+              color: 'rgba(212,160,23,0.5)',
               textAlign: 'center',
               marginTop: 8,
               marginBottom: 30,
@@ -305,23 +314,24 @@ export function HomeExperience() {
             Ibrahim and upon the family of Ibrahim. Indeed, You are Praiseworthy, Most Glorious.
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', marginTop: 44 }}>
             <Link
               to="/quran"
               className="adq-home-btn-primary"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 18,
+                fontSize: 19,
                 fontWeight: 700,
-                background: '#34d399',
+                letterSpacing: '0.02em',
+                background: 'linear-gradient(135deg, #34d399 0%, #2dd4a8 100%)',
                 color: '#021a0d',
                 border: 'none',
-                padding: '15px 34px',
-                borderRadius: 10,
+                padding: '16px 40px',
+                borderRadius: 12,
                 cursor: 'pointer',
                 textDecoration: 'none',
                 display: 'inline-block',
-                boxShadow: '0 4px 24px rgba(52,211,153,0.25)',
+                boxShadow: '0 6px 30px rgba(52,211,153,0.3), 0 2px 8px rgba(52,211,153,0.2)',
               }}
             >
               Open Qur'an Reader
@@ -331,13 +341,13 @@ export function HomeExperience() {
               className="adq-home-btn-ghost"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 18,
+                fontSize: 19,
                 fontStyle: 'italic',
                 background: 'transparent',
-                border: '1.5px solid rgba(212,160,23,0.25)',
-                color: 'rgba(212,160,23,0.85)',
-                padding: '15px 34px',
-                borderRadius: 10,
+                border: '1.5px solid rgba(212,160,23,0.4)',
+                color: 'rgba(212,160,23,0.9)',
+                padding: '16px 40px',
+                borderRadius: 12,
                 cursor: 'pointer',
                 textDecoration: 'none',
                 display: 'inline-block',
@@ -350,13 +360,13 @@ export function HomeExperience() {
               className="adq-home-btn-ghost"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 18,
+                fontSize: 19,
                 fontStyle: 'italic',
                 background: 'transparent',
-                border: '1.5px solid rgba(212,160,23,0.25)',
-                color: 'rgba(212,160,23,0.85)',
-                padding: '15px 34px',
-                borderRadius: 10,
+                border: '1.5px solid rgba(212,160,23,0.4)',
+                color: 'rgba(212,160,23,0.9)',
+                padding: '16px 40px',
+                borderRadius: 12,
                 cursor: 'pointer',
                 textDecoration: 'none',
                 display: 'inline-block',
@@ -373,15 +383,15 @@ export function HomeExperience() {
       {/* Prayer bar */}
       <div
         style={{
-          background: 'rgba(8,16,24,0.85)',
-          border: '1px solid rgba(52,211,153,0.08)',
-          borderRadius: 16,
-          padding: '18px 28px',
+          background: 'linear-gradient(135deg, rgba(10,20,30,0.9) 0%, rgba(8,16,24,0.95) 100%)',
+          border: '1px solid rgba(52,211,153,0.12)',
+          borderRadius: 20,
+          padding: '22px 32px',
           display: 'flex',
           alignItems: 'center',
           gap: 18,
-          margin: '0 48px 32px',
-          boxShadow: '0 4px 32px rgba(0,0,0,0.3)',
+          margin: '0 48px 12px',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
         <div
@@ -405,18 +415,18 @@ export function HomeExperience() {
                 alignItems: 'center',
                 gap: 2,
                 padding: '6px 8px',
-                borderRadius: 8,
-                background: p.current ? 'rgba(52,211,153,0.1)' : 'transparent',
-                border: p.current ? '1px solid rgba(52,211,153,0.25)' : '1px solid transparent',
-                boxShadow: p.current ? '0 0 20px rgba(52,211,153,0.15)' : 'none',
+                borderRadius: 12,
+                background: p.current ? 'linear-gradient(135deg, rgba(52,211,153,0.15) 0%, rgba(52,211,153,0.08) 100%)' : 'transparent',
+                border: p.current ? '1.5px solid rgba(52,211,153,0.35)' : '1px solid transparent',
+                boxShadow: p.current ? '0 0 24px rgba(52,211,153,0.2), inset 0 1px 0 rgba(52,211,153,0.1)' : 'none',
               }}
             >
               <div
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: p.current ? '#34d399' : 'rgba(180,205,230,0.5)',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: p.current ? '#34d399' : 'rgba(200,215,230,0.55)',
                 }}
               >
                 {p.name}
@@ -424,9 +434,9 @@ export function HomeExperience() {
               <div
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 17,
-                  fontWeight: p.current ? 700 : 600,
-                  color: p.current ? '#ffffff' : 'rgba(220,230,240,0.75)',
+                  fontSize: 20,
+                  fontWeight: p.current ? 800 : 700,
+                  color: p.current ? '#ffffff' : 'rgba(230,240,250,0.85)',
                 }}
               >
                 {p.time}
@@ -435,8 +445,8 @@ export function HomeExperience() {
                 dir="rtl"
                 style={{
                   fontFamily: 'Amiri, serif',
-                  fontSize: 14,
-                  color: p.current ? 'rgba(212,160,23,0.55)' : 'rgba(212,160,23,0.45)',
+                  fontSize: 15,
+                  color: p.current ? 'rgba(212,160,23,0.6)' : 'rgba(212,160,23,0.5)',
                 }}
               >
                 {p.arabic}
@@ -450,24 +460,25 @@ export function HomeExperience() {
       <div
         style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '0 48px', marginBottom: 8,
+          padding: '0 48px', marginBottom: 12,
         }}
       >
-        <span style={{ fontSize: 12, color: 'rgba(180,205,230,0.45)' }}>
+        <span style={{ fontSize: 13, color: 'rgba(180,205,230,0.5)' }}>
           ☀ Sunrise {prayerData.sunriseTime} · Sunset {prayerData.sunsetTime}
         </span>
-        <span style={{ fontFamily: "'Amiri', serif", fontSize: 13, color: 'rgba(212,160,23,0.5)' }}>
+        <span style={{ fontFamily: "'Amiri', serif", fontSize: 14, color: 'rgba(212,160,23,0.5)' }}>
           {prayerData.hijriDate}
         </span>
       </div>
 
       {/* Link to full Salaat page */}
-      <div style={{ textAlign: 'right', padding: '0 48px', marginBottom: 32 }}>
+      <div style={{ textAlign: 'right', padding: '0 48px', marginBottom: 80 }}>
         <Link
           to="/prayer"
           className="adq-home-schedule-link"
           style={{
-            fontSize: 13,
+            fontSize: 14,
+            fontWeight: 500,
             color: '#34d399',
             textDecoration: 'none',
             fontFamily: "'Inter', sans-serif",
@@ -481,24 +492,24 @@ export function HomeExperience() {
       {/* Daily Ayat band */}
       <div
         style={{
-          border: '1px solid rgba(212,160,23,0.15)',
-          borderRadius: 16,
-          padding: '26px 32px',
-          background: 'rgba(212,160,23,0.035)',
-          margin: '0 48px 32px',
+          border: '1px solid rgba(212,160,23,0.18)',
+          borderRadius: 20,
+          padding: '40px 48px',
+          background: 'linear-gradient(135deg, rgba(212,160,23,0.04) 0%, rgba(212,160,23,0.02) 100%)',
+          margin: '0 48px 80px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           gap: 24,
           alignItems: 'center',
-          boxShadow: '0 4px 40px rgba(212,160,23,0.06)',
+          boxShadow: '0 8px 48px rgba(212,160,23,0.06), inset 0 1px 0 rgba(212,160,23,0.08)',
         }}
       >
         <div>
           <div
             style={{
-              fontSize: 12,
-              color: 'rgba(212,160,23,0.55)',
-              letterSpacing: '0.18em',
+              fontSize: 13,
+              color: 'rgba(212,160,23,0.6)',
+              letterSpacing: '0.2em',
               textTransform: 'uppercase',
               marginBottom: 9,
             }}
@@ -508,15 +519,16 @@ export function HomeExperience() {
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 21,
+              fontSize: 24,
               fontStyle: 'italic',
-              fontWeight: 300,
-              color: 'rgba(230,220,200,0.85)',
+              fontWeight: 400,
+              lineHeight: 1.5,
+              color: 'rgba(240,232,216,0.9)',
             }}
           >
             And say: My Lord, increase me in knowledge.
           </p>
-          <p style={{ fontSize: 13, color: 'rgba(212,160,23,0.5)', marginTop: 6 }}>
+          <p style={{ fontSize: 14, color: 'rgba(212,160,23,0.5)', marginTop: 10 }}>
             Qur'an 20:114 · Surah Ta-Ha
           </p>
         </div>
@@ -524,11 +536,11 @@ export function HomeExperience() {
           dir="rtl"
           style={{
             fontFamily: 'Amiri, serif',
-            fontSize: 38,
+            fontSize: 44,
             color: '#d4a017',
             textAlign: 'right',
             whiteSpace: 'nowrap',
-            textShadow: '0 0 40px rgba(212,160,23,0.2)',
+            textShadow: '0 0 60px rgba(212,160,23,0.25)',
           }}
         >
           وَقُل رَّبِّ زِدۡنِی عِلۡمًا
@@ -537,19 +549,19 @@ export function HomeExperience() {
       {/* TODO: wire daily ayat rotation */}
 
       {/* Section divider */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '0 48px', marginBottom: 14 }}>
-        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '0 48px', marginBottom: 24 }}>
+        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
         <div
           style={{
-            fontSize: 12,
-            color: 'rgba(180,205,230,0.35)',
-            letterSpacing: '0.25em',
+            fontSize: 13,
+            color: 'rgba(180,205,230,0.4)',
+            letterSpacing: '0.3em',
             textTransform: 'uppercase',
           }}
         >
           Modules
         </div>
-        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' }} />
+        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.07)' }} />
       </div>
 
       {/* Top row */}
@@ -557,42 +569,42 @@ export function HomeExperience() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 16,
+          gap: 20,
           padding: '0 48px',
-          marginBottom: 16,
+          marginBottom: 20,
         }}
       >
         {/* Card A — Mirath */}
-        <Link to="/mirath" className="adq-home-card" style={{ background: 'linear-gradient(160deg, #080e16 0%, #0a1018 100%)' }}>
+        <Link to="/mirath" className="adq-home-card" style={{ background: 'linear-gradient(160deg, #0a1220 0%, #0c1628 100%)' }}>
           <GeoOverlay patternId="geoA" stroke="#d4a017" />
-          <div style={{ position: 'relative', zIndex: 3, padding: '26px 24px' }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '32px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 22 }}>⚖️</span>
+              <div style={{ width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: 18 }}>⚖️</span>
               </div>
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: '#34d399',
                   border: '1px solid rgba(52,211,153,0.12)',
-                  padding: '4px 12px',
-                  borderRadius: 20,
+                  padding: '5px 14px',
+                  borderRadius: 24,
                 }}
               >
                 ✔ Verified
               </span>
             </div>
-            <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: '#f0e8d0', marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 26, fontWeight: 700, color: '#f4ede0', marginBottom: 8 }}>
               Mirath engine
             </h3>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: 'rgba(180,205,230,0.48)', lineHeight: 1.7, marginBottom: 16 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: 'rgba(180,205,230,0.55)', lineHeight: 1.8, marginBottom: 16 }}>
               Full Islamic inheritance with automatic Ḥajb blocking, 'Awl and Radd across all cases
             </p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 64, fontWeight: 600, color: '#34d399', lineHeight: 1, textShadow: '0 0 40px rgba(52,211,153,0.3)' }}>
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 72, fontWeight: 600, color: '#34d399', lineHeight: 1, textShadow: '0 0 50px rgba(52,211,153,0.35), 0 0 100px rgba(52,211,153,0.15)' }}>
                 205
               </span>
-              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, color: 'rgba(52,211,153,0.6)' }}>
+              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 18, color: 'rgba(52,211,153,0.65)' }}>
                 cases ✓
               </span>
             </div>
@@ -600,16 +612,16 @@ export function HomeExperience() {
         </Link>
 
         {/* Card B — Zakat */}
-        <Link to="/zakat" className="adq-home-card" style={{ background: 'linear-gradient(160deg, #060e0a 0%, #081210 100%)' }}>
+        <Link to="/zakat" className="adq-home-card" style={{ background: 'linear-gradient(160deg, #081210 0%, #0a1816 100%)' }}>
           <GeoOverlay patternId="geoB" stroke="#d4a017" />
-          <div style={{ position: 'relative', zIndex: 3, padding: '26px 24px' }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '32px 28px' }}>
             <div
               dir="rtl"
-              style={{ fontFamily: 'Amiri, serif', fontSize: 30, color: 'rgba(212,160,23,0.8)', textAlign: 'right', marginBottom: 12 }}
+              style={{ fontFamily: 'Amiri, serif', fontSize: 32, color: 'rgba(212,160,23,0.85)', textAlign: 'right', marginBottom: 12 }}
             >
               الزكاة والنصاب
             </div>
-            <div style={{ height: 1, background: 'rgba(212,160,23,0.12)', marginBottom: 4 }} />
+            <div style={{ height: 1, background: 'rgba(212,160,23,0.15)', marginBottom: 4 }} />
             {[
               { label: 'Gold NISAB', value: '87.48g' },
               { label: 'Silver NISAB', value: '595g' },
@@ -622,19 +634,19 @@ export function HomeExperience() {
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  padding: '7px 0',
+                  padding: '9px 0',
                   borderBottom: '1px solid rgba(255,255,255,0.03)',
                 }}
               >
-                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: 'rgba(180,205,230,0.48)' }}>
+                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: 'rgba(180,205,230,0.55)' }}>
                   {row.label}
                 </span>
                 <span
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: row.gold ? '#f0c840' : row.emerald ? '#5eead4' : '#eef2f8',
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: row.gold ? '#f5d050' : row.emerald ? '#5eead4' : '#f0f4f8',
                   }}
                 >
                   {row.value}
@@ -646,14 +658,14 @@ export function HomeExperience() {
         {/* TODO: wire from features/zakat live NISAB engine */}
 
         {/* Card D — Prayer tracker */}
-        <Link to="/prayer" className="adq-home-card" style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <Link to="/prayer" className="adq-home-card" style={{ background: 'rgba(10,18,28,0.9)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
           <GeoOverlay patternId="geoD" stroke="#d4a017" />
-          <div style={{ position: 'relative', zIndex: 3, padding: '26px 24px' }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '32px 28px' }}>
             <div
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: 12,
-                color: 'rgba(180,205,230,0.4)',
+                fontSize: 13,
+                color: 'rgba(180,205,230,0.5)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.16em',
                 marginBottom: 10,
@@ -662,23 +674,23 @@ export function HomeExperience() {
               Prayer tracker — today
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: 4 }}>
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 52, fontWeight: 600, color: '#f0ece4' }}>
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 60, fontWeight: 700, color: '#f0ece4' }}>
                 6
               </span>
-              <span style={{ fontSize: 18, color: 'rgba(52,211,153,0.55)', marginLeft: 5 }}>/ 9</span>
+              <span style={{ fontSize: 22, color: 'rgba(52,211,153,0.55)', marginLeft: 5 }}>/ 9</span>
             </div>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(52,211,153,0.65)', marginTop: 5 }}>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: 'rgba(52,211,153,0.7)', marginTop: 5 }}>
               Asr · next in 2h 13m
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 44, marginTop: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 52, marginTop: 18 }}>
               {TRACKER_BARS.map((h, i) => (
                 <div
                   key={i}
                   style={{
                     flex: 1,
                     height: `${h}%`,
-                    borderRadius: '3px 3px 0 0',
-                    background: i < 6 ? 'rgba(52,211,153,0.55)' : 'rgba(52,211,153,0.14)',
+                    borderRadius: '4px 4px 0 0',
+                    background: i < 6 ? 'rgba(52,211,153,0.6)' : 'rgba(52,211,153,0.15)',
                   }}
                 />
               ))}
@@ -689,14 +701,14 @@ export function HomeExperience() {
       </div>
 
       {/* Full width Qur'an card */}
-      <div style={{ padding: '0 48px', marginBottom: 16 }}>
+      <div style={{ padding: '0 48px', marginBottom: 20 }}>
         <Link
           to="/quran"
           className="adq-home-card adq-home-card-quran"
-          style={{ background: 'linear-gradient(135deg, #f8f3ea 0%, #f0ead8 100%)', borderColor: 'rgba(184,134,11,0.12)', display: 'block', ['--geo-hover-opacity' as string]: 0.3 } as CSSProperties}
+          style={{ background: 'linear-gradient(135deg, #faf5e8 0%, #f2ead4 50%, #f5f0e0 100%)', borderColor: 'rgba(184,134,11,0.15)', borderRadius: 20, display: 'block', ['--geo-hover-opacity' as string]: 0.3 } as CSSProperties}
         >
           <GeoOverlay patternId="geoC" stroke="#b8860b" />
-          <div style={{ position: 'relative', zIndex: 3, padding: '28px 30px' }}>
+          <div style={{ position: 'relative', zIndex: 3, padding: '40px 44px' }}>
             <div
               style={{
                 display: 'grid',
@@ -709,7 +721,7 @@ export function HomeExperience() {
                 <div
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 600,
                     letterSpacing: '0.18em',
                     textTransform: 'uppercase',
@@ -722,27 +734,29 @@ export function HomeExperience() {
                 <h3
                   style={{
                     fontFamily: "'DM Serif Display', serif",
-                    fontSize: 28,
-                    color: '#0a0a0a',
-                    lineHeight: 1.2,
+                    fontSize: 32,
+                    fontWeight: 700,
+                    color: '#080808',
+                    lineHeight: 1.15,
+                    letterSpacing: '-0.02em',
                     marginBottom: 9,
                   }}
                 >
                   Read, study and understand the Book of Allah
                 </h3>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: '#3f4a57', lineHeight: 1.8 }}>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, color: '#3a4550', lineHeight: 1.85 }}>
                   Word-by-word Arabic with English, Urdu and root analysis. Compare Tafsir Ibn Kathir, Al-Tabari,
                   Al-Qurtubi, As-Sa'di, Ma'arif-ul-Qur'an, Al-Muyassar and Al-Jalalayn side by side.
                 </p>
-                <div style={{ width: 36, height: 3, background: '#d4a017', marginTop: 16, borderRadius: 1 }} />
+                <div style={{ width: 44, height: 3, background: '#d4a017', marginTop: 16, borderRadius: 1 }} />
               </div>
               <div>
                 <div
                   dir="rtl"
                   style={{
                     fontFamily: 'Amiri, serif',
-                    fontSize: 36,
-                    color: '#a67c00',
+                    fontSize: 42,
+                    color: '#8a6500',
                     textAlign: 'right',
                     lineHeight: 1.7,
                     marginBottom: 8,
@@ -750,7 +764,7 @@ export function HomeExperience() {
                 >
                   وَرَتِّلِ ٱلۡقُرۡءَانَ تَرۡتِیلًا
                 </div>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#9a7a3a', fontStyle: 'italic' }}>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: '#9a7a3a', fontStyle: 'italic' }}>
                   And recite the Qur'an with measured recitation. — 73:4
                 </p>
               </div>
@@ -764,47 +778,47 @@ export function HomeExperience() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 16,
+          gap: 20,
           padding: '0 48px',
-          marginBottom: 32,
+          marginBottom: 80,
         }}
       >
         {BOTTOM_CARDS.map((card) => (
-          <Link key={card.title} to={card.to} className="adq-home-card" style={{ background: 'linear-gradient(160deg, #070b12 0%, #0a0f18 100%)' }}>
+          <Link key={card.title} to={card.to} className="adq-home-card" style={{ background: 'linear-gradient(160deg, #0a1018 0%, #0c1420 100%)' }}>
             <GeoOverlay patternId={card.patternId} stroke="#d4a017" />
-            <div style={{ position: 'relative', zIndex: 3, padding: '22px 22px 18px' }}>
+            <div style={{ position: 'relative', zIndex: 3, padding: '28px 26px' }}>
               <div
                 dir="rtl"
                 style={{
                   fontFamily: 'Amiri, serif',
-                  fontSize: 24,
-                  color: 'rgba(212,160,23,0.7)',
+                  fontSize: 26,
+                  color: 'rgba(212,160,23,0.75)',
                   textAlign: 'right',
                   marginBottom: 8,
                 }}
               >
                 {card.arabic}
               </div>
-              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: '#e0ecf4', marginBottom: 4 }}>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, fontWeight: 700, color: '#e4eef6', marginBottom: 4 }}>
                 {card.title}
               </h3>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: 'rgba(180,205,230,0.45)', lineHeight: 1.7, marginBottom: 14 }}>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 15, color: 'rgba(180,205,230,0.52)', lineHeight: 1.75, marginBottom: 14 }}>
                 {card.body}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 11,
+                    fontSize: 12,
                     color: 'rgba(52,211,153,0.45)',
                     border: '1px solid rgba(52,211,153,0.14)',
-                    padding: '3px 11px',
+                    padding: '4px 14px',
                     borderRadius: 20,
                   }}
                 >
                   {card.pill}
                 </span>
-                <span style={{ fontSize: 18, color: 'rgba(180,205,230,0.1)' }}>›</span>
+                <span style={{ fontSize: 20, color: 'rgba(180,205,230,0.1)' }}>›</span>
               </div>
             </div>
           </Link>
@@ -814,22 +828,22 @@ export function HomeExperience() {
       {/* Hadith band */}
       <div
         style={{
-          border: '1px solid rgba(212,160,23,0.15)',
-          borderRadius: 16,
-          padding: '24px 32px',
-          background: 'rgba(212,160,23,0.035)',
-          margin: '0 48px 32px',
+          border: '1px solid rgba(212,160,23,0.18)',
+          borderRadius: 20,
+          padding: '36px 40px',
+          background: 'linear-gradient(135deg, rgba(212,160,23,0.04) 0%, rgba(212,160,23,0.025) 100%)',
+          margin: '0 48px 40px',
           display: 'flex',
           alignItems: 'center',
           gap: 28,
-          boxShadow: '0 4px 32px rgba(212,160,23,0.04)',
+          boxShadow: '0 8px 40px rgba(212,160,23,0.05), inset 0 1px 0 rgba(212,160,23,0.08)',
         }}
       >
         <div
           style={{
             fontFamily: 'Inter, sans-serif',
-            fontSize: 10,
-            color: 'rgba(212,160,23,0.35)',
+            fontSize: 11,
+            color: 'rgba(212,160,23,0.4)',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
             writingMode: 'vertical-rl',
@@ -843,8 +857,8 @@ export function HomeExperience() {
             dir="rtl"
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 26,
-              color: 'rgba(212,160,23,0.8)',
+              fontSize: 28,
+              color: 'rgba(212,160,23,0.85)',
               textAlign: 'right',
               marginBottom: 8,
             }}
@@ -854,23 +868,23 @@ export function HomeExperience() {
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 17,
+              fontSize: 18,
               fontStyle: 'italic',
               fontWeight: 300,
-              color: 'rgba(230,220,200,0.65)',
-              lineHeight: 1.7,
+              color: 'rgba(240,232,216,0.7)',
+              lineHeight: 1.75,
             }}
           >
             Actions are judged by intentions, and every person shall have only what they intended.
           </p>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(180,205,230,0.35)', marginTop: 8 }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: 'rgba(180,205,230,0.4)', marginTop: 8 }}>
             Sahih al-Bukhari · Hadith 1 · Narrated by Umar ibn al-Khattab رضي الله عنه
           </p>
         </div>
         <div
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 80,
+            fontSize: 96,
             fontWeight: 300,
             color: 'rgba(212,160,23,0.1)',
             lineHeight: 1,
@@ -886,14 +900,14 @@ export function HomeExperience() {
       <div
         style={{
           borderTop: '1px solid rgba(255,255,255,0.04)',
-          padding: '20px 48px',
+          padding: '24px 48px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           background: 'rgba(3,7,13,0.8)',
         }}
       >
-        <div style={{ fontFamily: 'Amiri, serif', fontSize: 16, color: 'rgba(212,160,23,0.4)' }}>
+        <div style={{ fontFamily: 'Amiri, serif', fontSize: 17, color: 'rgba(212,160,23,0.45)' }}>
           الدَّينُ القَيِّمُ
         </div>
         <nav style={{ display: 'flex' }}>
@@ -910,8 +924,8 @@ export function HomeExperience() {
               to={link.to}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: 13,
-                color: 'rgba(180,205,230,0.35)',
+                fontSize: 14,
+                color: 'rgba(180,205,230,0.4)',
                 padding: '4px 12px',
                 textDecoration: 'none',
               }}
@@ -920,7 +934,7 @@ export function HomeExperience() {
             </Link>
           ))}
         </nav>
-        <div style={{ fontFamily: 'Amiri, serif', fontSize: 15, color: 'rgba(212,160,23,0.3)' }}>
+        <div style={{ fontFamily: 'Amiri, serif', fontSize: 16, color: 'rgba(212,160,23,0.35)' }}>
           رَبِّ زِدۡنِی عِلۡمًا
         </div>
       </div>
