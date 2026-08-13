@@ -1,30 +1,17 @@
-import { useState, useEffect, useRef, useMemo, type CSSProperties } from 'react';
+import { useEffect, useRef, useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { computeDaySchedule, resolveCurrentNext } from '../../features/prayer/logic/schedule';
-import { getMethod, DEFAULT_METHOD_ID } from '../../features/astronomy/config/settings';
-import type { ObserverLocation } from '../../features/astronomy/models';
+import { readLocation, readMadhhab } from '../../features/astronomy/config/location';
+import { readMethodId, readSettings, effectiveMethod, effectiveLocation } from '../../features/astronomy/config/settings';
+import { HijriCalendarEngine } from '../../features/astronomy/engine/math/HijriCalendarEngine';
 
 type Star = { x: number; y: number; r: number; a: number; spd: number; ph: number; warm: boolean };
 
-// Mumbai coordinates, used as the homepage's default location for the prayer bar.
-const MUMBAI_LOCATION: ObserverLocation = {
-  id: 'mumbai',
-  name: 'Mumbai',
-  coordinates: { latitude: 19.076, longitude: 72.8777, elevation: 0 },
-  timezone: 'Asia/Kolkata',
-  elevation: 0,
-};
+const hijriEngine = new HijriCalendarEngine();
 
 function fmtPrayerTime(d: Date | null, tz: string): string {
   if (!d) return '--:--';
-  const parts = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz }).formatToParts(d);
-  let h = '';
-  let m = '';
-  for (const p of parts) {
-    if (p.type === 'hour') h = p.value;
-    else if (p.type === 'minute') m = p.value;
-  }
-  return `${h}:${m}`;
+  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: false, timeZone: tz }).format(d);
 }
 
 // TODO: wire real prayer tracker from features/prayer tracker
@@ -84,26 +71,34 @@ function GeoOverlay({ patternId, stroke }: { patternId: string; stroke: string }
 }
 
 export function HomeExperience() {
-  const [currentDate, setCurrentDate] = useState({ gregorian: '', hijri: '' });
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  useEffect(() => {
-    const today = new Date();
-    const greg = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    const hijri = '15 Safar 1448 AH';
-    setCurrentDate({ gregorian: greg, hijri });
-  }, []);
-
-  // Wired from features/prayer engine
-  const prayerTimes = useMemo(() => {
+  // Wired from the Salaat engine — uses the user's saved location, calculation
+  // method and madhhab (same settings the full /prayer page reads), not a fixed city.
+  const prayerData = useMemo(() => {
     const now = new Date();
-    const schedule = computeDaySchedule(now, MUMBAI_LOCATION, getMethod(DEFAULT_METHOD_ID), 'standard');
-    const current = resolveCurrentNext(schedule.windows, schedule.fajrNext, now);
-    const tz = MUMBAI_LOCATION.timezone;
+    const location = readLocation();
+    const madhhab = readMadhhab();
+    const methodId = readMethodId();
+    const settings = readSettings();
+    const method = effectiveMethod(methodId, settings);
+    const loc = effectiveLocation(location, methodId, settings);
+    const tz = location.timezone;
+
+    const schedule = computeDaySchedule(now, loc, method, madhhab);
+    const currentNext = resolveCurrentNext(schedule.windows, schedule.fajrNext, now);
     const ishraqStart = schedule.nafl.find((w) => w.key === 'ishraq')?.start ?? null;
     const chashtStart = schedule.nafl.find((w) => w.key === 'duha')?.start ?? null;
 
-    return [
+    const hijri = hijriEngine.gregorianToHijri(
+      { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() },
+      'Astronomical',
+    ).data;
+    const gregorianDate = new Intl.DateTimeFormat('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: tz,
+    }).format(now);
+
+    const items = [
       { key: 'fajr', name: 'Fajr', time: fmtPrayerTime(schedule.times.fajr, tz), arabic: 'فجر' },
       { key: 'sunrise', name: 'Shurūq', time: fmtPrayerTime(schedule.times.sunrise, tz), arabic: 'شروق' },
       { key: 'ishraq', name: 'Ishraq', time: fmtPrayerTime(ishraqStart, tz), arabic: 'إشراق' },
@@ -112,7 +107,16 @@ export function HomeExperience() {
       { key: 'asr', name: 'Asr', time: fmtPrayerTime(schedule.times.asr, tz), arabic: 'عصر' },
       { key: 'maghrib', name: 'Maghrib', time: fmtPrayerTime(schedule.times.maghrib, tz), arabic: 'مغرب' },
       { key: 'isha', name: 'Isha', time: fmtPrayerTime(schedule.times.isha, tz), arabic: 'عشاء' },
-    ].map((p) => ({ ...p, current: p.key === current?.currentKey }));
+    ].map((p) => ({ ...p, current: p.key === currentNext?.currentKey }));
+
+    return {
+      locationName: location.name,
+      items,
+      sunriseTime: fmtPrayerTime(schedule.times.sunrise, tz),
+      sunsetTime: fmtPrayerTime(schedule.times.maghrib, tz),
+      hijriDate: hijri ? `${hijri.day} ${hijri.monthName} ${hijri.year} AH` : '',
+      gregorianDate,
+    };
   }, []);
 
   // Animated star field for the nebula hero
@@ -374,10 +378,10 @@ export function HomeExperience() {
             whiteSpace: 'nowrap',
           }}
         >
-          Today · Mumbai
+          Today · {prayerData.locationName}
         </div>
         <div style={{ display: 'flex', flex: 1, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-          {prayerTimes.map((p) => (
+          {prayerData.items.map((p) => (
             <div
               key={p.name}
               style={{
@@ -425,6 +429,38 @@ export function HomeExperience() {
         </div>
       </div>
 
+      {/* Sunrise / sunset + Hijri date */}
+      <div
+        style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '0 40px', marginBottom: 8,
+        }}
+      >
+        <span style={{ fontSize: 11, color: 'rgba(180,205,230,0.35)' }}>
+          ☀ Sunrise {prayerData.sunriseTime} · Sunset {prayerData.sunsetTime}
+        </span>
+        <span style={{ fontFamily: "'Amiri', serif", fontSize: 12, color: 'rgba(212,160,23,0.4)' }}>
+          {prayerData.hijriDate}
+        </span>
+      </div>
+
+      {/* Link to full Salaat page */}
+      <div style={{ textAlign: 'right', padding: '0 40px', marginBottom: 16 }}>
+        <Link
+          to="/prayer"
+          style={{
+            fontSize: 12,
+            color: '#34d399',
+            textDecoration: 'none',
+            fontFamily: "'Inter', sans-serif",
+            borderBottom: '1px solid rgba(52,211,153,0.2)',
+            paddingBottom: 1,
+          }}
+        >
+          View full prayer schedule →
+        </Link>
+      </div>
+
       {/* Daily Ayat band */}
       <div
         style={{
@@ -449,7 +485,7 @@ export function HomeExperience() {
               marginBottom: 9,
             }}
           >
-            Daily Ayat — {currentDate.gregorian}
+            Daily Ayat — {prayerData.gregorianDate}
           </div>
           <p
             style={{
