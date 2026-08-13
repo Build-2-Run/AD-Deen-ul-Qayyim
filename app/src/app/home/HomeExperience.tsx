@@ -1,19 +1,31 @@
-import { useState, useEffect, useRef, type CSSProperties } from 'react';
+import { useState, useEffect, useRef, useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
+import { computeDaySchedule, resolveCurrentNext } from '../../features/prayer/logic/schedule';
+import { getMethod, DEFAULT_METHOD_ID } from '../../features/astronomy/config/settings';
+import type { ObserverLocation } from '../../features/astronomy/models';
 
 type Star = { x: number; y: number; r: number; a: number; spd: number; ph: number; warm: boolean };
 
-// TODO: wire real prayer times from features/prayer engine
-const PRAYER_TIMES = [
-  { name: 'Fajr', time: '4:18', arabic: 'فجر', current: false },
-  { name: 'Shurūq', time: '5:52', arabic: 'شروق', current: false },
-  { name: 'Ishraq', time: '6:18', arabic: 'إشراق', current: false },
-  { name: 'Chasht', time: '9:30', arabic: 'چاشت', current: false },
-  { name: 'Dhuhr', time: '12:55', arabic: 'ظهر', current: false },
-  { name: 'Asr', time: '4:31', arabic: 'عصر', current: true },
-  { name: 'Maghrib', time: '7:44', arabic: 'مغرب', current: false },
-  { name: 'Isha', time: '9:08', arabic: 'عشاء', current: false },
-];
+// Mumbai coordinates, used as the homepage's default location for the prayer bar.
+const MUMBAI_LOCATION: ObserverLocation = {
+  id: 'mumbai',
+  name: 'Mumbai',
+  coordinates: { latitude: 19.076, longitude: 72.8777, elevation: 0 },
+  timezone: 'Asia/Kolkata',
+  elevation: 0,
+};
+
+function fmtPrayerTime(d: Date | null, tz: string): string {
+  if (!d) return '--:--';
+  const parts = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz }).formatToParts(d);
+  let h = '';
+  let m = '';
+  for (const p of parts) {
+    if (p.type === 'hour') h = p.value;
+    else if (p.type === 'minute') m = p.value;
+  }
+  return `${h}:${m}`;
+}
 
 // TODO: wire real prayer tracker from features/prayer tracker
 const TRACKER_BARS = [75, 60, 90, 50, 80, 65, 35, 28, 22];
@@ -80,6 +92,27 @@ export function HomeExperience() {
     const greg = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     const hijri = '15 Safar 1448 AH';
     setCurrentDate({ gregorian: greg, hijri });
+  }, []);
+
+  // Wired from features/prayer engine
+  const prayerTimes = useMemo(() => {
+    const now = new Date();
+    const schedule = computeDaySchedule(now, MUMBAI_LOCATION, getMethod(DEFAULT_METHOD_ID), 'standard');
+    const current = resolveCurrentNext(schedule.windows, schedule.fajrNext, now);
+    const tz = MUMBAI_LOCATION.timezone;
+    const ishraqStart = schedule.nafl.find((w) => w.key === 'ishraq')?.start ?? null;
+    const chashtStart = schedule.nafl.find((w) => w.key === 'duha')?.start ?? null;
+
+    return [
+      { key: 'fajr', name: 'Fajr', time: fmtPrayerTime(schedule.times.fajr, tz), arabic: 'فجر' },
+      { key: 'sunrise', name: 'Shurūq', time: fmtPrayerTime(schedule.times.sunrise, tz), arabic: 'شروق' },
+      { key: 'ishraq', name: 'Ishraq', time: fmtPrayerTime(ishraqStart, tz), arabic: 'إشراق' },
+      { key: 'duha', name: 'Chasht', time: fmtPrayerTime(chashtStart, tz), arabic: 'چاشت' },
+      { key: 'dhuhr', name: 'Dhuhr', time: fmtPrayerTime(schedule.times.dhuhr, tz), arabic: 'ظهر' },
+      { key: 'asr', name: 'Asr', time: fmtPrayerTime(schedule.times.asr, tz), arabic: 'عصر' },
+      { key: 'maghrib', name: 'Maghrib', time: fmtPrayerTime(schedule.times.maghrib, tz), arabic: 'مغرب' },
+      { key: 'isha', name: 'Isha', time: fmtPrayerTime(schedule.times.isha, tz), arabic: 'عشاء' },
+    ].map((p) => ({ ...p, current: p.key === current?.currentKey }));
   }, []);
 
   // Animated star field for the nebula hero
@@ -200,8 +233,8 @@ export function HomeExperience() {
           <p
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 13,
-              color: 'rgba(212,160,23,0.5)',
+              fontSize: 15,
+              color: 'rgba(212,160,23,0.65)',
               letterSpacing: '0.12em',
               marginBottom: 16,
             }}
@@ -213,10 +246,10 @@ export function HomeExperience() {
             dir="rtl"
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 46,
+              fontSize: 52,
               fontWeight: 700,
               color: '#d4a017',
-              textShadow: '0 2px 60px rgba(212,160,23,0.3)',
+              textShadow: '0 2px 80px rgba(212,160,23,0.4)',
               marginBottom: 6,
             }}
           >
@@ -225,37 +258,34 @@ export function HomeExperience() {
 
           <div
             dir="rtl"
-            style={{ fontFamily: 'Amiri, serif', fontSize: 16, color: 'rgba(212,160,23,0.4)', marginBottom: 30 }}
-          >
-            صَلَّى اللَّهُ عَلَيْهِ وَآلِهِ وَسَلَّمَ
-          </div>
-
-          <h1
             style={{
-              fontFamily: "'DM Serif Display', serif",
-              fontSize: 52,
-              lineHeight: 1.08,
-              color: '#f4ede0',
-              letterSpacing: '-0.02em',
-              marginBottom: 10,
-              fontWeight: 400,
+              fontFamily: 'Amiri, serif',
+              fontSize: 18,
+              color: 'rgba(212,160,23,0.55)',
+              textAlign: 'center',
+              lineHeight: 2.0,
+              maxWidth: 700,
+              margin: '0 auto',
             }}
           >
-            Islamic knowledge, <br />
-            <em style={{ fontStyle: 'italic', color: '#34d399' }}>verified</em> and complete
-          </h1>
+            اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ
+            <br />
+            اللَّهُمَّ بَارِكْ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ كَمَا بَارَكْتَ عَلَىٰ إِبْرَاهِيمَ وَعَلَىٰ آلِ إِبْرَاهِيمَ إِنَّكَ حَمِيدٌ مَجِيدٌ
+          </div>
 
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 19,
-              fontWeight: 300,
+              fontSize: 14,
               fontStyle: 'italic',
-              color: 'rgba(212,160,23,0.5)',
-              marginBottom: 38,
+              color: 'rgba(212,160,23,0.35)',
+              textAlign: 'center',
+              marginTop: 8,
+              marginBottom: 30,
             }}
           >
-            Technology is the means. Authenticity is the foundation.
+            O Allah, send Your grace upon Muhammad ﷺ and upon the family of Muhammad ﷺ, as You sent Your grace upon
+            Ibrahim and upon the family of Ibrahim. Indeed, You are Praiseworthy, Most Glorious.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
@@ -264,12 +294,12 @@ export function HomeExperience() {
               className="adq-home-btn-primary"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 17,
-                fontWeight: 600,
+                fontSize: 18,
+                fontWeight: 700,
                 background: '#34d399',
                 color: '#021a0d',
                 border: 'none',
-                padding: '13px 28px',
+                padding: '14px 32px',
                 borderRadius: 8,
                 cursor: 'pointer',
                 textDecoration: 'none',
@@ -283,12 +313,12 @@ export function HomeExperience() {
               className="adq-home-btn-ghost"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 17,
+                fontSize: 18,
                 fontStyle: 'italic',
                 background: 'transparent',
-                border: '1px solid rgba(212,160,23,0.25)',
-                color: 'rgba(212,160,23,0.65)',
-                padding: '13px 28px',
+                border: '1.5px solid rgba(212,160,23,0.25)',
+                color: 'rgba(212,160,23,0.8)',
+                padding: '14px 32px',
                 borderRadius: 8,
                 cursor: 'pointer',
                 textDecoration: 'none',
@@ -302,12 +332,12 @@ export function HomeExperience() {
               className="adq-home-btn-ghost"
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 17,
+                fontSize: 18,
                 fontStyle: 'italic',
                 background: 'transparent',
-                border: '1px solid rgba(212,160,23,0.25)',
-                color: 'rgba(212,160,23,0.65)',
-                padding: '13px 28px',
+                border: '1.5px solid rgba(212,160,23,0.25)',
+                color: 'rgba(212,160,23,0.8)',
+                padding: '14px 32px',
                 borderRadius: 8,
                 cursor: 'pointer',
                 textDecoration: 'none',
@@ -337,8 +367,8 @@ export function HomeExperience() {
       >
         <div
           style={{
-            fontSize: 9,
-            color: 'rgba(180,205,230,0.22)',
+            fontSize: 10,
+            color: 'rgba(180,205,230,0.35)',
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
@@ -347,7 +377,7 @@ export function HomeExperience() {
           Today · Mumbai
         </div>
         <div style={{ display: 'flex', flex: 1, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-          {PRAYER_TIMES.map((p) => (
+          {prayerTimes.map((p) => (
             <div
               key={p.name}
               style={{
@@ -364,7 +394,7 @@ export function HomeExperience() {
               <div
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 9,
+                  fontSize: 11,
                   color: p.current ? '#34d399' : 'rgba(180,205,230,0.4)',
                 }}
               >
@@ -373,8 +403,9 @@ export function HomeExperience() {
               <div
                 style={{
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 13,
-                  color: p.current ? '#f0ece4' : 'rgba(224,224,224,0.75)',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: p.current ? '#ffffff' : 'rgba(180,205,230,0.6)',
                 }}
               >
                 {p.time}
@@ -383,8 +414,8 @@ export function HomeExperience() {
                 dir="rtl"
                 style={{
                   fontFamily: 'Amiri, serif',
-                  fontSize: 11,
-                  color: p.current ? 'rgba(212,160,23,0.55)' : 'rgba(212,160,23,0.3)',
+                  fontSize: 13,
+                  color: p.current ? 'rgba(212,160,23,0.55)' : 'rgba(212,160,23,0.35)',
                 }}
               >
                 {p.arabic}
@@ -411,8 +442,8 @@ export function HomeExperience() {
         <div>
           <div
             style={{
-              fontSize: 9,
-              color: 'rgba(212,160,23,0.3)',
+              fontSize: 11,
+              color: 'rgba(212,160,23,0.45)',
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               marginBottom: 9,
@@ -423,15 +454,15 @@ export function HomeExperience() {
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 17,
+              fontSize: 19,
               fontStyle: 'italic',
               fontWeight: 300,
-              color: 'rgba(230,220,200,0.65)',
+              color: 'rgba(230,220,200,0.8)',
             }}
           >
             And say: My Lord, increase me in knowledge.
           </p>
-          <p style={{ fontSize: 10, color: 'rgba(212,160,23,0.28)', marginTop: 6 }}>
+          <p style={{ fontSize: 12, color: 'rgba(212,160,23,0.4)', marginTop: 6 }}>
             Qur'an 20:114 · Surah Ta-Ha
           </p>
         </div>
@@ -439,7 +470,7 @@ export function HomeExperience() {
           dir="rtl"
           style={{
             fontFamily: 'Amiri, serif',
-            fontSize: 30,
+            fontSize: 34,
             color: '#d4a017',
             textAlign: 'right',
             whiteSpace: 'nowrap',
@@ -455,8 +486,8 @@ export function HomeExperience() {
         <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' }} />
         <div
           style={{
-            fontSize: 9,
-            color: 'rgba(180,205,230,0.18)',
+            fontSize: 11,
+            color: 'rgba(180,205,230,0.3)',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
           }}
@@ -484,7 +515,7 @@ export function HomeExperience() {
               <span style={{ fontSize: 22 }}>⚖️</span>
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 10,
                   color: '#34d399',
                   border: '1px solid rgba(52,211,153,0.12)',
                   padding: '3px 9px',
@@ -494,17 +525,17 @@ export function HomeExperience() {
                 ✔ Verified
               </span>
             </div>
-            <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: '#e8dfc8', marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, color: '#e8dfc8', marginBottom: 8 }}>
               Mirath engine
             </h3>
-            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: 'rgba(180,205,230,0.28)', lineHeight: 1.55, marginBottom: 16 }}>
+            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(180,205,230,0.4)', lineHeight: 1.55, marginBottom: 16 }}>
               Full Islamic inheritance with automatic Ḥajb blocking, 'Awl and Radd across all cases
             </p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 52, fontWeight: 600, color: '#34d399', lineHeight: 1 }}>
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 56, fontWeight: 600, color: '#34d399', lineHeight: 1 }}>
                 205
               </span>
-              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: 'rgba(52,211,153,0.35)' }}>
+              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: 'rgba(52,211,153,0.5)' }}>
                 cases ✓
               </span>
             </div>
@@ -517,7 +548,7 @@ export function HomeExperience() {
           <div style={{ position: 'relative', zIndex: 3, padding: '22px 20px' }}>
             <div
               dir="rtl"
-              style={{ fontFamily: 'Amiri, serif', fontSize: 26, color: 'rgba(212,160,23,0.72)', textAlign: 'right', marginBottom: 12 }}
+              style={{ fontFamily: 'Amiri, serif', fontSize: 28, color: 'rgba(212,160,23,0.72)', textAlign: 'right', marginBottom: 12 }}
             >
               الزكاة والنصاب
             </div>
@@ -538,15 +569,15 @@ export function HomeExperience() {
                   borderBottom: '1px solid rgba(255,255,255,0.03)',
                 }}
               >
-                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: 'rgba(180,205,230,0.28)' }}>
+                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(180,205,230,0.4)' }}>
                   {row.label}
                 </span>
                 <span
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 11,
-                    fontWeight: 500,
-                    color: row.gold ? '#d4a017' : row.emerald ? '#34d399' : '#c8dce8',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: row.gold ? '#f0c030' : row.emerald ? '#4ade80' : '#e0ecf4',
                   }}
                 >
                   {row.value}
@@ -564,8 +595,8 @@ export function HomeExperience() {
             <div
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: 9,
-                color: 'rgba(180,205,230,0.22)',
+                fontSize: 11,
+                color: 'rgba(180,205,230,0.35)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.16em',
                 marginBottom: 10,
@@ -574,12 +605,12 @@ export function HomeExperience() {
               Prayer tracker — today
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: 4 }}>
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontWeight: 600, color: '#f0ece4' }}>
+              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 44, fontWeight: 600, color: '#f0ece4' }}>
                 6
               </span>
-              <span style={{ fontSize: 14, color: 'rgba(52,211,153,0.45)', marginLeft: 5 }}>/ 9</span>
+              <span style={{ fontSize: 16, color: 'rgba(52,211,153,0.45)', marginLeft: 5 }}>/ 9</span>
             </div>
-            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: 'rgba(52,211,153,0.45)', marginTop: 5 }}>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: 'rgba(52,211,153,0.6)', marginTop: 5 }}>
               Asr · next in 2h 13m
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 36, marginTop: 18 }}>
@@ -621,7 +652,7 @@ export function HomeExperience() {
                 <div
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: 600,
                     letterSpacing: '0.18em',
                     textTransform: 'uppercase',
@@ -634,7 +665,7 @@ export function HomeExperience() {
                 <h3
                   style={{
                     fontFamily: "'DM Serif Display', serif",
-                    fontSize: 24,
+                    fontSize: 26,
                     color: '#111',
                     lineHeight: 1.2,
                     marginBottom: 9,
@@ -642,7 +673,7 @@ export function HomeExperience() {
                 >
                   Read, study and understand the Book of Allah
                 </h3>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#6b7280', lineHeight: 1.75 }}>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#4b5563', lineHeight: 1.75 }}>
                   Word-by-word Arabic with English, Urdu and root analysis. Compare Tafsir Ibn Kathir, Al-Tabari,
                   Al-Qurtubi, As-Sa'di, Ma'arif-ul-Qur'an, Al-Muyassar and Al-Jalalayn side by side.
                 </p>
@@ -653,7 +684,7 @@ export function HomeExperience() {
                   dir="rtl"
                   style={{
                     fontFamily: 'Amiri, serif',
-                    fontSize: 28,
+                    fontSize: 32,
                     color: '#b8860b',
                     textAlign: 'right',
                     lineHeight: 1.7,
@@ -662,7 +693,7 @@ export function HomeExperience() {
                 >
                   وَرَتِّلِ ٱلۡقُرۡءَانَ تَرۡتِیلًا
                 </div>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#9a7a3a', fontStyle: 'italic' }}>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#9a7a3a', fontStyle: 'italic' }}>
                   And recite the Qur'an with measured recitation. — 73:4
                 </p>
               </div>
@@ -689,25 +720,25 @@ export function HomeExperience() {
                 dir="rtl"
                 style={{
                   fontFamily: 'Amiri, serif',
-                  fontSize: 20,
-                  color: 'rgba(212,160,23,0.48)',
+                  fontSize: 22,
+                  color: 'rgba(212,160,23,0.6)',
                   textAlign: 'right',
                   marginBottom: 8,
                 }}
               >
                 {card.arabic}
               </div>
-              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 16, color: '#d8e8f4', marginBottom: 4 }}>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 18, color: '#d8e8f4', marginBottom: 4 }}>
                 {card.title}
               </h3>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: 'rgba(180,205,230,0.27)', lineHeight: 1.6, marginBottom: 14 }}>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: 'rgba(180,205,230,0.38)', lineHeight: 1.6, marginBottom: 14 }}>
                 {card.body}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: 9,
+                    fontSize: 10,
                     color: 'rgba(52,211,153,0.45)',
                     border: '1px solid rgba(52,211,153,0.14)',
                     padding: '2px 9px',
@@ -754,8 +785,8 @@ export function HomeExperience() {
             dir="rtl"
             style={{
               fontFamily: 'Amiri, serif',
-              fontSize: 22,
-              color: 'rgba(212,160,23,0.65)',
+              fontSize: 24,
+              color: 'rgba(212,160,23,0.75)',
               textAlign: 'right',
               marginBottom: 8,
             }}
@@ -765,23 +796,23 @@ export function HomeExperience() {
           <p
             style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 15,
+              fontSize: 16,
               fontStyle: 'italic',
               fontWeight: 300,
-              color: 'rgba(230,220,200,0.48)',
+              color: 'rgba(230,220,200,0.6)',
               lineHeight: 1.6,
             }}
           >
             Actions are judged by intentions, and every person shall have only what they intended.
           </p>
-          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 10, color: 'rgba(180,205,230,0.18)', marginTop: 8 }}>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: 'rgba(180,205,230,0.28)', marginTop: 8 }}>
             Sahih al-Bukhari · Hadith 1 · Narrated by Umar ibn al-Khattab رضي الله عنه
           </p>
         </div>
         <div
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 64,
+            fontSize: 72,
             fontWeight: 300,
             color: 'rgba(212,160,23,0.07)',
             lineHeight: 1,
@@ -804,7 +835,7 @@ export function HomeExperience() {
           background: 'rgba(3,7,13,0.8)',
         }}
       >
-        <div style={{ fontFamily: 'Amiri, serif', fontSize: 14, color: 'rgba(212,160,23,0.3)' }}>
+        <div style={{ fontFamily: 'Amiri, serif', fontSize: 15, color: 'rgba(212,160,23,0.3)' }}>
           الدَّينُ القَيِّمُ
         </div>
         <nav style={{ display: 'flex' }}>
@@ -821,8 +852,8 @@ export function HomeExperience() {
               to={link.to}
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: 11,
-                color: 'rgba(180,205,230,0.18)',
+                fontSize: 12,
+                color: 'rgba(180,205,230,0.3)',
                 padding: '4px 12px',
                 textDecoration: 'none',
               }}
@@ -831,7 +862,7 @@ export function HomeExperience() {
             </Link>
           ))}
         </nav>
-        <div style={{ fontFamily: 'Amiri, serif', fontSize: 12, color: 'rgba(212,160,23,0.2)' }}>
+        <div style={{ fontFamily: 'Amiri, serif', fontSize: 14, color: 'rgba(212,160,23,0.2)' }}>
           رَبِّ زِدۡنِی عِلۡمًا
         </div>
       </div>
