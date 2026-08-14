@@ -119,7 +119,7 @@ export function HomeExperience() {
     };
   }, []);
 
-  // Animated star field for the nebula hero
+  // Animated star field over the gradient mesh background
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -136,11 +136,11 @@ export function HomeExperience() {
     };
     window.addEventListener('resize', handleResize);
 
-    const stars: Star[] = Array.from({ length: 260 }).map(() => ({
+    const stars: Star[] = Array.from({ length: 180 }).map(() => ({
       x: Math.random() * width,
       y: Math.random() * height,
       r: Math.random() * 1.3 + 0.3,
-      a: Math.random() * 0.6 + 0.3,
+      a: Math.random() * 0.5 + 0.15,
       spd: Math.random() * 0.8 + 0.2,
       ph: Math.random() * Math.PI * 2,
       warm: Math.random() > 0.6,
@@ -168,7 +168,7 @@ export function HomeExperience() {
   }, []);
 
   return (
-    <div style={{ background: '#03070d' }}>
+    <div style={{ background: 'transparent' }}>
       <style>{`
         @keyframes borderGlow {
           0%, 100% { opacity: 0.5; }
@@ -183,14 +183,14 @@ export function HomeExperience() {
           overflow: hidden;
           display: block;
           border-radius: 20px;
-          border: 1px solid rgba(212,160,23,0.15);
+          border: 1px solid rgba(255,255,255,0.06);
           text-decoration: none;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .adq-home-card:hover {
           transform: translateY(-8px);
-          border-color: rgba(212,160,23,0.35);
-          box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 48px rgba(212,160,23,0.08);
+          border-color: rgba(212,160,23,0.3);
+          box-shadow: 0 24px 64px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.1), 0 0 48px rgba(212,160,23,0.06);
         }
         .adq-home-card .adq-home-geo {
           opacity: 0;
@@ -217,35 +217,96 @@ export function HomeExperience() {
         }
       `}</style>
 
-      {/* SECTION 1: NEBULA HERO */}
-      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url('${import.meta.env.BASE_URL}assets/nebula-bg.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 30%',
-            zIndex: 0,
-          }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(3,7,13,0.52)', zIndex: 1 }} />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 340,
-            background: 'linear-gradient(to bottom, transparent, #03070d)',
-            zIndex: 2,
-          }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}
-        />
+      {/* Gradient mesh background — Clearbit style */}
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        background: '#060a14',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+      }}>
+        {/* Large emerald orb — top right */}
+        <div style={{
+          position: 'absolute',
+          top: '-15%',
+          right: '-10%',
+          width: '900px',
+          height: '900px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(52,211,153,0.15) 0%, rgba(52,211,153,0.05) 40%, transparent 70%)',
+          filter: 'blur(80px)',
+        }} />
 
+        {/* Gold orb — left center */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          left: '-15%',
+          width: '800px',
+          height: '800px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(212,160,23,0.12) 0%, rgba(212,160,23,0.04) 40%, transparent 70%)',
+          filter: 'blur(80px)',
+        }} />
+
+        {/* Blue orb — bottom center */}
+        <div style={{
+          position: 'absolute',
+          bottom: '-20%',
+          left: '30%',
+          width: '1000px',
+          height: '1000px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(56,100,220,0.1) 0%, rgba(56,100,220,0.03) 40%, transparent 70%)',
+          filter: 'blur(100px)',
+        }} />
+
+        {/* Small emerald accent — bottom right */}
+        <div style={{
+          position: 'absolute',
+          bottom: '10%',
+          right: '5%',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 60%)',
+          filter: 'blur(60px)',
+        }} />
+
+        {/* Subtle gold accent — top left */}
+        <div style={{
+          position: 'absolute',
+          top: '5%',
+          left: '20%',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(212,160,23,0.06) 0%, transparent 60%)',
+          filter: 'blur(60px)',
+        }} />
+
+        {/* Noise texture overlay for depth */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.03,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '128px 128px',
+        }} />
+      </div>
+
+      {/* Animated star field */}
+      <canvas
+        ref={canvasRef}
+        style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}
+      />
+
+      <div style={{ position: 'relative', zIndex: 2 }}>
+
+      {/* SECTION 1: HERO */}
+      <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
         <div
           style={{
             position: 'relative',
@@ -254,6 +315,7 @@ export function HomeExperience() {
             margin: '0 auto',
             padding: '120px 48px 100px',
             textAlign: 'center',
+            background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(6,10,20,0.4) 0%, transparent 70%)',
           }}
         >
           <p
@@ -275,7 +337,7 @@ export function HomeExperience() {
               fontSize: 62,
               fontWeight: 700,
               color: '#d4a017',
-              textShadow: '0 4px 120px rgba(212,160,23,0.5), 0 0 300px rgba(212,160,23,0.2)',
+              textShadow: '0 4px 80px rgba(212,160,23,0.6), 0 0 200px rgba(212,160,23,0.3)',
               marginBottom: 6,
             }}
           >
@@ -383,8 +445,10 @@ export function HomeExperience() {
       {/* Prayer bar */}
       <div
         style={{
-          background: 'linear-gradient(135deg, rgba(10,20,30,0.9) 0%, rgba(8,16,24,0.95) 100%)',
-          border: '1px solid rgba(52,211,153,0.12)',
+          background: 'rgba(6,10,20,0.75)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: 20,
           padding: '22px 32px',
           display: 'flex',
@@ -495,7 +559,9 @@ export function HomeExperience() {
           border: '1px solid rgba(212,160,23,0.18)',
           borderRadius: 20,
           padding: '40px 48px',
-          background: 'linear-gradient(135deg, rgba(212,160,23,0.04) 0%, rgba(212,160,23,0.02) 100%)',
+          background: 'rgba(212,160,23,0.03)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           margin: '0 48px 80px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
@@ -575,7 +641,7 @@ export function HomeExperience() {
         }}
       >
         {/* Card A — Mirath */}
-        <Link to="/mirath" className="adq-home-card" style={{ background: 'linear-gradient(160deg, #0a1220 0%, #0c1628 100%)' }}>
+        <Link to="/mirath" className="adq-home-card" style={{ background: 'linear-gradient(160deg, rgba(10,18,32,0.9) 0%, rgba(12,22,40,0.85) 100%)' }}>
           <GeoOverlay patternId="geoA" stroke="#d4a017" />
           <div style={{ position: 'relative', zIndex: 3, padding: '32px 28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -612,7 +678,7 @@ export function HomeExperience() {
         </Link>
 
         {/* Card B — Zakat */}
-        <Link to="/zakat" className="adq-home-card" style={{ background: 'linear-gradient(160deg, #081210 0%, #0a1816 100%)' }}>
+        <Link to="/zakat" className="adq-home-card" style={{ background: 'linear-gradient(160deg, rgba(8,18,16,0.9) 0%, rgba(10,24,22,0.85) 100%)' }}>
           <GeoOverlay patternId="geoB" stroke="#d4a017" />
           <div style={{ position: 'relative', zIndex: 3, padding: '32px 28px' }}>
             <div
@@ -658,7 +724,7 @@ export function HomeExperience() {
         {/* TODO: wire from features/zakat live NISAB engine */}
 
         {/* Card D — Prayer tracker */}
-        <Link to="/prayer" className="adq-home-card" style={{ background: 'rgba(10,18,28,0.9)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+        <Link to="/prayer" className="adq-home-card" style={{ background: 'rgba(10,18,28,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
           <GeoOverlay patternId="geoD" stroke="#d4a017" />
           <div style={{ position: 'relative', zIndex: 3, padding: '32px 28px' }}>
             <div
@@ -784,7 +850,7 @@ export function HomeExperience() {
         }}
       >
         {BOTTOM_CARDS.map((card) => (
-          <Link key={card.title} to={card.to} className="adq-home-card" style={{ background: 'linear-gradient(160deg, #0a1018 0%, #0c1420 100%)' }}>
+          <Link key={card.title} to={card.to} className="adq-home-card" style={{ background: 'linear-gradient(160deg, rgba(10,16,24,0.9) 0%, rgba(12,20,32,0.85) 100%)' }}>
             <GeoOverlay patternId={card.patternId} stroke="#d4a017" />
             <div style={{ position: 'relative', zIndex: 3, padding: '28px 26px' }}>
               <div
@@ -831,7 +897,9 @@ export function HomeExperience() {
           border: '1px solid rgba(212,160,23,0.18)',
           borderRadius: 20,
           padding: '36px 40px',
-          background: 'linear-gradient(135deg, rgba(212,160,23,0.04) 0%, rgba(212,160,23,0.025) 100%)',
+          background: 'rgba(212,160,23,0.03)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           margin: '0 48px 40px',
           display: 'flex',
           alignItems: 'center',
@@ -937,6 +1005,8 @@ export function HomeExperience() {
         <div style={{ fontFamily: 'Amiri, serif', fontSize: 16, color: 'rgba(212,160,23,0.35)' }}>
           رَبِّ زِدۡنِی عِلۡمًا
         </div>
+      </div>
+
       </div>
     </div>
   );
