@@ -11,7 +11,7 @@ const hijriEngine = new HijriCalendarEngine();
 
 function fmtPrayerTime(d: Date | null, tz: string): string {
   if (!d) return '--:--';
-  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: false, timeZone: tz }).format(d);
+  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz }).format(d);
 }
 
 // TODO: wire real prayer tracker from features/prayer tracker

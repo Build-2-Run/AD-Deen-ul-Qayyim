@@ -420,7 +420,18 @@ export function MoonSighting() {
   const hijriOffset = useMemo(() => readHijriOffset(), []);
 
   const data = useMemo(() => astronomyService.getDailyAstronomy(
-    effLoc, { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() },
+    effLoc,
+    {
+      // Full UTC instant, not just the calendar date: the moon's phase/age/
+      // illumination genuinely change through the day, so "tonight's real
+      // data" has to mean "right now", not "midnight UTC" (which the engine
+      // defaults to when hour/minute/second are omitted — that used to make
+      // this card quietly show this morning's numbers under a "Tonight's
+      // Moon" heading, several hours and a few illumination-% stale by
+      // evening).
+      year: today.getUTCFullYear(), month: today.getUTCMonth() + 1, day: today.getUTCDate(),
+      hour: today.getUTCHours(), minute: today.getUTCMinutes(), second: today.getUTCSeconds(),
+    },
     { calculationMethod: method, hijriStrategy, hijriOffsetDays: hijriOffset },
   ), [effLoc, method, today, hijriStrategy, hijriOffset]);
 
