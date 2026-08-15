@@ -93,19 +93,28 @@ export const AstronomyHome: React.FC = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        // Browser geolocation almost never reports a real altitude (most devices
+        // have no altimeter/GPS-Z fix; `enableHighAccuracy: false` makes it even
+        // less likely) — `pos.coords.altitude` is typically `null`. Silently
+        // falling back to 0m here used to erase a correct known elevation (e.g.
+        // Srinagar's ~1585m) and make every sunset/Maghrib/Isha calculation a few
+        // minutes early, since the horizon-dip correction depends on elevation.
+        // Carry the previous location's elevation forward instead of zeroing it —
+        // GPS lat/long is still accurate even when altitude is missing.
+        const fallbackElevation = location.elevation ?? location.coordinates.elevation ?? 0;
         applyLocation({
           id: 'current-location',
           name: 'Current location',
-          coordinates: { latitude: pos.coords.latitude, longitude: pos.coords.longitude, elevation: pos.coords.altitude ?? 0 },
+          coordinates: { latitude: pos.coords.latitude, longitude: pos.coords.longitude, elevation: pos.coords.altitude ?? fallbackElevation },
           timezone: tz,
-          elevation: pos.coords.altitude ?? 0,
+          elevation: pos.coords.altitude ?? fallbackElevation,
         });
         setGeolocating(false);
       },
       (err) => { setGeolocating(false); setGeoError(err.message || 'Unable to determine your location.'); },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
     );
-  }, [applyLocation]);
+  }, [applyLocation, location]);
 
   // Tick every second so the countdown stays live.
   useEffect(() => {
