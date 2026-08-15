@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '@/design/icons/Icon';
 import type { HijriStrategyChoice } from '../config/settings';
+import { HijriCalendarEngine } from '../engine/math/HijriCalendarEngine';
+
+const hijriEngine = new HijriCalendarEngine();
 
 interface Props {
   open: boolean;
@@ -43,6 +46,20 @@ export const HijriStrategyModal: React.FC<Props> = ({
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
   }, [open, offsetDays, onClose]);
 
+  // Today's date under each method, computed live so the user can see exactly
+  // what each option (and each offset) produces before picking one — rather
+  // than guessing at an offset with no feedback.
+  const today = useMemo(() => new Date(), [open]);
+  const gregorianToday = useMemo(() => ({
+    year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate(),
+  }), [today]);
+  const previewFor = (s: HijriStrategyChoice, offset: number): string => {
+    try {
+      const h = hijriEngine.gregorianToHijri(gregorianToday, s, offset).data;
+      return `${h.day} ${h.monthName} ${h.year} AH`;
+    } catch { return '—'; }
+  };
+
   if (!open) return null;
 
   const commitOffset = (days: number) => {
@@ -79,8 +96,13 @@ export const HijriStrategyModal: React.FC<Props> = ({
                     <span className={`w-4 h-4 mt-0.5 rounded-full shrink-0 border-2 ${active ? 'border-[#6ee7b7]' : 'border-white/30'} flex items-center justify-center`}>
                       {active && <span className="w-2 h-2 rounded-full bg-[#6ee7b7]" />}
                     </span>
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold">{opt.name}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="block text-sm font-semibold">{opt.name}</span>
+                        <span className="shrink-0 text-[11px] font-semibold tabular-nums" style={{ color: active ? '#6ee7b7' : 'rgba(255,255,255,0.5)' }}>
+                          {previewFor(opt.id, opt.id === 'ManualSighting' ? localOffset : 0)}
+                        </span>
+                      </span>
                       <span className="block text-[11px] text-white/55 mt-0.5 leading-relaxed">{opt.description}</span>
                     </span>
                   </button>
@@ -91,7 +113,10 @@ export const HijriStrategyModal: React.FC<Props> = ({
 
           {strategy === 'ManualSighting' && (
             <div className="pt-1">
-              <div className="text-sm font-semibold mb-2">Day offset: {localOffset > 0 ? `+${localOffset}` : localOffset}</div>
+              <div className="text-sm font-semibold mb-2">
+                Day offset: {localOffset > 0 ? `+${localOffset}` : localOffset}
+                <span className="ml-2 text-[#6ee7b7]">→ {previewFor('ManualSighting', localOffset)}</span>
+              </div>
               <div className="flex items-center gap-3">
                 <button
                   type="button"

@@ -119,6 +119,69 @@ function InsightNote({ label, children }: { label: string; children: ReactNode }
   );
 }
 
+/**
+ * Illustrative side-by-side comparison for Yā-Sīn 36:39's simile: the dried,
+ * curved date-stalk (al-ʿurjūn al-qadīm) vs. the waning crescent moon.
+ *
+ * The date-stalk shape is a labelled illustration (not a photograph) — a web
+ * search for a verifiably-labelled photo of this specific botanical form
+ * (the emptied fruit-raceme after it dries and curls) didn't turn up a source
+ * accurate enough to present as authentic, so this draws the described shape
+ * instead of risking a mislabeled stock image. The crescent on the right is
+ * not illustrative — it's rendered with the same `moonShadowPath` geometry
+ * used for the real moon disc elsewhere on this page, at a thin waning
+ * fraction, so its curve is the same one the astronomy engine computes.
+ */
+function DateStalkMoonComparison() {
+  return (
+    <div style={NESTED_CARD_STYLE}>
+      <div className="text-[11px] font-bold uppercase tracking-wider text-[#6ee7b7] mb-3">
+        The simile, side by side
+      </div>
+      <div className="flex items-center justify-center gap-6 sm:gap-10 flex-wrap py-2">
+        <figure className="flex flex-col items-center gap-2 m-0">
+          <svg viewBox="0 0 120 120" width={112} height={112} style={{ display: 'block' }}>
+            <defs>
+              <linearGradient id="urjunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#d9b382" />
+                <stop offset="55%" stopColor="#b8865a" />
+                <stop offset="100%" stopColor="#8a5f3c" />
+              </linearGradient>
+            </defs>
+            {/* Curved, tapering fruit-stalk (raceme): wide woody base narrowing to a bent, thin tip */}
+            <path
+              d="M 30 96 C 26 76, 34 54, 52 38 C 70 22, 88 20, 96 26 C 90 24, 76 28, 64 40 C 46 56, 38 76, 40 92 C 41 98, 35 100, 30 96 Z"
+              fill="url(#urjunGrad)"
+              stroke="#6b4527"
+              strokeWidth="0.75"
+            />
+            {/* Small nubs along the inner curve marking where individual dates once attached */}
+            {[
+              [46, 84], [52, 72], [60, 60], [70, 49], [80, 40], [88, 32],
+            ].map(([x, y], i) => (
+              <circle key={i} cx={x} cy={y} r={2.1} fill="#5c3c22" opacity={0.75} />
+            ))}
+          </svg>
+          <figcaption className="text-center">
+            <span className="block text-xs font-semibold text-white/85">Al-ʿUrjūn al-Qadīm</span>
+            <span className="block text-[10px] text-white/45 mt-0.5">Illustration — the dried, curved fruit-stalk</span>
+          </figcaption>
+        </figure>
+
+        <span className="text-white/30 text-xl">≈</span>
+
+        <figure className="flex flex-col items-center gap-2 m-0">
+          <MoonDisc size={96} illum={9} waxing={false} glow="drop-shadow(0 0 18px rgba(200,210,255,0.25))" />
+          <figcaption className="text-center">
+            <span className="block text-xs font-semibold text-white/85">Hilāl (waning crescent)</span>
+            <span className="block text-[10px] text-white/45 mt-0.5">Rendered from the same crescent geometry as the live moon above</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  );
+}
+
 function CategoryBadge({ label }: { label: string }) {
   return (
     <span
@@ -457,6 +520,7 @@ export function MoonSighting() {
               <InsightNote label="Tafsir note">
                 Commentators read <em>al-ʿUrjūn al-Qadīm</em> — the dried, curved palm-stalk — as a description of the waning crescent's shape near the end of the lunar month.
               </InsightNote>
+              <DateStalkMoonComparison />
 
               <AyahCard
                 arabic="هُوَ الَّذِي جَعَلَ الشَّمْسَ ضِيَاءً وَالْقَمَرَ نُورًا وَقَدَّرَهُ مَنَازِلَ لِتَعْلَمُوا عَدَدَ السِّنِينَ وَالْحِسَابَ"
