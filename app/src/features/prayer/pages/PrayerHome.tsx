@@ -12,6 +12,8 @@ import {
   readHijriStrategy, writeHijriStrategy, readHijriOffset, writeHijriOffset, type HijriStrategyChoice,
 } from '../../astronomy/config/settings';
 import { HijriCalendarEngine } from '../../astronomy/engine/math/HijriCalendarEngine';
+import { SolarEventsEngine } from '../../astronomy/engine/math/SolarEventsEngine';
+import { TimeEngine } from '../../astronomy/engine/math/TimeEngine';
 import { astronomyService } from '../../astronomy/service/AstronomyPlatform';
 import { HijriStrategyModal } from '../../astronomy/components/HijriStrategyModal';
 import { computeDaySchedule, resolveCurrentNext } from '../logic/schedule';
@@ -24,6 +26,7 @@ import {
 } from '../logic/tracker';
 
 const hijriEngine = new HijriCalendarEngine();
+const solarEvents = new SolarEventsEngine();
 
 // Same phase-name buckets used on the Moon page (MoonSighting.tsx), so the
 // two pages agree on what to call tonight's phase.
@@ -78,25 +81,55 @@ export function PrayerHome() {
   const yesterdaySchedule = useMemo(() => computeDaySchedule(yesterday, effLoc, method, madhhab), [yesterday, effLoc, method, madhhab]);
   const tz = location.timezone;
 
+  // How many minutes later Maghrib falls because of real elevation, vs. a
+  // sea-level (elevation 0) calculation for the same day/location — computed
+  // live from the actual engine rather than a fixed guess, since the true
+  // difference varies with season and latitude.
+  const elevationDipMinutes = useMemo(() => {
+    if (!(effLoc.elevation && effLoc.elevation > 0)) return 0;
+    const g = { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+    const jd = TimeEngine.calculateJulianDate(g);
+    const withElevation = solarEvents.calculateEvent(jd, effLoc, 'Sunset').data;
+    const seaLevel = solarEvents.calculateEvent(jd, { ...effLoc, elevation: 0, coordinates: { ...effLoc.coordinates, elevation: 0 } }, 'Sunset').data;
+    if (!withElevation || !seaLevel) return 0;
+    return Math.round((withElevation.value - seaLevel.value) * 24 * 60);
+  }, [effLoc, today]);
+
   const [hijriStrategy, setHijriStrategy] = useState<HijriStrategyChoice>(() => readHijriStrategy());
   const [hijriOffset, setHijriOffset] = useState<number>(() => readHijriOffset());
   const [hijriModalOpen, setHijriModalOpen] = useState(false);
   useEffect(() => { writeHijriStrategy(hijriStrategy); }, [hijriStrategy]);
   useEffect(() => { writeHijriOffset(hijriOffset); }, [hijriOffset]);
 
+  // Full current UTC instant — NOT `today`'s local calendar-day fields. The
+  // Hijri day count and the moon's phase are both anchored to real elapsed
+  // time since an astronomical event, so they need the true "now", not the
+  // browser's local calendar day. For a timezone ahead of UTC (like IST),
+  // grabbing the local day number (e.g. "16") and handing it to an engine
+  // that treats {year,month,day} as 0h UTC used to silently fast-forward
+  // the date by several hours every evening — enough to occasionally tip
+  // the Hijri day over a full day early. Prayer-time search below is left
+  // on `today` (local calendar day) deliberately: that's a same-civil-day
+  // event search, not an elapsed-time count, and it already has its own
+  // yesterday/pre-Fajr handling built around the local calendar day.
+  const nowUTC = useMemo(() => {
+    const n = new Date();
+    return { year: n.getUTCFullYear(), month: n.getUTCMonth() + 1, day: n.getUTCDate(), hour: n.getUTCHours(), minute: n.getUTCMinutes(), second: n.getUTCSeconds() };
+  }, []);
+
   const hijriLabel = useMemo(() => {
     try {
-      const h = hijriEngine.gregorianToHijri({ year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() }, hijriStrategy, hijriOffset).data;
+      const h = hijriEngine.gregorianToHijri(nowUTC, hijriStrategy, hijriOffset).data;
       return h ? `${h.day} ${h.monthName} ${h.year} AH` : null;
     } catch { return null; }
-  }, [today, hijriStrategy, hijriOffset]);
+  }, [nowUTC, hijriStrategy, hijriOffset]);
   const gregLabel = useMemo(() => new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: tz }).format(today), [today, tz]);
 
   // Tonight's moon — same astronomy-engine data source as the full Moon page.
   const moonData = useMemo(() => astronomyService.getDailyAstronomy(
-    effLoc, { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() },
+    effLoc, nowUTC,
     { calculationMethod: method, hijriStrategy, hijriOffsetDays: hijriOffset },
-  ), [effLoc, method, today, hijriStrategy, hijriOffset]);
+  ), [effLoc, method, nowUTC, hijriStrategy, hijriOffset]);
   const moonPhase = moonData.moon?.phase;
   const moonIllum = moonPhase ? Math.round(moonPhase.illuminatedFraction * 100) : null;
   const moonAge = moonPhase?.ageDays ?? null;
@@ -268,6 +301,20 @@ export function PrayerHome() {
                           </Caption>
                           <Caption variant="secondary" className="text-[11px] block mt-1.5 leading-tight text-[var(--text-secondary)]">Asr's time differs by the shadow-length criterion: most schools use 1× the object's height (Standard); the Hanafi school uses 2×.</Caption>
                         </div>
+                      )}
+                      {id === 'maghrib' && (
+                        <details className="mt-1.5 group">
+                          <summary
+                            className="text-[11px] font-semibold cursor-pointer select-none list-none inline-flex items-center gap-1"
+                            style={{ color: 'var(--primary)' }}
+                          >
+                            <Icon name="Info" size={12} />
+                            Why this time?
+                          </summary>
+                          <Caption variant="secondary" className="text-[11px] block mt-1.5 leading-tight text-[var(--text-secondary)]">
+                            Maghrib begins the moment the sun's disc has fully set — not a fixed clock offset. Above sea level, the horizon dips, so the sun stays visible a little longer than it would at the coast: at {a.locationName}'s elevation (~{a.elevation}m), that adds about {elevationDipMinutes} minute{elevationDipMinutes === 1 ? '' : 's'} today compared to a sea-level calculation. This time uses that real elevation, matching what a local masjid observes rather than a generic sea-level formula.
+                          </Caption>
+                        </details>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 flex-wrap">

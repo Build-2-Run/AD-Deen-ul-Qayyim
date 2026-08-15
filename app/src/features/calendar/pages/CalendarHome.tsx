@@ -79,10 +79,15 @@ export function CalendarHome() {
   const strategy = useMemo(() => readHijriStrategy(), []);
   const offset = useMemo(() => readHijriOffset(), []);
 
+  // Full UTC instant, not the local calendar day: the Hijri day count is an
+  // elapsed-time-since-conjunction figure, so for a timezone ahead of UTC
+  // (e.g. IST) grabbing the local day number and feeding it to an engine
+  // that assumes 0h UTC used to silently roll the date forward hours early.
   const hijriToday = useMemo(() => {
     try {
+      const n = new Date();
       return hijriEngine.gregorianToHijri(
-        { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() },
+        { year: n.getUTCFullYear(), month: n.getUTCMonth() + 1, day: n.getUTCDate(), hour: n.getUTCHours(), minute: n.getUTCMinutes(), second: n.getUTCSeconds() },
         strategy,
         offset,
       ).data;

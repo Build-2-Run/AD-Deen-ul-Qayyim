@@ -81,14 +81,19 @@ export function effectiveMethod(id: string, settings: SettingsMap): CalculationM
 }
 
 /**
- * The location used for calculation. Standard timetables compute sunrise/sunset at
- * the SEA-LEVEL horizon, so we default the elevation (horizon dip) to 0 and only
- * apply a value when the user explicitly sets an elevation override. This keeps the
- * app's times in line with published almanacs; the location's true geographic
- * elevation is still available on `loc` for display/education.
+ * The location used for calculation. Sunrise/sunset depend on the observer's real
+ * elevation (a higher horizon-dip means the sun stays visible a little longer) —
+ * so this uses the location's true geographic elevation by default, and only
+ * overrides it when the user explicitly sets one in settings. An earlier version
+ * of this defaulted elevation to 0 to match generic global prayer-time apps, but
+ * for a site anchored to one real, mountainous location (Srinagar, ~1585m) that
+ * consistently put Maghrib several minutes earlier than local reality — verified
+ * against Srinagar's masjid-announced time, which lines up with the elevation-
+ * corrected calculation, not the sea-level one.
  */
 export function effectiveLocation(loc: ObserverLocation, id: string, settings: SettingsMap): ObserverLocation {
   const o = settings[id] ?? {};
-  const elevation = o.elevation ?? 0;
+  const realElevation = loc.elevation ?? loc.coordinates.elevation ?? 0;
+  const elevation = o.elevation ?? realElevation;
   return { ...loc, elevation, coordinates: { ...loc.coordinates, elevation } };
 }

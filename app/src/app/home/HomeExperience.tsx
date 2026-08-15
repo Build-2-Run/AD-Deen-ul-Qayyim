@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, type CSSProperties } from 'react';
+import { useEffect, useRef, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { computeDaySchedule, resolveCurrentNext } from '../../features/prayer/logic/schedule';
 import { readLocation, readMadhhab } from '../../features/astronomy/config/location';
@@ -6,6 +6,48 @@ import { readMethodId, readSettings, effectiveMethod, effectiveLocation, readHij
 import { HijriCalendarEngine } from '../../features/astronomy/engine/math/HijriCalendarEngine';
 
 type Star = { x: number; y: number; r: number; a: number; spd: number; ph: number; warm: boolean };
+
+/**
+ * Fades + slides a section into place the first time it scrolls into view.
+ * One IntersectionObserver per instance is cheap at this section count (a
+ * dozen or so on the page) and keeps each section's reveal independent —
+ * no shared scroll-listener bookkeeping to get wrong.
+ */
+function Reveal({ children, delayMs = 0, className, style }: { children: ReactNode; delayMs?: number; className?: string; style?: CSSProperties }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(28px)',
+        transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${delayMs}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${delayMs}ms`,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 const hijriEngine = new HijriCalendarEngine();
 
@@ -90,8 +132,12 @@ export function HomeExperience() {
     const ishraqStart = schedule.nafl.find((w) => w.key === 'ishraq')?.start ?? null;
     const chashtStart = schedule.nafl.find((w) => w.key === 'duha')?.start ?? null;
 
+    // Full UTC instant, not the local calendar day: the Hijri day count is an
+    // elapsed-time-since-conjunction figure — for a timezone ahead of UTC
+    // (e.g. IST) feeding the local day number into a 0h-UTC-assuming engine
+    // used to silently roll the date forward hours early.
     const hijri = hijriEngine.gregorianToHijri(
-      { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() },
+      { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1, day: now.getUTCDate(), hour: now.getUTCHours(), minute: now.getUTCMinutes(), second: now.getUTCSeconds() },
       readHijriStrategy(),
       readHijriOffset(),
     ).data;
@@ -179,6 +225,27 @@ export function HomeExperience() {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.02); }
         }
+        @keyframes orbDriftA {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(-4%, 3%) scale(1.06); }
+          66% { transform: translate(3%, -2%) scale(0.97); }
+        }
+        @keyframes orbDriftB {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          40% { transform: translate(5%, -4%) scale(0.95); }
+          75% { transform: translate(-3%, 3%) scale(1.05); }
+        }
+        @keyframes orbDriftC {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-3%, -3%) scale(1.08); }
+        }
+        @keyframes bismillahGlow {
+          0%, 100% { text-shadow: 0 4px 80px rgba(212,160,23,0.6), 0 0 200px rgba(212,160,23,0.3); }
+          50% { text-shadow: 0 4px 100px rgba(212,160,23,0.85), 0 0 240px rgba(212,160,23,0.45); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .adq-orb, .adq-bismillah { animation: none !important; }
+        }
         .adq-home-card {
           position: relative;
           overflow: hidden;
@@ -228,7 +295,7 @@ export function HomeExperience() {
         pointerEvents: 'none',
       }}>
         {/* Large emerald orb — top right */}
-        <div style={{
+        <div className="adq-orb" style={{
           position: 'absolute',
           top: '-15%',
           right: '-10%',
@@ -237,10 +304,12 @@ export function HomeExperience() {
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(52,211,153,0.15) 0%, rgba(52,211,153,0.05) 40%, transparent 70%)',
           filter: 'blur(80px)',
+          animation: 'orbDriftA 26s ease-in-out infinite',
+          willChange: 'transform',
         }} />
 
         {/* Gold orb — left center */}
-        <div style={{
+        <div className="adq-orb" style={{
           position: 'absolute',
           top: '20%',
           left: '-15%',
@@ -249,10 +318,12 @@ export function HomeExperience() {
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(212,160,23,0.12) 0%, rgba(212,160,23,0.04) 40%, transparent 70%)',
           filter: 'blur(80px)',
+          animation: 'orbDriftB 32s ease-in-out infinite',
+          willChange: 'transform',
         }} />
 
         {/* Blue orb — bottom center */}
-        <div style={{
+        <div className="adq-orb" style={{
           position: 'absolute',
           bottom: '-20%',
           left: '30%',
@@ -261,6 +332,8 @@ export function HomeExperience() {
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(56,100,220,0.1) 0%, rgba(56,100,220,0.03) 40%, transparent 70%)',
           filter: 'blur(100px)',
+          animation: 'orbDriftC 38s ease-in-out infinite',
+          willChange: 'transform',
         }} />
 
         {/* Small emerald accent — bottom right */}
@@ -333,6 +406,7 @@ export function HomeExperience() {
 
           <div
             dir="rtl"
+            className="adq-bismillah"
             style={{
               fontFamily: 'Amiri, serif',
               fontSize: 62,
@@ -340,6 +414,7 @@ export function HomeExperience() {
               color: '#d4a017',
               textShadow: '0 4px 80px rgba(212,160,23,0.6), 0 0 200px rgba(212,160,23,0.3)',
               marginBottom: 6,
+              animation: 'bismillahGlow 5s ease-in-out infinite',
             }}
           >
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
@@ -555,7 +630,7 @@ export function HomeExperience() {
       </div>
 
       {/* Daily Ayat band */}
-      <div
+      <Reveal
         style={{
           border: '1px solid rgba(212,160,23,0.18)',
           borderRadius: 20,
@@ -612,7 +687,7 @@ export function HomeExperience() {
         >
           وَقُل رَّبِّ زِدۡنِی عِلۡمًا
         </div>
-      </div>
+      </Reveal>
       {/* TODO: wire daily ayat rotation */}
 
       {/* Section divider */}
@@ -632,7 +707,7 @@ export function HomeExperience() {
       </div>
 
       {/* Top row */}
-      <div
+      <Reveal
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
@@ -765,7 +840,7 @@ export function HomeExperience() {
           </div>
         </Link>
         {/* TODO: wire from features/prayer tracker */}
-      </div>
+      </Reveal>
 
       {/* Full width Qur'an card */}
       <div style={{ padding: '0 48px', marginBottom: 20 }}>
@@ -841,7 +916,7 @@ export function HomeExperience() {
       </div>
 
       {/* Bottom row */}
-      <div
+      <Reveal
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
@@ -890,10 +965,10 @@ export function HomeExperience() {
             </div>
           </Link>
         ))}
-      </div>
+      </Reveal>
 
       {/* Hadith band */}
-      <div
+      <Reveal
         style={{
           border: '1px solid rgba(212,160,23,0.18)',
           borderRadius: 20,
@@ -962,7 +1037,7 @@ export function HomeExperience() {
         >
           ١
         </div>
-      </div>
+      </Reveal>
       {/* TODO: wire daily hadith rotation */}
 
       {/* Footer */}

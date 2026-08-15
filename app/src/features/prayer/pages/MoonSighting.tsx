@@ -17,6 +17,8 @@ const ASSET_BASE = import.meta.env.BASE_URL;
 const SUN_IMG = `${ASSET_BASE}assets/sun-3d.jpg`;
 const EARTH_IMG = `${ASSET_BASE}assets/earth-3d.jpg`;
 const MOON_IMG = `${ASSET_BASE}assets/moon-3d.jpg`;
+const MOON_ARC_PHOTO = `${ASSET_BASE}assets/moon/moon-phase-arc.jpg`;
+const DATE_STALK_PHOTO = `${ASSET_BASE}assets/moon/date-stalk.jpg`;
 
 /**
  * SVG terminator path for the moon's dark shadow, drawn over the lit disc.
@@ -119,106 +121,55 @@ function InsightNote({ label, children }: { label: string; children: ReactNode }
   );
 }
 
-// Phase steps for the month-arc illustration below: ages spread across the
-// synodic month, skipping true new moon (invisible) at both ends — same
-// convention as composite "lunation arc" photos of a full month's phases.
-const ARC_STEPS = 15;
-const ARC_AGES = Array.from({ length: ARC_STEPS }, (_, i) => {
-  const t = i / (ARC_STEPS - 1);
-  return 1.3 + t * (SYNODIC - 2.6);
-});
-
-function illumFractionForAge(age: number): number {
-  return (1 - Math.cos((2 * Math.PI * age) / SYNODIC)) / 2;
-}
 
 /**
  * A month's worth of moon phases traced as an arc, paired with the dried,
- * curved date-stalk (al-ʿurjūn al-qadīm) from Yā-Sīn 36:39 — the same
- * composition style as the well-known "lunation arc" composite photos, but
- * built from scratch here rather than reusing one of those images directly:
- * they're uncredited/unlicensed as far as I could verify, so republishing one
- * on a live public site risks using someone else's copyrighted photograph
- * without permission.
+ * curved date-stalk (al-ʿurjūn al-qadīm) from Yā-Sīn 36:39.
  *
- * The moon arc is not decorative — each disc is rendered with the same
- * `moonShadowPath` geometry as the live moon disc elsewhere on this page, at
- * a real illuminated fraction for that day of the month. The date-stalk
- * shape below it is a labelled illustration (not a photograph), since a web
- * search didn't turn up a verifiably-labelled photo of this specific
- * botanical form accurate enough to present as authentic.
+ * Both photos were supplied by the site owner as their own work. The source
+ * image's baked-in captions framed this as a "Lunar Analemma... Annual
+ * Trajectory" tied to the solstices — that's a different, real phenomenon
+ * (the S-curve the Moon traces at a fixed clock time over about a year) and
+ * doesn't describe what 36:39 is actually talking about, which is the
+ * Moon's monthly waxing/waning cycle. The images here are cropped to drop
+ * that misleading title band; the captions below state the correct,
+ * monthly framing instead.
  */
 function DateStalkMoonComparison() {
   return (
     <div style={NESTED_CARD_STYLE}>
       <div className="text-[11px] font-bold uppercase tracking-wider text-[#6ee7b7] mb-1">
-        The simile, traced
+        The simile, pictured
       </div>
       <div className="text-[11px] text-white/45 mb-3 leading-relaxed">
-        One lunar month's phases, arced — each disc a real illuminated fraction, not a photo composite.
+        One lunar month's phases, traced as an arc — new to full and back to crescent again.
       </div>
 
-      {/* Moon-phase arc */}
-      <div
-        className="relative w-full overflow-hidden rounded-xl"
-        style={{ height: 150, background: 'radial-gradient(ellipse at 50% 120%, rgba(245,199,93,0.06), transparent 60%), #050a14' }}
-      >
-        {ARC_AGES.map((age, i) => {
-          const t = i / (ARC_STEPS - 1);
-          const angle = Math.PI * t;
-          const leftPct = 4 + t * 92;
-          const topPct = 74 - 56 * Math.sin(angle);
-          const illum = Math.round(illumFractionForAge(age) * 100);
-          const waxing = (((age % SYNODIC) + SYNODIC) % SYNODIC) < SYNODIC / 2;
-          return (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                left: `${leftPct}%`,
-                top: `${topPct}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <MoonDisc size={26} illum={illum} waxing={waxing} glow="drop-shadow(0 0 4px rgba(230,235,255,0.35))" />
-            </div>
-          );
-        })}
-      </div>
+      {/* Moon-phase arc (real photo composite) */}
+      <figure className="m-0">
+        <img
+          src={MOON_ARC_PHOTO}
+          alt="A composite of the Moon's phases across one lunar month, traced as an arc against a mountain skyline"
+          className="w-full rounded-xl block"
+          style={{ objectFit: 'cover' }}
+        />
+      </figure>
 
       <div className="flex items-center justify-center my-2">
         <span className="text-white/30 text-lg">≈</span>
       </div>
 
-      {/* Date-stalk illustration, same width and a matching gentle curve */}
+      {/* Date-stalk photo, same width and a matching gentle curve */}
       <figure className="m-0">
-        <svg viewBox="0 0 1000 160" width="100%" height={110} style={{ display: 'block' }} preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="urjunGradWide" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8a5f3c" />
-              <stop offset="50%" stopColor="#c99a63" />
-              <stop offset="100%" stopColor="#8a5f3c" />
-            </linearGradient>
-          </defs>
-          {/* Curving fruit-stalk (raceme): thin, woody, bent along the same broad arc as the moon phases above */}
-          <path
-            d="M 40 132 C 140 40, 340 8, 500 6 C 660 8, 860 40, 960 132 C 940 108, 760 60, 500 58 C 240 60, 60 108, 40 132 Z"
-            fill="url(#urjunGradWide)"
-            stroke="#6b4527"
-            strokeWidth="1.2"
-          />
-          {/* Nubs along the stalk marking where individual dates once attached */}
-          {Array.from({ length: 17 }, (_, i) => {
-            const t = i / 16;
-            const angle = Math.PI * t;
-            const x = 60 + t * 880;
-            const y = 118 - 88 * Math.sin(angle);
-            return <circle key={i} cx={x} cy={y} r={5.5} fill="#5c3c22" opacity={0.7} />;
-          })}
-        </svg>
-        <figcaption className="text-center mt-1">
-          <span className="block text-xs font-semibold text-white/85">Al-ʿUrjūn al-Qadīm — illustration, not a photograph</span>
-          <span className="block text-[10px] text-white/45 mt-0.5">the dried, curved fruit-stalk, traced along the same arc as the phases above</span>
+        <img
+          src={DATE_STALK_PHOTO}
+          alt="A dried, curved date-palm fruit stalk (al-ʿUrjūn al-Qadīm) resting on a wooden surface"
+          className="w-full rounded-xl block"
+          style={{ objectFit: 'cover' }}
+        />
+        <figcaption className="text-center mt-1.5">
+          <span className="block text-xs font-semibold text-white/85">Al-ʿUrjūn al-Qadīm — the old, dried date-stalk</span>
+          <span className="block text-[10px] text-white/45 mt-0.5">its curve echoes the arc the Moon's phases trace across one month</span>
         </figcaption>
       </figure>
     </div>
