@@ -21,6 +21,7 @@ import { Book, Sun, Calendar, History, Users, User, TreePine, FlaskConical, Star
 
 import { QurbaniHome } from './features/qurbani/pages/QurbaniHome';
 import { TafsirHome } from './features/tafsir/pages/TafsirHome';
+import { CalendarHome } from './features/calendar/pages/CalendarHome';
 
 export async function bootstrap(): Promise<void> {
   console.log('[Bootstrap] Initializing ADQ Platform...');
@@ -92,7 +93,9 @@ export async function bootstrap(): Promise<void> {
           ? React.createElement(QurbaniHome)
           : p.id === 'tafsir'
             ? React.createElement(TafsirHome)
-            : React.createElement(ComingSoon, { title: p.name! })
+            : p.id === 'calendar'
+              ? React.createElement(CalendarHome)
+              : React.createElement(ComingSoon, { title: p.name! })
       }
     ]);
   });

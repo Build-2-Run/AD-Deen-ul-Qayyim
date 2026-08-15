@@ -119,65 +119,108 @@ function InsightNote({ label, children }: { label: string; children: ReactNode }
   );
 }
 
+// Phase steps for the month-arc illustration below: ages spread across the
+// synodic month, skipping true new moon (invisible) at both ends — same
+// convention as composite "lunation arc" photos of a full month's phases.
+const ARC_STEPS = 15;
+const ARC_AGES = Array.from({ length: ARC_STEPS }, (_, i) => {
+  const t = i / (ARC_STEPS - 1);
+  return 1.3 + t * (SYNODIC - 2.6);
+});
+
+function illumFractionForAge(age: number): number {
+  return (1 - Math.cos((2 * Math.PI * age) / SYNODIC)) / 2;
+}
+
 /**
- * Illustrative side-by-side comparison for Yā-Sīn 36:39's simile: the dried,
- * curved date-stalk (al-ʿurjūn al-qadīm) vs. the waning crescent moon.
+ * A month's worth of moon phases traced as an arc, paired with the dried,
+ * curved date-stalk (al-ʿurjūn al-qadīm) from Yā-Sīn 36:39 — the same
+ * composition style as the well-known "lunation arc" composite photos, but
+ * built from scratch here rather than reusing one of those images directly:
+ * they're uncredited/unlicensed as far as I could verify, so republishing one
+ * on a live public site risks using someone else's copyrighted photograph
+ * without permission.
  *
- * The date-stalk shape is a labelled illustration (not a photograph) — a web
- * search for a verifiably-labelled photo of this specific botanical form
- * (the emptied fruit-raceme after it dries and curls) didn't turn up a source
- * accurate enough to present as authentic, so this draws the described shape
- * instead of risking a mislabeled stock image. The crescent on the right is
- * not illustrative — it's rendered with the same `moonShadowPath` geometry
- * used for the real moon disc elsewhere on this page, at a thin waning
- * fraction, so its curve is the same one the astronomy engine computes.
+ * The moon arc is not decorative — each disc is rendered with the same
+ * `moonShadowPath` geometry as the live moon disc elsewhere on this page, at
+ * a real illuminated fraction for that day of the month. The date-stalk
+ * shape below it is a labelled illustration (not a photograph), since a web
+ * search didn't turn up a verifiably-labelled photo of this specific
+ * botanical form accurate enough to present as authentic.
  */
 function DateStalkMoonComparison() {
   return (
     <div style={NESTED_CARD_STYLE}>
-      <div className="text-[11px] font-bold uppercase tracking-wider text-[#6ee7b7] mb-3">
-        The simile, side by side
+      <div className="text-[11px] font-bold uppercase tracking-wider text-[#6ee7b7] mb-1">
+        The simile, traced
       </div>
-      <div className="flex items-center justify-center gap-6 sm:gap-10 flex-wrap py-2">
-        <figure className="flex flex-col items-center gap-2 m-0">
-          <svg viewBox="0 0 120 120" width={112} height={112} style={{ display: 'block' }}>
-            <defs>
-              <linearGradient id="urjunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#d9b382" />
-                <stop offset="55%" stopColor="#b8865a" />
-                <stop offset="100%" stopColor="#8a5f3c" />
-              </linearGradient>
-            </defs>
-            {/* Curved, tapering fruit-stalk (raceme): wide woody base narrowing to a bent, thin tip */}
-            <path
-              d="M 30 96 C 26 76, 34 54, 52 38 C 70 22, 88 20, 96 26 C 90 24, 76 28, 64 40 C 46 56, 38 76, 40 92 C 41 98, 35 100, 30 96 Z"
-              fill="url(#urjunGrad)"
-              stroke="#6b4527"
-              strokeWidth="0.75"
-            />
-            {/* Small nubs along the inner curve marking where individual dates once attached */}
-            {[
-              [46, 84], [52, 72], [60, 60], [70, 49], [80, 40], [88, 32],
-            ].map(([x, y], i) => (
-              <circle key={i} cx={x} cy={y} r={2.1} fill="#5c3c22" opacity={0.75} />
-            ))}
-          </svg>
-          <figcaption className="text-center">
-            <span className="block text-xs font-semibold text-white/85">Al-ʿUrjūn al-Qadīm</span>
-            <span className="block text-[10px] text-white/45 mt-0.5">Illustration — the dried, curved fruit-stalk</span>
-          </figcaption>
-        </figure>
-
-        <span className="text-white/30 text-xl">≈</span>
-
-        <figure className="flex flex-col items-center gap-2 m-0">
-          <MoonDisc size={96} illum={9} waxing={false} glow="drop-shadow(0 0 18px rgba(200,210,255,0.25))" />
-          <figcaption className="text-center">
-            <span className="block text-xs font-semibold text-white/85">Hilāl (waning crescent)</span>
-            <span className="block text-[10px] text-white/45 mt-0.5">Rendered from the same crescent geometry as the live moon above</span>
-          </figcaption>
-        </figure>
+      <div className="text-[11px] text-white/45 mb-3 leading-relaxed">
+        One lunar month's phases, arced — each disc a real illuminated fraction, not a photo composite.
       </div>
+
+      {/* Moon-phase arc */}
+      <div
+        className="relative w-full overflow-hidden rounded-xl"
+        style={{ height: 150, background: 'radial-gradient(ellipse at 50% 120%, rgba(245,199,93,0.06), transparent 60%), #050a14' }}
+      >
+        {ARC_AGES.map((age, i) => {
+          const t = i / (ARC_STEPS - 1);
+          const angle = Math.PI * t;
+          const leftPct = 4 + t * 92;
+          const topPct = 74 - 56 * Math.sin(angle);
+          const illum = Math.round(illumFractionForAge(age) * 100);
+          const waxing = (((age % SYNODIC) + SYNODIC) % SYNODIC) < SYNODIC / 2;
+          return (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${leftPct}%`,
+                top: `${topPct}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <MoonDisc size={26} illum={illum} waxing={waxing} glow="drop-shadow(0 0 4px rgba(230,235,255,0.35))" />
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-center my-2">
+        <span className="text-white/30 text-lg">≈</span>
+      </div>
+
+      {/* Date-stalk illustration, same width and a matching gentle curve */}
+      <figure className="m-0">
+        <svg viewBox="0 0 1000 160" width="100%" height={110} style={{ display: 'block' }} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="urjunGradWide" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8a5f3c" />
+              <stop offset="50%" stopColor="#c99a63" />
+              <stop offset="100%" stopColor="#8a5f3c" />
+            </linearGradient>
+          </defs>
+          {/* Curving fruit-stalk (raceme): thin, woody, bent along the same broad arc as the moon phases above */}
+          <path
+            d="M 40 132 C 140 40, 340 8, 500 6 C 660 8, 860 40, 960 132 C 940 108, 760 60, 500 58 C 240 60, 60 108, 40 132 Z"
+            fill="url(#urjunGradWide)"
+            stroke="#6b4527"
+            strokeWidth="1.2"
+          />
+          {/* Nubs along the stalk marking where individual dates once attached */}
+          {Array.from({ length: 17 }, (_, i) => {
+            const t = i / 16;
+            const angle = Math.PI * t;
+            const x = 60 + t * 880;
+            const y = 118 - 88 * Math.sin(angle);
+            return <circle key={i} cx={x} cy={y} r={5.5} fill="#5c3c22" opacity={0.7} />;
+          })}
+        </svg>
+        <figcaption className="text-center mt-1">
+          <span className="block text-xs font-semibold text-white/85">Al-ʿUrjūn al-Qadīm — illustration, not a photograph</span>
+          <span className="block text-[10px] text-white/45 mt-0.5">the dried, curved fruit-stalk, traced along the same arc as the phases above</span>
+        </figcaption>
+      </figure>
     </div>
   );
 }

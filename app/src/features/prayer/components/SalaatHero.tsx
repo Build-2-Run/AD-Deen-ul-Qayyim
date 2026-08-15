@@ -10,6 +10,7 @@ interface SalaatHeroProps {
   nextTime: string;
   nextIsTomorrow: boolean;
   countdownText: string;
+  onHijriClick?: () => void;
 }
 
 const NAV_ITEMS: Array<{ emoji: string; label: string; path: string }> = [
@@ -20,7 +21,7 @@ const NAV_ITEMS: Array<{ emoji: string; label: string; path: string }> = [
 ];
 
 export function SalaatHero({
-  gregLabel, hijriLabel, locationName, currentLabel, currentTime, nextLabel, nextTime, nextIsTomorrow, countdownText,
+  gregLabel, hijriLabel, locationName, currentLabel, currentTime, nextLabel, nextTime, nextIsTomorrow, countdownText, onHijriClick,
 }: SalaatHeroProps) {
   const navigate = useNavigate();
 
@@ -56,7 +57,26 @@ export function SalaatHero({
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 12, color: '#ffffff' }}>{gregLabel}</div>
-          {hijriLabel && <div style={{ color: '#f5c75d', fontWeight: 600, fontSize: 15, marginTop: 4 }}>{hijriLabel}</div>}
+          {hijriLabel && (
+            onHijriClick ? (
+              <button
+                type="button"
+                onClick={onHijriClick}
+                style={{
+                  color: '#f5c75d', fontWeight: 600, fontSize: 15, marginTop: 4,
+                  background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                }}
+                aria-label="Change Hijri date method"
+                title="Change Hijri date method"
+              >
+                {hijriLabel}
+                <span style={{ fontSize: 10, opacity: 0.7 }}>⚙</span>
+              </button>
+            ) : (
+              <div style={{ color: '#f5c75d', fontWeight: 600, fontSize: 15, marginTop: 4 }}>{hijriLabel}</div>
+            )
+          )}
           <div style={{ color: '#ffffff', fontSize: 12, marginTop: 8 }}>{locationName}</div>
         </div>
       </div>

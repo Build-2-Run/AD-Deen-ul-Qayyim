@@ -7,9 +7,13 @@ import { Icon } from '../../../design/icons/Icon';
 import { FiqhStatusBadge } from '../../../platform/fiqh/FiqhStatusBadge';
 
 import { readLocation, readMadhhab, writeMadhhab, type Madhhab } from '../../astronomy/config/location';
-import { readMethodId, readSettings, effectiveMethod, effectiveLocation, readHijriStrategy, readHijriOffset } from '../../astronomy/config/settings';
+import {
+  readMethodId, readSettings, effectiveMethod, effectiveLocation,
+  readHijriStrategy, writeHijriStrategy, readHijriOffset, writeHijriOffset, type HijriStrategyChoice,
+} from '../../astronomy/config/settings';
 import { HijriCalendarEngine } from '../../astronomy/engine/math/HijriCalendarEngine';
 import { astronomyService } from '../../astronomy/service/AstronomyPlatform';
+import { HijriStrategyModal } from '../../astronomy/components/HijriStrategyModal';
 import { computeDaySchedule, resolveCurrentNext } from '../logic/schedule';
 import { SunPathDiagram } from '../components/SunPathDiagram';
 import { MoonCard } from '../components/MoonCard';
@@ -74,8 +78,11 @@ export function PrayerHome() {
   const yesterdaySchedule = useMemo(() => computeDaySchedule(yesterday, effLoc, method, madhhab), [yesterday, effLoc, method, madhhab]);
   const tz = location.timezone;
 
-  const hijriStrategy = useMemo(() => readHijriStrategy(), []);
-  const hijriOffset = useMemo(() => readHijriOffset(), []);
+  const [hijriStrategy, setHijriStrategy] = useState<HijriStrategyChoice>(() => readHijriStrategy());
+  const [hijriOffset, setHijriOffset] = useState<number>(() => readHijriOffset());
+  const [hijriModalOpen, setHijriModalOpen] = useState(false);
+  useEffect(() => { writeHijriStrategy(hijriStrategy); }, [hijriStrategy]);
+  useEffect(() => { writeHijriOffset(hijriOffset); }, [hijriOffset]);
 
   const hijriLabel = useMemo(() => {
     try {
@@ -162,6 +169,7 @@ export function PrayerHome() {
         <SalaatHero
           gregLabel={gregLabel}
           hijriLabel={hijriLabel}
+          onHijriClick={() => setHijriModalOpen(true)}
           locationName={location.name}
           currentLabel={currentWindow ? prayerLabel(currentWindow.key) : null}
           currentTime={currentWindow ? fmtTime(currentWindow.start, tz) : null}
@@ -388,6 +396,15 @@ export function PrayerHome() {
           </Caption>
         </section>
       </ContentContainer>
+
+      <HijriStrategyModal
+        open={hijriModalOpen}
+        strategy={hijriStrategy}
+        offsetDays={hijriOffset}
+        onClose={() => setHijriModalOpen(false)}
+        onChangeStrategy={setHijriStrategy}
+        onChangeOffset={setHijriOffset}
+      />
     </PageContainer>
   );
 }
