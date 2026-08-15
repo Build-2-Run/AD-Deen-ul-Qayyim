@@ -7,7 +7,7 @@ import { Icon } from '../../../design/icons/Icon';
 import { FiqhStatusBadge } from '../../../platform/fiqh/FiqhStatusBadge';
 
 import { readLocation, readMadhhab, writeMadhhab, type Madhhab } from '../../astronomy/config/location';
-import { readMethodId, readSettings, effectiveMethod, effectiveLocation } from '../../astronomy/config/settings';
+import { readMethodId, readSettings, effectiveMethod, effectiveLocation, readHijriStrategy, readHijriOffset } from '../../astronomy/config/settings';
 import { HijriCalendarEngine } from '../../astronomy/engine/math/HijriCalendarEngine';
 import { astronomyService } from '../../astronomy/service/AstronomyPlatform';
 import { computeDaySchedule, resolveCurrentNext } from '../logic/schedule';
@@ -74,19 +74,22 @@ export function PrayerHome() {
   const yesterdaySchedule = useMemo(() => computeDaySchedule(yesterday, effLoc, method, madhhab), [yesterday, effLoc, method, madhhab]);
   const tz = location.timezone;
 
+  const hijriStrategy = useMemo(() => readHijriStrategy(), []);
+  const hijriOffset = useMemo(() => readHijriOffset(), []);
+
   const hijriLabel = useMemo(() => {
     try {
-      const h = hijriEngine.gregorianToHijri({ year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() }, 'Astronomical').data;
+      const h = hijriEngine.gregorianToHijri({ year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() }, hijriStrategy, hijriOffset).data;
       return h ? `${h.day} ${h.monthName} ${h.year} AH` : null;
     } catch { return null; }
-  }, [today]);
+  }, [today, hijriStrategy, hijriOffset]);
   const gregLabel = useMemo(() => new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: tz }).format(today), [today, tz]);
 
   // Tonight's moon — same astronomy-engine data source as the full Moon page.
   const moonData = useMemo(() => astronomyService.getDailyAstronomy(
     effLoc, { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() },
-    { calculationMethod: method, hijriStrategy: 'Astronomical' },
-  ), [effLoc, method, today]);
+    { calculationMethod: method, hijriStrategy, hijriOffsetDays: hijriOffset },
+  ), [effLoc, method, today, hijriStrategy, hijriOffset]);
   const moonPhase = moonData.moon?.phase;
   const moonIllum = moonPhase ? Math.round(moonPhase.illuminatedFraction * 100) : null;
   const moonAge = moonPhase?.ageDays ?? null;

@@ -1,17 +1,22 @@
-import { useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { Suspense, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Stars, useTexture } from '@react-three/drei';
+import * as THREE from 'three';
 import { Body, Caption } from '../../../design/typography/BasicText';
 import { ArabicText } from '../../../design/typography/ArabicText';
 import { Icon } from '../../../design/icons/Icon';
 
 import { astronomyService } from '../../astronomy/service/AstronomyPlatform';
 import { readLocation } from '../../astronomy/config/location';
-import { readMethodId, readSettings, effectiveMethod, effectiveLocation } from '../../astronomy/config/settings';
+import { readMethodId, readSettings, effectiveMethod, effectiveLocation, readHijriStrategy, readHijriOffset } from '../../astronomy/config/settings';
 
 const SYNODIC = 29.53059;
 
-const SUN_IMG = '/assets/sun-3d.jpg';
-const EARTH_IMG = '/assets/earth-3d.jpg';
+const ASSET_BASE = import.meta.env.BASE_URL;
+const SUN_IMG = `${ASSET_BASE}assets/sun-3d.jpg`;
+const EARTH_IMG = `${ASSET_BASE}assets/earth-3d.jpg`;
+const MOON_IMG = `${ASSET_BASE}assets/moon-3d.jpg`;
 
 /**
  * SVG terminator path for the moon's dark shadow, drawn over the lit disc.
@@ -125,14 +130,107 @@ function CategoryBadge({ label }: { label: string }) {
   );
 }
 
-/** The panoramic 3D orbital canvas: Sun → Earth → orbiting Moon (current phase), with live stats & interactive slider. */
+// Orbit geometry shared by the Moon mesh and the dashed orbit ring.
+// The Sun sits along -X; theta=0 places the Moon on the sun side (new moon,
+// dark near-face toward Earth) and theta=PI places it opposite the Sun (full
+// moon). A small inclination (the Moon's real ~5.14° orbital tilt) is applied
+// so the ring reads as a 3D ellipse rather than a flat circle.
+const ORBIT_RADIUS = 3.2;
+const ORBIT_TILT_RAD = (5.14 * Math.PI) / 180;
+const EARTH_RADIUS = 1.05;
+const MOON_RADIUS = 0.32;
+const SUN_RADIUS = 1.7;
+const SUN_POSITION: [number, number, number] = [-9, 0.4, -1.5];
+
+function moonOrbitPosition(fraction: number): [number, number, number] {
+  const theta = fraction * Math.PI * 2;
+  const localX = ORBIT_RADIUS * Math.cos(theta);
+  const localZ = ORBIT_RADIUS * Math.sin(theta);
+  const y = localZ * Math.sin(ORBIT_TILT_RAD);
+  const z = localZ * Math.cos(ORBIT_TILT_RAD);
+  return [-localX, y, z];
+}
+
+/** Glowing Sun sphere (emissive + its own point light) — the scene's only real light source. */
+function SunMesh() {
+  const texture = useTexture(SUN_IMG);
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame((_, delta) => { if (ref.current) ref.current.rotation.y += delta * 0.02; });
+  return (
+    <group position={SUN_POSITION}>
+      <pointLight color="#fff2d0" intensity={220} distance={60} decay={1.4} />
+      <mesh ref={ref}>
+        <sphereGeometry args={[SUN_RADIUS, 48, 48]} />
+        <meshBasicMaterial map={texture} color="#ffdca0" toneMapped={false} />
+      </mesh>
+      {/* soft glow shell */}
+      <mesh scale={1.35}>
+        <sphereGeometry args={[SUN_RADIUS, 32, 32]} />
+        <meshBasicMaterial color="#ffb545" transparent opacity={0.18} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Textured Earth, lit only by the Sun's point light so day/night falls out naturally. */
+function EarthMesh() {
+  const texture = useTexture(EARTH_IMG);
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame((_, delta) => { if (ref.current) ref.current.rotation.y += delta * 0.06; });
+  return (
+    <mesh ref={ref} position={[0, 0, 0]}>
+      <sphereGeometry args={[EARTH_RADIUS, 64, 64]} />
+      <meshStandardMaterial map={texture} roughness={0.85} metalness={0.05} />
+    </mesh>
+  );
+}
+
+/** Textured Moon positioned on the (approximate) real orbit for the given phase fraction. */
+function MoonMesh({ fraction }: { fraction: number }) {
+  const texture = useTexture(MOON_IMG);
+  const position = useMemo(() => moonOrbitPosition(fraction), [fraction]);
+  return (
+    <mesh position={position}>
+      <sphereGeometry args={[MOON_RADIUS, 48, 48]} />
+      <meshStandardMaterial map={texture} roughness={1} metalness={0} />
+    </mesh>
+  );
+}
+
+/** Dashed ring tracing the Moon's orbital path around Earth. */
+function OrbitRing() {
+  const points = useMemo(() => {
+    const pts: THREE.Vector3[] = [];
+    for (let i = 0; i <= 128; i++) pts.push(new THREE.Vector3(...moonOrbitPosition(i / 128)));
+    return pts;
+  }, []);
+  const geometry = useMemo(() => new THREE.BufferGeometry().setFromPoints(points), [points]);
+  return (
+    <primitive object={new THREE.LineLoop(geometry, new THREE.LineDashedMaterial({ color: '#ffffff', dashSize: 0.18, gapSize: 0.14, transparent: true, opacity: 0.35 }))} onUpdate={(l: THREE.LineLoop) => l.computeLineDistances()} />
+  );
+}
+
+function SceneContent({ fraction }: { fraction: number }) {
+  return (
+    <>
+      <ambientLight intensity={0.06} />
+      <Stars radius={80} depth={40} count={2600} factor={3} fade speed={0.4} />
+      <SunMesh />
+      <EarthMesh />
+      <MoonMesh fraction={fraction} />
+      <OrbitRing />
+    </>
+  );
+}
+
+/** The panoramic 3D orbital scene (WebGL, via react-three-fiber): Sun → Earth → orbiting Moon
+ * with real point-light shading, plus the live stats overlay & interactive slider. */
 function MoonScene({
   illum,
   ageDays,
   solarAngleDeg,
-  waxing,
-  activeFraction,
   isPreviewing,
+  activeFraction,
   onSliderChange,
   onReset,
 }: {
@@ -145,89 +243,37 @@ function MoonScene({
   onSliderChange: (val: number) => void;
   onReset: () => void;
 }) {
-  const stars = useMemo(
-    () => Array.from({ length: 52 }, () => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      size: Math.random() * 1.8 + 1,
-      delay: Math.random() * 3.5,
-    })),
-    [],
-  );
-
-  // Moon position on the tilted orbit around Earth (new = sun side, full = anti-sun).
-  const f = (((ageDays % SYNODIC) + SYNODIC) % SYNODIC) / SYNODIC;
-  const angle = (180 - 360 * f) * (Math.PI / 180);
-  // rx/ry keep the Moon's orbit strictly around Earth with a clean gap from the Sun
-  const rx = 160, ry = 65;
-  const mx = rx * Math.cos(angle);
-  const my = ry * Math.sin(angle);
-
-  const moonD = 48;
+  const fraction = (((ageDays % SYNODIC) + SYNODIC) % SYNODIC) / SYNODIC;
 
   return (
-    <div className="adq-orbit-canvas relative overflow-hidden" style={{ height: 400, paddingBottom: 16 }}>
-      {stars.map((s, i) => (
-        <span key={i} className="adq-star" style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.size, height: s.size, animationDelay: `${s.delay}s` }} />
-      ))}
+    <div className="adq-orbit-canvas relative overflow-hidden" style={{ height: 460, paddingBottom: 16 }}>
+      <Canvas
+        camera={{ position: [0.5, 2.6, 8], fov: 45 }}
+        style={{ position: 'absolute', inset: 0 }}
+        gl={{ antialias: true }}
+      >
+        <Suspense fallback={null}>
+          <SceneContent fraction={fraction} />
+        </Suspense>
+        <OrbitControls
+          enablePan={false}
+          minDistance={4.5}
+          maxDistance={16}
+          target={[0, 0, 0]}
+          autoRotate
+          autoRotateSpeed={0.35}
+        />
+      </Canvas>
 
       {/* Card Title */}
-      <div className="absolute top-4 left-5 z-10 font-[family-name:var(--font-heading)] text-sm font-bold text-white/90 tracking-wide">
+      <div className="absolute top-4 left-5 z-10 font-[family-name:var(--font-heading)] text-sm font-bold text-white/90 tracking-wide pointer-events-none">
         3D Solar System &amp; Orbit Alignment
       </div>
 
       {/* Floating stats overlay - Solar Angle ONLY */}
-      <div className="adq-orbit-stats">
+      <div className="adq-orbit-stats pointer-events-none">
         <div className="adq-orbit-stat">Solar Angle<b>{solarAngleDeg != null ? `${Math.round(solarAngleDeg)}°` : '—'}</b></div>
-      </div>
-
-      {/* Sun — local 3D asset */}
-      <div style={{ position: 'absolute', left: 30, top: '44%', width: 130, height: 130, transform: 'translateY(-50%)', borderRadius: '50%', overflow: 'hidden', filter: 'drop-shadow(0 0 35px rgba(255, 180, 50, 0.7))' }}>
-        <img
-          src={SUN_IMG}
-          alt="3D Sun"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: 'scale(1.04)' }}
-        />
-      </div>
-      <span className="absolute text-[10px] uppercase tracking-wider text-[#f5c75d]/80" style={{ left: 78, top: 'calc(44% + 75px)' }}>Sun</span>
-      {/* light ray toward Earth */}
-      <div className="adq-ray" style={{ left: 160, top: '44%', width: 'calc(50% - 235px)' }} />
-
-      {/* Dashed Moon Orbit path around Earth */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '58%',
-          top: '44%',
-          width: rx * 2,
-          height: ry * 2,
-          transform: 'translate(-50%, -50%)',
-          borderRadius: '50%',
-          border: '1.5px dashed rgba(255, 255, 255, 0.5)',
-          boxShadow: '0 0 8px rgba(255, 255, 255, 0.15)',
-          pointerEvents: 'none',
-          zIndex: 2,
-        }}
-      />
-
-      {/* Earth Globe */}
-      <div style={{ position: 'absolute', left: '58%', top: '44%', width: 110, height: 110, transform: 'translate(-50%, -50%)', borderRadius: '50%', overflow: 'hidden', filter: 'drop-shadow(0 0 25px rgba(59, 130, 246, 0.5))' }}>
-        <img
-          src={EARTH_IMG}
-          alt="3D Earth Globe"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transform: 'scale(1.04)' }}
-        />
-      </div>
-      <span className="adq-earth-badge" style={{ top: 'calc(44% + 10px)' }}>You are here</span>
-
-      {/* Moon on the orbit, showing tonight's phase */}
-      <div style={{ position: 'absolute', left: '58%', top: '44%', transform: `translate(calc(-50% + ${mx}px), calc(-50% + ${my}px))`, display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
-        <MoonDisc
-          size={moonD}
-          illum={illum}
-          waxing={waxing}
-        />
-        <span className="text-[10px] uppercase tracking-wider text-white/70 mt-1 whitespace-nowrap">Moon</span>
+        <div className="adq-orbit-stat">Illumination<b>{illum}%</b></div>
       </div>
 
       {/* Interactive Lunar Cycle Slider embedded inside the orbital canvas */}
@@ -264,10 +310,13 @@ export function MoonSighting() {
   const effLoc = useMemo(() => effectiveLocation(location, methodId, settings), [location, methodId, settings]);
   const today = useMemo(() => new Date(), []);
 
+  const hijriStrategy = useMemo(() => readHijriStrategy(), []);
+  const hijriOffset = useMemo(() => readHijriOffset(), []);
+
   const data = useMemo(() => astronomyService.getDailyAstronomy(
     effLoc, { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() },
-    { calculationMethod: method, hijriStrategy: 'Astronomical' },
-  ), [effLoc, method, today]);
+    { calculationMethod: method, hijriStrategy, hijriOffsetDays: hijriOffset },
+  ), [effLoc, method, today, hijriStrategy, hijriOffset]);
 
   const phase = data.moon?.phase;
   const coords = data.moon?.coordinates;

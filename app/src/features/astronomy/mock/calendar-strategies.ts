@@ -51,6 +51,13 @@ export const calendarStrategies: Record<HijriCalendarType, CalendarStrategyConfi
     isAstronomical: false,
     authority: 'Local Islamic Authority'
   },
+  ManualSighting: {
+    id: 'ManualSighting',
+    name: 'Manual sighting (offset)',
+    description: 'Astronomical date shifted by a user-set day offset to match a local moon-sighting committee’s announcement.',
+    isAstronomical: false,
+    authority: 'User-configured offset'
+  },
   Custom: {
     id: 'Custom',
     name: 'Custom User Configuration',

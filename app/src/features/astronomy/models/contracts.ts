@@ -141,7 +141,12 @@ export interface INewMoonEngine {
 }
 
 export interface IHijriCalendarEngine {
-  gregorianToHijri(date: GregorianDate, strategy?: HijriCalendarType): EngineResult<HijriDateResult>;
+  /**
+   * @param offsetDays Only consulted when `strategy === 'ManualSighting'`. Whole-day
+   * adjustment (+/-) applied on top of the astronomical date so the displayed date can
+   * be aligned to a local moon-sighting committee's announcement.
+   */
+  gregorianToHijri(date: GregorianDate, strategy?: HijriCalendarType, offsetDays?: number): EngineResult<HijriDateResult>;
   hijriToGregorian(date: HijriDate, strategy?: HijriCalendarType): EngineResult<GregorianDate>;
 }
 

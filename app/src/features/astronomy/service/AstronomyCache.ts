@@ -25,7 +25,7 @@ export class AstronomyCache {
     const methodKey = cm
       ? `${cm.id}[f:${twilight(cm.fajr)}|i:${twilight(cm.isha)}|mg:${twilight(cm.maghrib)}|mid:${cm.midnight ?? ''}]`
       : 'defaultMethod';
-    const strategyKey = options?.hijriStrategy ?? 'Astronomical';
+    const strategyKey = `${options?.hijriStrategy ?? 'Astronomical'}${options?.hijriStrategy === 'ManualSighting' ? `:${options?.hijriOffsetDays ?? 0}` : ''}`;
     const atmosphereKey = options?.atmosphere
       ? `${options.atmosphere.temperature},${options.atmosphere.pressure}`
       : 'standardAtmo';

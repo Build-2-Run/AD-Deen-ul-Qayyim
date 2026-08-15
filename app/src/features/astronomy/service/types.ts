@@ -30,6 +30,8 @@ export interface DailyAstronomyOptions {
   includeVisibility?: boolean;
   calculationMethod?: CalculationMethod;
   hijriStrategy?: HijriCalendarType;
+  /** Only consulted when hijriStrategy === 'ManualSighting'. See IHijriCalendarEngine. */
+  hijriOffsetDays?: number;
   atmosphere?: AtmosphericConditions;
 }
 

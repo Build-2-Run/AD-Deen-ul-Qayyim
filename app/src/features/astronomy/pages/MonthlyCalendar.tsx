@@ -5,7 +5,7 @@ import { TimeEngine } from '../engine/math/TimeEngine';
 import { astronomyService } from '../service/AstronomyPlatform';
 import type { CalculationMethod, JulianDate, ObserverLocation } from '../models';
 import { readLocation, readMadhhab, type Madhhab } from '../config/location';
-import { readMethodId, readSettings, effectiveMethod, effectiveLocation } from '../config/settings';
+import { readMethodId, readSettings, effectiveMethod, effectiveLocation, readHijriStrategy, readHijriOffset } from '../config/settings';
 import { Icon } from '@/design/icons/Icon';
 
 const engine = new PrayerTimeEngine();
@@ -129,7 +129,7 @@ export const MonthlyCalendar: React.FC = () => {
         const mid = astronomyService.getDailyAstronomy(
           effLoc,
           { year: view.year, month: view.month, day: Math.min(15, total) },
-          { calculationMethod: method, hijriStrategy: 'Astronomical' },
+          { calculationMethod: method, hijriStrategy: readHijriStrategy(), hijriOffsetDays: readHijriOffset() },
         ).hijri;
         if (mid) hijriLabel = `${mid.monthName} ${mid.year}`;
       } catch { /* ignore */ }

@@ -8,8 +8,12 @@ import { ArabicText } from '@/design/typography/ArabicText';
 import { Icon } from '@/design/icons/Icon';
 import { LocationPickerModal } from '../components/LocationPickerModal';
 import { MethodSettingsModal } from '../components/MethodSettingsModal';
+import { HijriStrategyModal } from '../components/HijriStrategyModal';
 import { DEFAULT_LOCATION, LOC_KEY, SAVED_KEY, readJSON, readMadhhab, writeMadhhab, type Madhhab } from '../config/location';
-import { readMethodId, writeMethodId, readSettings, writeSettings, effectiveMethod, effectiveLocation, type SettingsMap } from '../config/settings';
+import {
+  readMethodId, writeMethodId, readSettings, writeSettings, effectiveMethod, effectiveLocation, type SettingsMap,
+  readHijriStrategy, writeHijriStrategy, readHijriOffset, writeHijriOffset, type HijriStrategyChoice,
+} from '../config/settings';
 
 /** A Julian Date is a universal instant; convert to a JS Date. */
 function jdToDate(jd: JulianDate | null | undefined): Date | null {
@@ -33,10 +37,17 @@ export const AstronomyHome: React.FC = () => {
   const [madhhab, setMadhhab] = useState<Madhhab>(() => readMadhhab());
   const [now, setNow] = useState(() => new Date());
   const [methodModalOpen, setMethodModalOpen] = useState(false);
+  const [hijriModalOpen, setHijriModalOpen] = useState(false);
 
   // Calculation method + per-method advanced overrides (persisted).
   const [methodId, setMethodId] = useState<string>(() => readMethodId());
   const [settings, setSettings] = useState<SettingsMap>(() => readSettings());
+
+  // Hijri date method + manual sighting offset (persisted).
+  const [hijriStrategy, setHijriStrategy] = useState<HijriStrategyChoice>(() => readHijriStrategy());
+  const [hijriOffset, setHijriOffset] = useState<number>(() => readHijriOffset());
+  useEffect(() => { writeHijriStrategy(hijriStrategy); }, [hijriStrategy]);
+  useEffect(() => { writeHijriOffset(hijriOffset); }, [hijriOffset]);
 
   // Location (persisted). Changing it recomputes everything for the new place.
   const [location, setLocation] = useState<ObserverLocation>(() => readJSON(LOC_KEY, DEFAULT_LOCATION));
@@ -107,7 +118,7 @@ export const AstronomyHome: React.FC = () => {
     const result = astronomyService.getDailyAstronomy(
       effLoc,
       { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() },
-      { calculationMethod: method, hijriStrategy: 'Astronomical' },
+      { calculationMethod: method, hijriStrategy, hijriOffsetDays: hijriOffset },
     );
     const h = result.hijri;
     const hijriLabel = h ? `${h.day} ${h.monthName} ${h.year} AH` : null;
@@ -115,7 +126,7 @@ export const AstronomyHome: React.FC = () => {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: location.timezone,
     }).format(d);
     return { data: result, hijriLabel, todayLabel };
-  }, [effLoc, method, location.timezone]);
+  }, [effLoc, method, location.timezone, hijriStrategy, hijriOffset]);
 
   const busy = isPending || geolocating;
   const p = data.prayerTimes;
@@ -228,7 +239,14 @@ export const AstronomyHome: React.FC = () => {
                 <Caption className="text-white/70 text-xs mt-1 block">{todayLabel}</Caption>
               </div>
               <div className="text-right shrink-0">
-                {hijriLabel && <div dir="rtl" className="adq-sky-arabic text-2xl md:text-3xl">{hijriLabel}</div>}
+                <button
+                  type="button"
+                  onClick={() => setHijriModalOpen(true)}
+                  className="adq-focus-ring inline-flex items-center gap-1.5 rounded-lg px-1 py-0.5 text-white/85 hover:text-white hover:bg-white/10 transition-colors ml-auto"
+                >
+                  {hijriLabel && <span dir="rtl" className="adq-sky-arabic text-2xl md:text-3xl">{hijriLabel}</span>}
+                  <Icon name="SlidersHorizontal" size={12} className="opacity-70" />
+                </button>
                 {moon && (
                   <div className="flex items-center justify-end gap-1.5 mt-1.5 text-white/75">
                     <Icon name="Moon" size={13} />
@@ -437,6 +455,15 @@ export const AstronomyHome: React.FC = () => {
         onChangeMethod={applyMethod}
         onChangeSettings={applySettings}
         onChangeMadhhab={setMadhhab}
+      />
+
+      <HijriStrategyModal
+        open={hijriModalOpen}
+        strategy={hijriStrategy}
+        offsetDays={hijriOffset}
+        onClose={() => setHijriModalOpen(false)}
+        onChangeStrategy={setHijriStrategy}
+        onChangeOffset={setHijriOffset}
       />
     </div>
   );

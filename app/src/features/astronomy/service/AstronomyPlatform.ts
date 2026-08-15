@@ -142,6 +142,7 @@ export class AstronomyPlatform {
       includeVisibility: options?.includeVisibility ?? true,
       calculationMethod: options?.calculationMethod ?? calculationMethods.find(m => m.id === 'method:mwl')!,
       hijriStrategy: options?.hijriStrategy ?? 'Astronomical',
+      hijriOffsetDays: options?.hijriOffsetDays ?? 0,
       atmosphere: options?.atmosphere
     };
 
@@ -220,7 +221,7 @@ export class AstronomyPlatform {
       try {
         const hijriEngine = this.registry.getEngine('hijriCalendarEngine');
         if (hijriEngine) {
-          payload.hijri = hijriEngine.gregorianToHijri(date, opts.hijriStrategy).data;
+          payload.hijri = hijriEngine.gregorianToHijri(date, opts.hijriStrategy, opts.hijriOffsetDays).data;
         }
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);

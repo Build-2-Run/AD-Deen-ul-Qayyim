@@ -2,7 +2,7 @@ import { useEffect, useRef, useMemo, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { computeDaySchedule, resolveCurrentNext } from '../../features/prayer/logic/schedule';
 import { readLocation, readMadhhab } from '../../features/astronomy/config/location';
-import { readMethodId, readSettings, effectiveMethod, effectiveLocation } from '../../features/astronomy/config/settings';
+import { readMethodId, readSettings, effectiveMethod, effectiveLocation, readHijriStrategy, readHijriOffset } from '../../features/astronomy/config/settings';
 import { HijriCalendarEngine } from '../../features/astronomy/engine/math/HijriCalendarEngine';
 
 type Star = { x: number; y: number; r: number; a: number; spd: number; ph: number; warm: boolean };
@@ -92,7 +92,8 @@ export function HomeExperience() {
 
     const hijri = hijriEngine.gregorianToHijri(
       { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() },
-      'Astronomical',
+      readHijriStrategy(),
+      readHijriOffset(),
     ).data;
     const gregorianDate = new Intl.DateTimeFormat('en-GB', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: tz,

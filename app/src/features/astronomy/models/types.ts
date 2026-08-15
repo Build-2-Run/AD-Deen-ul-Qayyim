@@ -164,6 +164,7 @@ export type HijriCalendarType =
   | 'ISNA'
   | 'MoonsightingCommittee'
   | 'LocalObservation'
+  | 'ManualSighting'
   | 'Custom';
 
 export interface ScientificMetadata {
